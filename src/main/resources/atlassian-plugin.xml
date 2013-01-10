@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<atlassian-plugin key="${project.groupId}.${project.artifactId}"
+	name="${project.name}" plugins-version="2">
+	<plugin-info>
+		<description>${project.description}</description>
+		<version>${project.version}</version>
+		<vendor name="${project.organization.name}" url="${project.organization.url}" />
+		<param name="plugin-icon">images/pluginIcon.png</param>
+		<param name="plugin-logo">images/pluginLogo.png</param>
+	</plugin-info>
+	
+	<!-- add our i18n resource -->
+	<resource type="i18n" name="i18n" location="BlazeMeterBamboo" />
+	
+	<!-- add our web resources -->
+	<web-resource key="BlazeMeterResources" name="BlazeMeterResources">
+		<dependency>com.atlassian.auiplugin:ajs</dependency>
+		<resource type="download" name="BlazeMeterBamboo.css"
+			location="css/BlazeMeterBamboo.css" />
+		<resource type="download" name="BlazeMeterBamboo.js"
+			location="js/BlazeMeterBamboo.js" />
+		<context>atl.general</context>
+	</web-resource>
+
+	<!-- import from the product container -->
+
+	<component-import key="renderer"
+		interface="com.atlassian.bamboo.template.TemplateRenderer" />
+	<servlet key="admin-servlet"
+		class="com.blazemeter.bamboo.plugin.servlet.AdminServlet">
+		<url-pattern>/blazemeter/admin</url-pattern>
+	</servlet>
+
+	<component-import key="pluginSettingsFactory"
+		interface="com.atlassian.sal.api.pluginsettings.PluginSettingsFactory" />
+	<component-import key="transactionTemplate"
+		interface="com.atlassian.sal.api.transaction.TransactionTemplate" />
+
+	<component-import key="applicationProperties"
+		interface="com.atlassian.sal.api.ApplicationProperties" />
+	<template-context-item key="applicationPropertiesContextItem"
+		component-ref="applicationProperties" context-key="applicationProperties"
+		name="Application Properties Context Item" />
+
+	<web-section name="BlazeMeterAdministration" i18n-name-key="blaze-meter-administration.name"
+		key="blaze-meter-administration" location="system.admin" weight="10">
+		<description key="blaze-meter-administration.description">The BlazeMeter Administration Plugin
+		</description>
+		<label key="blaze-meter-administration.label" />
+	</web-section>
+	<web-item name="UserKeySettingsPage" i18n-name-key="user-key-settingspage.name"
+		key="user-key-settingspage" section="system.admin/blaze-meter-administration"
+		weight="10">
+		<description key="user-key-settingspage.description">The User Key Settings page Plugin
+		</description>
+		<label key="user-key-settingspage.label"></label>
+		<link linkId="user-key-settingspage-link">/plugins/servlet/blazemeter/admin</link>
+	</web-item>
+	
+	<!-- Definition for BlazeMeter task plugin -->
+	<taskType key="blazemeter" name="BlazeMeter Test"
+		class="com.blazemeter.bamboo.plugin.BlazeMeterTaskType">
+		<description>Execute the BlazeMeter tests as part of your build
+		</description>
+		<category name="builder" />
+		<category name="test" />
+		<executable key="blazemeter.exec" nameKey="blazemeter.builder.executableName"
+			pathHelpKey="blazemeter.builder.helpPath" />
+		<configuration
+			class="com.blazemeter.bamboo.plugin.configuration.BlazeMeterConfigTask" />
+		<resource type="freemarker" name="edit"
+			location="templates/editConfigTask.ftl" />
+		<resource type="freemarker" name="view"
+			location="templates/viewConfigTask.ftl" />
+		<resource type="download" name="icon" location="images/blazemeter.jpg" />
+	</taskType>
+
+	<!-- Report module definition -->
+	<indexReader key="blazemeterIndexReader"
+		name="Reads BlazeMeter result values from index" class="com.blazemeter.bamboo.plugin.index.BlazeMeterIndexReader">
+		<description>Reads the BlazeMeter result from an index document and
+			populates into build result summary</description>
+	</indexReader>
+	<postBuildIndexWriter key="blazemeterIndexWriter"
+		name="Writes BlazeMeter result values to index" class="com.blazemeter.bamboo.plugin.index.BlazeMeterResultsWriter">
+		<description>Writes the BlazeMeter result to an index document
+		</description>
+	</postBuildIndexWriter>
+
+	<!-- BlazeMeter Report Tab -->
+	<xwork key="blazeMeterReports" name="View BlazeMeter Reports">
+		<package name="blazemeterReportView" extends="buildResultView">
+			<action name="viewBlazeMeterReport"	class="com.blazemeter.bamboo.plugin.ui.ViewBlazeMeterReport">
+				<result name="success" type="freemarker">/templates/viewBlazeMeterTestReport.ftl</result>
+			</action>
+		</package>
+		<package name="blazemeterStatisticsView" extends="buildView">
+			<action name="viewBlazeMeterStatistics"	class="com.blazemeter.bamboo.plugin.ui.ViewBlazeMeterStatistics">
+				<result name="success" type="freemarker">/templates/viewBlazeMeterStatistics.ftl</result>
+			</action>
+		</package>
+	</xwork>
+	
+	<!-- Build Report -->
+	<web-item name="BlazemeterJobReportPage" i18n-name-key="blazemeterJobReport.label"
+		key="blazemeterJobReport" section="chainResults.subMenu/chainResults"
+		weight="80">
+		<description key="blazemeterJobReport.description">Display the BlazeMeter Test Report page</description>
+		<label key="blazemeterJobReport.label" />
+		<link linkId="blazemeterJobReport">/build/result/viewBlazeMeterReport.action?buildKey=${buildKey}&amp;buildNumber=${buildNumber}</link>
+	</web-item>
+	
+	<!-- Job Report -->
+	<web-item name="BlazemeterJobResultsReportPage" i18n-name-key="blazemeterJobReport.name"
+		key="blazemeterJobResultsReport" section="results.subMenu/results"
+		weight="80">
+		<description key="blazemeterJobResultsReport.description">Display the BlazeMeter Statistics page</description>
+		<label key="blazemeterJobResultsReport.label2" />
+		<link linkId="blazemeterJobResultsReport">/build/result/viewBlazeMeterReport.action?buildKey=${buildKey}&amp;buildNumber=${buildNumber}</link>
+	</web-item>
+	
+	<!-- Plan report -->
+	<web-item name="BlazemeterAllJobReportPage" i18n-name-key="blazemeterStatistics.name"
+		key="blazemeterAllJobReport" section="build.subMenu/build" weight="80">
+		<description key="blazemeterJobReport.description">Display the BlazeMeter Test Report page</description>
+		<label key="blazemeterStatistics.name" />
+		<link linkId="blazemeterAllJobReport">/build/viewBlazeMeterStatistics.action?buildKey=${buildKey}</link>
+	</web-item>
+</atlassian-plugin>

@@ -1,0 +1,18 @@
+<html>
+  <head>
+    <title>BlazeMeter Administration</title>
+    <meta name="decorator" content="atl.admin">
+    ${webResourceManager.requireResource("com.blazemeter.bamboo.plugin.BlazeMeterBamboo:BlazeMeterResources")}
+  </head>
+  <body>
+    <form id="blazemeteradmin" class="aui" method="POST">
+      <div class="field-group">
+        <label for="name">${i18n.getText("blazemeter.admin.userkey")}</label>
+        <input type="text" id="userkey" name="userkey" class="text" value="${userkey}">
+      </div>
+      <div class="field-group">
+        <input type="submit" value="Save" class="button">
+      </div>
+    </form>
+  </body>
+</html>
