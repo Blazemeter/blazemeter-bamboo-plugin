@@ -59,8 +59,8 @@ public class ViewBlazeMeterStatistics extends ViewBuild {
     private XYSeriesCollection convertMapToXySeries(List<ResultsSummary> summaries)
     {
         XYSeriesCollection dataset = new XYSeriesCollection();
-        XYSeries s1 = new XYSeries("Error Threshold" + " - " + "Error Threshold");
-        XYSeries s2 = new XYSeries("Response Time" + " - " + "Response Time");
+        XYSeries s1 = new XYSeries("Error Threshold");
+        XYSeries s2 = new XYSeries("Response Time");
 
         for (ResultsSummary summary : summaries) {
             String errThr = summary.getCustomBuildData().get(BlazeMeterConstants.REPORT_ERROR_THRESHOLD);
@@ -113,11 +113,9 @@ public class ViewBlazeMeterStatistics extends ViewBuild {
         
         XYItemRenderer renderer1 = new StandardXYItemRenderer();
         renderer1.setSeriesPaint(0, Color.GREEN);
-        renderer1.setLegendItemLabelGenerator(new StandardXYSeriesLabelGenerator("ResponseTime: {0} {1} {2}"));
         
         XYItemRenderer renderer2 = new StandardXYItemRenderer();
         renderer2.setSeriesPaint(0, Color.BLUE);
-        renderer1.setLegendItemLabelGenerator(new StandardXYSeriesLabelGenerator("Error threshold: {0} {1} {2}"));
         plot.setRenderer(1, renderer1);
         plot.setRenderer(2, renderer2);
         

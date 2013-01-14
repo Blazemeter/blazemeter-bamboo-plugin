@@ -11,7 +11,7 @@ import com.atlassian.bamboo.chains.ChainStageResult;
 import com.atlassian.bamboo.resultsummary.BuildResultsSummary;
 
 public class ViewBlazeMeterReport extends PlanResultsAction {
-	private String sessionKey = "MTM3MTc0";
+	private String sessionKey;
     /**
 	 * 
 	 */
@@ -26,7 +26,7 @@ public class ViewBlazeMeterReport extends PlanResultsAction {
     public String doExecute() throws Exception {
         String result = super.doExecute();
         String buildKey = this.getBuildKey();
-
+        
         if ((this.buildNumber != null) && (this.buildNumber > 0)) {
             this.isJob = true;
             
@@ -48,9 +48,7 @@ public class ViewBlazeMeterReport extends PlanResultsAction {
             
             if (sessionId != null){
             	setSessionId(sessionId);
-            } else {
-    	        setSessionId(sessionKey);
-            }
+            } 
         }
         else {
             this.isJob = false;

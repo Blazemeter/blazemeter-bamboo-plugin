@@ -31,7 +31,7 @@ import com.opensymphony.webwork.dispatcher.json.JSONObject;
 public class BlazemeterApi {
     PrintStream logger = new PrintStream(System.out);
 
-    public static final String APP_KEY = "jnk100x987c06f4e10c4";//tmcbzms4sbnsgb1z0hry
+    public static final String APP_KEY = "bmboo0x98a8w9s4s7c4";
     DefaultHttpClient httpClient;
     BmUrlManager urlManager;
 
@@ -292,7 +292,6 @@ public class BlazemeterApi {
             e.printStackTrace();
         }
         return String.format("https://a.blazemeter.com/api/rest/blazemeter/getTests.json/?app_key=%s&user_key=%s&test_id=all", appKey, userKey);
-//        return String.format("https://a.blazemeter.com/api/rest/blazemeter/getTests.json/?user_key=%s&test_id=all", userKey);
 
     }
 

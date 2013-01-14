@@ -13,7 +13,7 @@
                 <br/>
                 <div class="fullyCentered">
                 ${chart.imageMap}
-<img id="chart" src="${req.contextPath}/chart?filename=${chart.location}" border="0" height="${chart.height}" width="${chart.width}" usemap="${chart.imageMapName}"/>
+<img id="chart" src="${req.contextPath}/chart?filename=${chart.location}" border="0" height="${chart.height}" width="${chart.width}" usemap="${chart.imageMapName}"></img>
                 </div>
             </div>              
         </div>

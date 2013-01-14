@@ -111,20 +111,11 @@
 		<link linkId="blazemeterJobReport">/build/result/viewBlazeMeterReport.action?buildKey=${buildKey}&amp;buildNumber=${buildNumber}</link>
 	</web-item>
 	
-	<!-- Job Report -->
-	<web-item name="BlazemeterJobResultsReportPage" i18n-name-key="blazemeterJobReport.name"
-		key="blazemeterJobResultsReport" section="results.subMenu/results"
-		weight="80">
-		<description key="blazemeterJobResultsReport.description">Display the BlazeMeter Statistics page</description>
-		<label key="blazemeterJobResultsReport.label2" />
-		<link linkId="blazemeterJobResultsReport">/build/result/viewBlazeMeterReport.action?buildKey=${buildKey}&amp;buildNumber=${buildNumber}</link>
-	</web-item>
-	
 	<!-- Plan report -->
-	<web-item name="BlazemeterAllJobReportPage" i18n-name-key="blazemeterStatistics.name"
+	<web-item name="BlazemeterAllJobReportPage" i18n-name-key="blazemeterStatistics.label"
 		key="blazemeterAllJobReport" section="build.subMenu/build" weight="80">
-		<description key="blazemeterJobReport.description">Display the BlazeMeter Test Report page</description>
-		<label key="blazemeterStatistics.name" />
+		<description key="BlazemeterAllJobReportPage.description">Display the BlazeMeter Statistics page</description>
+		<label key="blazemeterStatistics.label" />
 		<link linkId="blazemeterAllJobReport">/build/viewBlazeMeterStatistics.action?buildKey=${buildKey}</link>
 	</web-item>
 </atlassian-plugin>
