@@ -9,13 +9,15 @@ import com.atlassian.bamboo.collections.ActionParametersMap;
 import com.atlassian.bamboo.task.AbstractTaskConfigurator;
 import com.atlassian.bamboo.task.TaskDefinition;
 import com.atlassian.bamboo.utils.error.ErrorCollection;
+import com.atlassian.sal.api.pluginsettings.PluginSettings;
+import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import com.blazemeter.bamboo.plugin.api.BlazeBean;
+import com.blazemeter.bamboo.plugin.servlet.AdminServlet.Config;
 import com.google.common.collect.ImmutableList;
 import com.opensymphony.xwork.TextProvider;
 
 public class BlazeMeterConfigTask extends AbstractTaskConfigurator {
 
-	private final String USER_KEY = "5a8da32f36036f8c29fe";
 	BlazeBean blazeBean;
 	
 	private static final List<String> FIELDS_TO_COPY = ImmutableList.of(BlazeMeterConstants.SETTINGS_SELECTED_TEST_ID,
@@ -27,11 +29,10 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator {
 	private static final List<String> DURATION_LIST = ImmutableList.of("60", "120", "180");
 	
 	private TextProvider textProvider;
-
+	
 	public BlazeMeterConfigTask() {
 		super();
 		blazeBean = new BlazeBean();
-		blazeBean.setUserKey(USER_KEY);		
 	}
 
 	@Override
@@ -39,6 +40,7 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator {
 		super.populateContextForCreate(context);
 		context.put(BlazeMeterConstants.SETTINGS_DATA_FOLDER, BlazeMeterConstants.DEFAULT_SETTINGS_DATA_FOLDER);
 		
+		setSessionId();
 		context.put("testlist", blazeBean.getTests());
 		context.put("durationlist", DURATION_LIST);
 	}
@@ -46,12 +48,16 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator {
 	@Override
 	public void populateContextForEdit(Map<String, Object> context, TaskDefinition taskDefinition) {
 		super.populateContextForEdit(context, taskDefinition);
+
 		taskConfiguratorHelper.populateContextWithConfiguration(context, taskDefinition, FIELDS_TO_COPY);
 		
+		setSessionId();
 		context.put("testlist", blazeBean.getTests());
 		context.put("durationlist", DURATION_LIST);
-
+		
 		context.put(BlazeMeterConstants.SETTINGS_DATA_FOLDER, taskDefinition.getConfiguration().get(BlazeMeterConstants.SETTINGS_DATA_FOLDER));
+		
+		
 	}
 
 	@Override
@@ -70,13 +76,18 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator {
 		final String respUnstable = params.getString(BlazeMeterConstants.SETTINGS_RESPONSE_TIME_UNSTABLE);
 		final String respFail = params.getString(BlazeMeterConstants.SETTINGS_RESPONSE_TIME_FAIL);
 		final String testDuration = params.getString(BlazeMeterConstants.SETTINGS_TEST_DURATION);
-		final String dataFolder = params.getString(BlazeMeterConstants.SETTINGS_DATA_FOLDER);
-		final String mainJMX = params.getString(BlazeMeterConstants.SETTINGS_MAIN_JMX);
+//		final String dataFolder = params.getString(BlazeMeterConstants.SETTINGS_DATA_FOLDER);
+//		final String mainJMX = params.getString(BlazeMeterConstants.SETTINGS_MAIN_JMX);
 
 		if (StringUtils.isEmpty(selectedTest)) {
 			errorCollection.addError(BlazeMeterConstants.SETTINGS_SELECTED_TEST_ID,
 					textProvider.getText("blazemeter.error" + BlazeMeterConstants.SETTINGS_SELECTED_TEST_ID));
 		}
+		if (StringUtils.isEmpty(blazeBean.getUserKey())) {
+			errorCollection.addError(BlazeMeterConstants.SETTINGS_SELECTED_TEST_ID,
+					"Cannot load tests from BlazeMeter server. Invalid user key!");
+		}
+		
 		if (StringUtils.isEmpty(errorUnstable)) {
 			errorCollection.addError(BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_UNSTABLE,
 					textProvider.getText("blazemeter.error." + BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_UNSTABLE));
@@ -128,4 +139,12 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator {
 		this.textProvider = textProvider;
 	}
 
+	public void setSessionId(){
+		final PluginSettingsFactory pluginSettingsFactory = StaticAccessor.getSettingsFactory();
+		PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();	
+		String config = (String) pluginSettings.get(Config.class.getName() + ".userkey");
+		if (config != null){
+			blazeBean.setUserKey(config);
+		} 
+	}
 }

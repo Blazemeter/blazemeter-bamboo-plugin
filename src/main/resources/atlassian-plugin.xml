@@ -75,6 +75,7 @@
 			location="templates/viewConfigTask.ftl" />
 		<resource type="download" name="icon" location="images/blazemeter.jpg" />
 	</taskType>
+	<component key="staticAccessor" class="com.blazemeter.bamboo.plugin.configuration.StaticAccessor" />
 
 	<!-- Report module definition -->
 	<indexReader key="blazemeterIndexReader"
