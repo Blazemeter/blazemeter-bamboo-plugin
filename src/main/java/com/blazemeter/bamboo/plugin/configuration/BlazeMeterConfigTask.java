@@ -53,11 +53,10 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator {
 		
 		setSessionId();
 		context.put("testlist", blazeBean.getTests());
+		
 		context.put("durationlist", DURATION_LIST);
 		
 		context.put(BlazeMeterConstants.SETTINGS_DATA_FOLDER, taskDefinition.getConfiguration().get(BlazeMeterConstants.SETTINGS_DATA_FOLDER));
-		
-		
 	}
 
 	@Override
@@ -79,31 +78,70 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator {
 //		final String dataFolder = params.getString(BlazeMeterConstants.SETTINGS_DATA_FOLDER);
 //		final String mainJMX = params.getString(BlazeMeterConstants.SETTINGS_MAIN_JMX);
 
-		if (StringUtils.isEmpty(selectedTest)) {
-			errorCollection.addError(BlazeMeterConstants.SETTINGS_SELECTED_TEST_ID,
-					textProvider.getText("blazemeter.error" + BlazeMeterConstants.SETTINGS_SELECTED_TEST_ID));
-		}
 		if (StringUtils.isEmpty(blazeBean.getUserKey())) {
 			errorCollection.addError(BlazeMeterConstants.SETTINGS_SELECTED_TEST_ID,
 					"Cannot load tests from BlazeMeter server. Invalid user key!");
+		}
+
+		if (StringUtils.isEmpty(selectedTest)) {
+			errorCollection.addError(BlazeMeterConstants.SETTINGS_SELECTED_TEST_ID,
+					textProvider.getText("blazemeter.error" + BlazeMeterConstants.SETTINGS_SELECTED_TEST_ID));
+		} else {
+			if (!blazeBean.verifyUserKey(blazeBean.getUserKey())){
+				errorCollection.addError(BlazeMeterConstants.SETTINGS_SELECTED_TEST_ID,
+						"Cannot load tests from BlazeMeter server. Invalid user key!");
+			}
 		}
 		
 		if (StringUtils.isEmpty(errorUnstable)) {
 			errorCollection.addError(BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_UNSTABLE,
 					textProvider.getText("blazemeter.error." + BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_UNSTABLE));
+		} else {
+			try{
+				Integer.valueOf(errorUnstable);
+			} catch (NumberFormatException nfe){
+				errorCollection.addError(BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_UNSTABLE,
+						textProvider.getText("blazemeter.error." + BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_UNSTABLE));
+			}
+			
 		}
+		
 		if (StringUtils.isEmpty(errorFail)) {
 			errorCollection.addError(BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_FAIL,
 					textProvider.getText("blazemeter.error." + BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_FAIL));
+		} else {
+			try{
+				Integer.valueOf(errorFail);
+			} catch (NumberFormatException nfe){
+				errorCollection.addError(BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_FAIL,
+						textProvider.getText("blazemeter.error." + BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_FAIL));
+			}
 		}
+		
 		if (StringUtils.isEmpty(respUnstable)) {
 			errorCollection.addError(BlazeMeterConstants.SETTINGS_RESPONSE_TIME_UNSTABLE,
 					textProvider.getText("blazemeter.error." + BlazeMeterConstants.SETTINGS_RESPONSE_TIME_UNSTABLE));
+		} else {
+			try{
+				Integer.valueOf(errorFail);
+			} catch (NumberFormatException nfe){
+				errorCollection.addError(BlazeMeterConstants.SETTINGS_RESPONSE_TIME_UNSTABLE,
+						textProvider.getText("blazemeter.error." + BlazeMeterConstants.SETTINGS_RESPONSE_TIME_UNSTABLE));
+			}
 		}
+		
 		if (StringUtils.isEmpty(respFail)) {
 			errorCollection.addError(BlazeMeterConstants.SETTINGS_RESPONSE_TIME_FAIL,
 					textProvider.getText("blazemeter.error." + BlazeMeterConstants.SETTINGS_RESPONSE_TIME_FAIL));
+		} else {
+			try{
+				Integer.valueOf(errorFail);
+			} catch (NumberFormatException nfe){
+				errorCollection.addError(BlazeMeterConstants.SETTINGS_RESPONSE_TIME_FAIL,
+						textProvider.getText("blazemeter.error." + BlazeMeterConstants.SETTINGS_RESPONSE_TIME_FAIL));
+			}
 		}
+		
 		if (StringUtils.isEmpty(testDuration)) {
 			errorCollection.addError(BlazeMeterConstants.SETTINGS_TEST_DURATION,
 					textProvider.getText("blazemeter.error." + BlazeMeterConstants.SETTINGS_TEST_DURATION));

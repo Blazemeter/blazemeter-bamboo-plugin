@@ -1,4 +1,4 @@
-[@ww.select cssClass="builderSelectWidget" labelKey='blazemeter.test' name='selectedtest' list='testlist' required='true'/]
+[@ww.select cssClass="builderSelectWidget" labelKey='blazemeter.test' name='selectedtest' list='testlist' required='true' emptyOption='true'/]
 [@ww.textfield labelKey="blazemeter.errorunstable" name="thr_unstable" required='true'/]
 [@ww.textfield labelKey="blazemeter.errorfail" name="thr_fail" required='true'/]
 [@ww.textfield labelKey="blazemeter.resptimeunstable" name="resp_unstable" required='true'/]

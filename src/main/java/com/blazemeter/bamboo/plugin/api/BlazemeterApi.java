@@ -379,6 +379,28 @@ public class BlazemeterApi {
         return testListOrdered;
     }
 
+    public boolean verifyUserKey(String userKey) {
+
+        if (userKey == null || userKey.trim().isEmpty()) {
+            return false;
+        } else {
+            String url = getUrlForTestList(APP_KEY, userKey);
+            try {
+            	JSONObject jo = getJson(url, null);
+                String r = jo.get("response_code").toString();
+                if (r.equals("200")) {
+                    return true;
+                } else {
+                	return false;
+                }
+            }
+            catch (Exception e) {
+                return false;
+            }
+        }
+    }
+
+    
     public static class BmUrlManager {
 
         private String SERVER_URL = "https://a.blazemeter.com/";

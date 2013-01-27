@@ -9,6 +9,8 @@
       <div class="field-group">
         <label for="name">${i18n.getText("blazemeter.admin.userkey")}</label>
         <input type="text" id="userkey" name="userkey" class="text" value="${userkey}">
+        <br />
+        <span class="errorText">${userkey_error}</span>
       </div>
       <div class="field-group">
         <input type="submit" value="Save" class="button">

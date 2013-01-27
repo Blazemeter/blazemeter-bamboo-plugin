@@ -14,6 +14,7 @@ import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import com.atlassian.bamboo.template.TemplateRenderer;
 import com.atlassian.sal.api.transaction.TransactionTemplate;
 import com.atlassian.sal.api.transaction.TransactionCallback;
+import com.blazemeter.bamboo.plugin.api.BlazeBean;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -49,6 +50,10 @@ public class AdminServlet extends HttpServlet {
 		String config = (String) pluginSettings.get(Config.class.getName() + ".userkey");
 		if (config != null){
 			context.put("userkey", config.trim());
+			context.put("userkey_error", "");
+		} else {
+			context.put("userkey", "");
+			context.put("userkey_error", "Please set the BlazeMeter user key!");
 		}
 		
 		renderer.render("blazemeteradmin.vm", context, resp.getWriter());
@@ -59,19 +64,29 @@ public class AdminServlet extends HttpServlet {
 		Map<String, Object> context = new HashMap<String, Object>();
 		resp.setContentType("text/html;charset=utf-8");
 		
-		transactionTemplate.execute(new TransactionCallback() {
-			public Object doInTransaction() {
-				PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();		
-				pluginSettings.put(Config.class.getName() + ".userkey", req.getParameter("userkey").trim());
-				return null;
-			}
-		});
+		String userKey = req.getParameter("userkey").trim();
+		BlazeBean blazeBean = new BlazeBean();
+		if (blazeBean.verifyUserKey(userKey)){
 		
-		context.put("userkey", req.getParameter("userkey").trim());
+			transactionTemplate.execute(new TransactionCallback() {
+				public Object doInTransaction() {
+					PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();		
+					pluginSettings.put(Config.class.getName() + ".userkey", req.getParameter("userkey").trim());
+					return null;
+				}
+			});
+			
+			context.put("userkey", req.getParameter("userkey").trim());
+			context.put("userkey_error", "");
+		} else {
+			context.put("userkey", req.getParameter("userkey").trim());
+			context.put("userkey_error", "Error! User key not saved! The user key " + req.getParameter("userkey").trim() + " is invalid!");
+		}
 				
 		renderer.render("blazemeteradmin.vm", context, resp.getWriter());
 	}
 
+	
 	@XmlRootElement
 	@XmlAccessorType(XmlAccessType.FIELD)
 	public static final class Config {

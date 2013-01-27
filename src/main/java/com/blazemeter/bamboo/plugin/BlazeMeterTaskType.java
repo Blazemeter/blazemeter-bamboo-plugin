@@ -103,6 +103,8 @@ public class BlazeMeterTaskType implements TaskType{
 			try {
 				Thread.currentThread().sleep(CHECK_INTERVAL);
 			} catch (InterruptedException e) {
+				addError("BlazeMeter Interrupted Exception: "+e.getMessage(), logger, currentBuildResult);
+				break;
 			}
 			
 			logger.addBuildLogEntry("Check if the test is still running. Time passed since start:"+((currentCheck*CHECK_INTERVAL)/1000/60) + " minutes.");
@@ -122,7 +124,7 @@ public class BlazeMeterTaskType implements TaskType{
 		logger.addBuildLogEntry("Stopping test...");
 		blazeBean.stopTest(testId, logger, currentBuildResult);
 		
-		logger.addBuildLogEntry("Test finised. Checking for test report...");
+		logger.addBuildLogEntry("Test finished. Checking for test report...");
 		
         //get testGetArchive information
         boolean waitForReport = blazeBean.waitForReport(logger, currentBuildResult);
@@ -170,6 +172,10 @@ public class BlazeMeterTaskType implements TaskType{
 	
 	private String validateParams(Map<String, String> params, BuildLogger logger) {
 		
+		if (!blazeBean.verifyUserKey(blazeBean.getUserKey())){
+			return "Invalid user key defined! Set a valid user key in BlazeMeter Administration page.";
+		}
+		
 		testId = params.get(BlazeMeterConstants.SETTINGS_SELECTED_TEST_ID);
 		if (isNullorEmpty(testId)) {
 			return "No test was defined in the configuration page.";
@@ -180,6 +186,8 @@ public class BlazeMeterTaskType implements TaskType{
 				if (!tests.keySet().contains(testId)) {
 					return "Test removed from BlazeMeter server.";
 				}
+			} else {
+				return "No tests defined on BlazeMeter server!";
 			}
 		}
 		String testDrt = params.get(BlazeMeterConstants.SETTINGS_TEST_DURATION);

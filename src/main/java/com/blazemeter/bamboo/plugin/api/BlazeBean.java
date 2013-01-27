@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.atlassian.bamboo.build.logger.BuildLogger;
 import com.atlassian.bamboo.v2.build.CurrentBuildResult;
 import com.atlassian.util.concurrent.NotNull;
@@ -284,4 +286,8 @@ public class BlazeBean {
 		return false;
 	}
 	
+	
+	public boolean verifyUserKey(String userKey){
+		return api.verifyUserKey(userKey);
+	}
 }
