@@ -44,7 +44,9 @@ public class ViewBlazeMeterReport extends PlanResultsAction {
             
             if (sessionId != null){
             	setSessionId(sessionId);
-            } 
+            } else {
+            	setSessionId("");
+            }
         }
         else {
             this.isJob = false;

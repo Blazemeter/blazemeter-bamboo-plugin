@@ -65,8 +65,6 @@
 		</description>
 		<category name="builder" />
 		<category name="test" />
-		<executable key="blazemeter.exec" nameKey="blazemeter.builder.executableName"
-			pathHelpKey="blazemeter.builder.helpPath" />
 		<configuration
 			class="com.blazemeter.bamboo.plugin.configuration.BlazeMeterConfigTask" />
 		<resource type="freemarker" name="edit"

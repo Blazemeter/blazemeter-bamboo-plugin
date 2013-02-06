@@ -1,5 +1,6 @@
 package com.blazemeter.bamboo.plugin.configuration;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -7,6 +8,7 @@ import org.apache.commons.lang.StringUtils;
 
 import com.atlassian.bamboo.collections.ActionParametersMap;
 import com.atlassian.bamboo.task.AbstractTaskConfigurator;
+import com.atlassian.bamboo.task.BuildTaskRequirementSupport;
 import com.atlassian.bamboo.task.TaskDefinition;
 import com.atlassian.bamboo.utils.error.ErrorCollection;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
@@ -16,7 +18,7 @@ import com.blazemeter.bamboo.plugin.servlet.AdminServlet.Config;
 import com.google.common.collect.ImmutableList;
 import com.opensymphony.xwork.TextProvider;
 
-public class BlazeMeterConfigTask extends AbstractTaskConfigurator {
+public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements BuildTaskRequirementSupport{
 
 	BlazeBean blazeBean;
 	
@@ -78,18 +80,26 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator {
 //		final String dataFolder = params.getString(BlazeMeterConstants.SETTINGS_DATA_FOLDER);
 //		final String mainJMX = params.getString(BlazeMeterConstants.SETTINGS_MAIN_JMX);
 
+		
 		if (StringUtils.isEmpty(blazeBean.getUserKey())) {
-			errorCollection.addError(BlazeMeterConstants.SETTINGS_SELECTED_TEST_ID,
-					"Cannot load tests from BlazeMeter server. Invalid user key!");
+			errorCollection.addErrorMessage("Cannot load tests from BlazeMeter server. Invalid user key!");
 		}
 
 		if (StringUtils.isEmpty(selectedTest)) {
-			errorCollection.addError(BlazeMeterConstants.SETTINGS_SELECTED_TEST_ID,
-					textProvider.getText("blazemeter.error" + BlazeMeterConstants.SETTINGS_SELECTED_TEST_ID));
+			errorCollection.addErrorMessage(textProvider.getText("blazemeter.error." + BlazeMeterConstants.SETTINGS_SELECTED_TEST_ID));
 		} else {
 			if (!blazeBean.verifyUserKey(blazeBean.getUserKey())){
-				errorCollection.addError(BlazeMeterConstants.SETTINGS_SELECTED_TEST_ID,
-						"Cannot load tests from BlazeMeter server. Invalid user key!");
+				errorCollection.addErrorMessage("Cannot load tests from BlazeMeter server. Invalid user key!");
+			} else {
+				//verify if the test still exists on BlazeMeter server
+				HashMap<String, String> tests = blazeBean.getTests();
+				if (tests != null){
+					if (!tests.keySet().contains(selectedTest)) {
+						errorCollection.addErrorMessage("Test '"+selectedTest+"' doesn't exits on BlazeMeter server.");
+					}
+				} else {
+					errorCollection.addErrorMessage("No tests defined on BlazeMeter server!");
+				}
 			}
 		}
 		
@@ -97,22 +107,17 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator {
 			errorCollection.addError(BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_UNSTABLE,
 					textProvider.getText("blazemeter.error." + BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_UNSTABLE));
 		} else {
-			try{
-				Integer.valueOf(errorUnstable);
-			} catch (NumberFormatException nfe){
+			if (!checkNumber(errorUnstable, true)) {
 				errorCollection.addError(BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_UNSTABLE,
 						textProvider.getText("blazemeter.error." + BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_UNSTABLE));
 			}
-			
 		}
 		
 		if (StringUtils.isEmpty(errorFail)) {
 			errorCollection.addError(BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_FAIL,
 					textProvider.getText("blazemeter.error." + BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_FAIL));
 		} else {
-			try{
-				Integer.valueOf(errorFail);
-			} catch (NumberFormatException nfe){
+			if (!checkNumber(errorFail, true)) {
 				errorCollection.addError(BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_FAIL,
 						textProvider.getText("blazemeter.error." + BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_FAIL));
 			}
@@ -122,9 +127,7 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator {
 			errorCollection.addError(BlazeMeterConstants.SETTINGS_RESPONSE_TIME_UNSTABLE,
 					textProvider.getText("blazemeter.error." + BlazeMeterConstants.SETTINGS_RESPONSE_TIME_UNSTABLE));
 		} else {
-			try{
-				Integer.valueOf(errorFail);
-			} catch (NumberFormatException nfe){
+			if (!checkNumber(respUnstable, false)) {
 				errorCollection.addError(BlazeMeterConstants.SETTINGS_RESPONSE_TIME_UNSTABLE,
 						textProvider.getText("blazemeter.error." + BlazeMeterConstants.SETTINGS_RESPONSE_TIME_UNSTABLE));
 			}
@@ -134,9 +137,7 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator {
 			errorCollection.addError(BlazeMeterConstants.SETTINGS_RESPONSE_TIME_FAIL,
 					textProvider.getText("blazemeter.error." + BlazeMeterConstants.SETTINGS_RESPONSE_TIME_FAIL));
 		} else {
-			try{
-				Integer.valueOf(errorFail);
-			} catch (NumberFormatException nfe){
+			if (!checkNumber(respFail, false)) {
 				errorCollection.addError(BlazeMeterConstants.SETTINGS_RESPONSE_TIME_FAIL,
 						textProvider.getText("blazemeter.error." + BlazeMeterConstants.SETTINGS_RESPONSE_TIME_FAIL));
 			}
@@ -146,17 +147,30 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator {
 			errorCollection.addError(BlazeMeterConstants.SETTINGS_TEST_DURATION,
 					textProvider.getText("blazemeter.error." + BlazeMeterConstants.SETTINGS_TEST_DURATION));
 		}
-//		if (StringUtils.isEmpty(mainJMX)) {
-//			errorCollection.addError(BlazeMeterConstants.SETTINGS_MAIN_JMX,
-//					textProvider.getText("blazemeter.error." + BlazeMeterConstants.SETTINGS_MAIN_JMX));
-//		}
-//		
-//		if (StringUtils.isEmpty(dataFolder)) {
-//			errorCollection.addError(BlazeMeterConstants.SETTINGS_DATA_FOLDER,
-//					textProvider.getText("blazemeter.error." + BlazeMeterConstants.SETTINGS_DATA_FOLDER));
-//		}
 	}
 
+	private boolean checkNumber(String number, boolean isPercentage){
+		try{
+			if (number.equals("-0")){
+				throw new NumberFormatException("Value cannot be -0!");
+			}
+			Integer val = Integer.valueOf(number);
+			if (isPercentage){
+				if (!((val >= 0) && (val <= 100))){
+					throw new NumberFormatException("Value is not between 0 and 100!");
+				}
+			} else {
+				if (!(val >= 0)){
+					throw new NumberFormatException("Value must be greater than 0!");
+				}
+			}
+		} catch (NumberFormatException nfe){
+			return false;
+		}
+		
+		return true;
+	}
+	
 	@Override
 	public Map<String, String> generateTaskConfigMap(ActionParametersMap params, TaskDefinition previousTaskDefinition) {
 		final Map<String, String> config = super.generateTaskConfigMap(params, previousTaskDefinition);
@@ -185,4 +199,5 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator {
 			blazeBean.setUserKey(config);
 		} 
 	}
+
 }

@@ -92,7 +92,7 @@ public class ViewBlazeMeterStatistics extends ViewBuild {
         chart = new HashMap<String, Object>();
         ChartRenderingInfo chartRenderingInfo = new ChartRenderingInfo();
         XYSeriesCollection dataset1 = new XYSeriesCollection(dataset.getSeries(1));
-        JFreeChart jchart = ChartFactory.createXYLineChart("", "Build Number", "Values", dataset1,
+        JFreeChart jchart = ChartFactory.createXYLineChart("", "Build Number", "Response Time", dataset1,
             PlotOrientation.VERTICAL, true, true, false);
 
         // Set the tick units of the domain (x) axis so they are always integers, because you can't have
@@ -103,7 +103,7 @@ public class ViewBlazeMeterStatistics extends ViewBuild {
         domainAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
         
         XYSeriesCollection dataset2 = new XYSeriesCollection(dataset.getSeries(0));
-        final NumberAxis axis2 = new NumberAxis("Secondary");
+        final NumberAxis axis2 = new NumberAxis("Error Threshold");
         axis2.setAutoRangeIncludesZero(true);
         plot.setRangeAxis(1, axis2);
         plot.setDataset(1, dataset2);
