@@ -1,12 +1,9 @@
 package com.blazemeter.bamboo.plugin.api;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
-
-import org.apache.commons.lang.StringUtils;
 
 import com.atlassian.bamboo.build.logger.BuildLogger;
 import com.atlassian.bamboo.v2.build.CurrentBuildResult;
@@ -22,7 +19,11 @@ import com.opensymphony.webwork.dispatcher.json.JSONObject;
  */
 public class BlazeBean {
 	private String userKey;
-	private BlazemeterApi api;
+	private String proxyserver;
+	private String proxyport;
+	private String proxyuser;
+	private String proxypass;	
+	private BlazemeterApi blazemeterApi;
 	
 	//Default properties
 
@@ -30,11 +31,11 @@ public class BlazeBean {
 	private String aggregate;
 	
 	public BlazeBean(){
-		api = new BlazemeterApi();
+		
 	}
 	
-	public BlazeBean(String userKey) {
-		api = new BlazemeterApi();
+	public BlazeBean(String userKey, String serverName, int serverPort, String username, String password) {
+		blazemeterApi = new BlazemeterApi(serverName, serverPort, username, password);
 		this.userKey = userKey;
 	}
 
@@ -49,7 +50,7 @@ public class BlazeBean {
 	 */
 	public HashMap<String, String> getTests() {
 		try {
-			return api.getTestList(userKey);
+			return getAPI().getTestList(userKey);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -68,7 +69,7 @@ public class BlazeBean {
         JSONObject json;
         int countStartRequests = 0;
         do {
-            json = api.startTest(userKey, testId);
+            json = getAPI().startTest(userKey, testId);
             countStartRequests++;
             if (countStartRequests > 5) {
             	addError("Could not start BlazeMeter Test", logger, currentBuildResult);
@@ -83,7 +84,7 @@ public class BlazeBean {
 					return false;
 				}
                 //Try again.
-				json = api.startTest(userKey, testId);
+				json = getAPI().startTest(userKey, testId);
                 if (!json.get("response_code").equals(200)) {
                 	addError("Could not start BlazeMeter Test -" + json.get("error").toString(), logger, currentBuildResult);
                     return false;
@@ -98,7 +99,7 @@ public class BlazeBean {
 
 	public boolean isReportReady(){
         //get testGetArchive information
-		JSONObject json = api.aggregateReport(userKey, session);
+		JSONObject json = getAPI().aggregateReport(userKey, session);
         try {
             if (json.get("response_code").equals(404))
                 return false;
@@ -114,11 +115,11 @@ public class BlazeBean {
 	@SuppressWarnings("static-access")
 	public boolean waitForReport(BuildLogger logger, CurrentBuildResult currentBuildResult){
         //get testGetArchive information
-		JSONObject json = api.aggregateReport(userKey, session);
+		JSONObject json = getAPI().aggregateReport(userKey, session);
         for (int i = 0; i < 200; i++) {
             try {
                 if (json.get("response_code").equals(404))
-                    json = api.aggregateReport(userKey, session);
+                    json = getAPI().aggregateReport(userKey, session);
                 else
                     break;
             } catch (JSONException e) {
@@ -151,7 +152,7 @@ public class BlazeBean {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-            json = api.aggregateReport(userKey, session);
+            json = getAPI().aggregateReport(userKey, session);
         }
 
         if (aggregate == null) {
@@ -208,11 +209,11 @@ public class BlazeBean {
 	}
 
 	public boolean uploadJMX(String testId, String filename, String pathname){
-		return api.uploadJmx(userKey, testId, filename, pathname);
+		return getAPI().uploadJmx(userKey, testId, filename, pathname);
 	}
 	
     public void uploadFile(String testId, String dataFolder, String fileName, BuildLogger logger, CurrentBuildResult currentBuildResult) {
-        JSONObject json = api.uploadFile(userKey, testId, fileName, dataFolder + File.separator + fileName);
+        JSONObject json = getAPI().uploadFile(userKey, testId, fileName, dataFolder + File.separator + fileName);
         try {
             if (!json.get("response_code").equals(new Integer(200))) {
             	addError("Could not upload file " + fileName + " " + json.get("error").toString(), logger, currentBuildResult);
@@ -227,7 +228,7 @@ public class BlazeBean {
 
     	int countStartRequests = 0;
         do {
-        	json = api.stopTest(userKey, testId);
+        	json = getAPI().stopTest(userKey, testId);
             countStartRequests++;
             if (countStartRequests > 5) {
             	addError("Could not stop BlazeMeter Test "+ testId, logger, currentBuildResult);
@@ -251,7 +252,7 @@ public class BlazeBean {
     }
     
     public TestInfo getTestStatus(String testId){
-    	return api.getTestRunStatus(userKey, testId);
+    	return getAPI().getTestRunStatus(userKey, testId);
     }
     
 	public String getUserKey() {
@@ -260,6 +261,40 @@ public class BlazeBean {
 
 	public void setUserKey(String userKey) {
 		this.userKey = userKey;
+	}
+	
+	
+
+	public String getProxyserver() {
+		return proxyserver;
+	}
+
+	public void setProxyserver(String proxyserver) {
+		this.proxyserver = proxyserver;
+	}
+
+	public String getProxyport() {
+		return proxyport;
+	}
+
+	public void setProxyport(String proxyport) {
+		this.proxyport = proxyport;
+	}
+
+	public String getProxyuser() {
+		return proxyuser;
+	}
+
+	public void setProxyuser(String proxyuser) {
+		this.proxyuser = proxyuser;
+	}
+
+	public String getProxypass() {
+		return proxypass;
+	}
+
+	public void setProxypass(String proxypass) {
+		this.proxypass = proxypass;
 	}
 
 	public String getSession() {
@@ -288,6 +323,14 @@ public class BlazeBean {
 	
 	
 	public boolean verifyUserKey(String userKey){
-		return api.verifyUserKey(userKey);
+		return getAPI().verifyUserKey(userKey);
+	}
+	
+	private BlazemeterApi getAPI(){
+		if (blazemeterApi == null){
+			blazemeterApi = new BlazemeterApi(proxyserver, Integer.parseInt(proxyport), proxyuser, proxypass);
+		}
+		
+		return blazemeterApi;
 	}
 }
