@@ -328,7 +328,13 @@ public class BlazeBean {
 	
 	private BlazemeterApi getAPI(){
 		if (blazemeterApi == null){
-			blazemeterApi = new BlazemeterApi(proxyserver, Integer.parseInt(proxyport), proxyuser, proxypass);
+			int proxyPortInt = -1;
+			try{
+				proxyPortInt = Integer.parseInt(proxyport);
+			} catch (NumberFormatException nfe){
+				
+			}
+			blazemeterApi = new BlazemeterApi(proxyserver, proxyPortInt, proxyuser, proxypass);
 		}
 		
 		return blazemeterApi;
