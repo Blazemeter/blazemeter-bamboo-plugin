@@ -19,7 +19,6 @@ import com.atlassian.bamboo.template.TemplateRenderer;
 import com.atlassian.sal.api.transaction.TransactionTemplate;
 import com.atlassian.sal.api.transaction.TransactionCallback;
 import com.blazemeter.bamboo.plugin.api.BlazeBean;
-
 import com.blazemeter.bamboo.plugin.api.BlazeBean;
 
 public class AdminServlet extends HttpServlet {
@@ -129,8 +128,14 @@ public class AdminServlet extends HttpServlet {
 		context.put("proxyserver_error", "");
 		context.put("proxyuser_error", "");
 		context.put("proxypass_error", "");
-
-		BlazeBean blazeBean = new BlazeBean(userKey, proxyserver, Integer.parseInt(proxyport), proxyuser, proxypass);
+		
+		int proxyPortInt = -1;
+		try{
+			proxyPortInt = Integer.parseInt(proxyport);
+		} catch (NumberFormatException nfe){
+			
+		}
+		BlazeBean blazeBean = new BlazeBean(userKey, proxyserver, proxyPortInt, proxyuser, proxypass);
 		if (blazeBean.verifyUserKey(userKey)){
 		
 			transactionTemplate.execute(new TransactionCallback() {
