@@ -19,7 +19,6 @@ import com.atlassian.bamboo.template.TemplateRenderer;
 import com.atlassian.sal.api.transaction.TransactionTemplate;
 import com.atlassian.sal.api.transaction.TransactionCallback;
 import com.blazemeter.bamboo.plugin.api.BlazeBean;
-import com.blazemeter.bamboo.plugin.api.BlazeBean;
 
 public class AdminServlet extends HttpServlet {
 	private final TransactionTemplate transactionTemplate;
