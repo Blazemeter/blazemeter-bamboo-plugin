@@ -13,11 +13,11 @@
     <description>This is the com.blazemeter.bamboo.plugin:BlazeMeterBamboo plugin for Atlassian Bamboo.</description>
     <packaging>atlassian-plugin</packaging>
     <properties>
-        <bamboo.version>4.3.3</bamboo.version>
+        <bamboo.version>5.1.1</bamboo.version>
         <bamboo.data.version>3.2.2</bamboo.data.version>
-        <amps.version>4.1.1</amps.version>
-        <plugin.testrunner.version>1.1</plugin.testrunner.version>
-    </properties>
+        <amps.version>4.2.9</amps.version>
+        <plugin.testrunner.version>1.1.1</plugin.testrunner.version>
+    </properties>    
     <dependencies>
         <dependency>
             <groupId>com.atlassian.bamboo</groupId>

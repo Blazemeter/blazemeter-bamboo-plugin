@@ -10,8 +10,13 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
+import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.Credentials;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.entity.FileEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -35,15 +40,37 @@ public class BlazemeterApi {
     DefaultHttpClient httpClient;
     BmUrlManager urlManager;
 
-    public BlazemeterApi() {
+	private String serverName;
+	private int serverPort;
+	private String username;
+	private String password;
+	
+	public BlazemeterApi(String serverName, int serverPort, String username, String password) {
+    	this.serverName = serverName;
+    	this.serverPort = serverPort;
+    	this.username = username;
+    	this.password = password;		
         urlManager = new BmUrlManager("https://a.blazemeter.com");
         try {
             httpClient = new DefaultHttpClient();
+            configureProxy();
         } catch (Exception ex) {
             logger.format("error Instantiating HTTPClient. Exception received: %s", ex);
         }
     }
 
+    private void configureProxy(){
+    	// Configure the proxy if necessary
+        if (getServerName() != null && !getServerName().isEmpty() && getServerPort() > 0) {
+            if (getUsername() != null && !getUsername().isEmpty()){
+            	Credentials cred = new UsernamePasswordCredentials(getUsername(), getPassword());
+                httpClient.getCredentialsProvider().setCredentials(new AuthScope(getServerName(), getServerPort()), cred);
+            }
+            HttpHost proxyHost = new HttpHost(getServerName(), getServerPort());
+            httpClient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxyHost);
+        }    	
+    } 
+    
     private HttpResponse getResponse(String url, JSONObject data) throws IOException {
 
         logger.println("Requesting : " + url);
@@ -401,7 +428,42 @@ public class BlazemeterApi {
     }
 
     
-    public static class BmUrlManager {
+    
+    public String getServerName() {
+		return serverName;
+	}
+
+	public void setServerName(String serverName) {
+		this.serverName = serverName;
+	}
+
+	public int getServerPort() {
+		return serverPort;
+	}
+
+	public void setServerPort(int serverPort) {
+		this.serverPort = serverPort;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+
+
+	public static class BmUrlManager {
 
         private String SERVER_URL = "https://a.blazemeter.com/";
 

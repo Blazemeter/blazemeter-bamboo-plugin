@@ -195,9 +195,26 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 		final PluginSettingsFactory pluginSettingsFactory = StaticAccessor.getSettingsFactory();
 		PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();	
 		String config = (String) pluginSettings.get(Config.class.getName() + ".userkey");
+		String proxyserver = (String) pluginSettings.get(Config.class.getName() + ".proxyserver");
+		String proxyport = (String) pluginSettings.get(Config.class.getName() + ".proxyport");
+		String proxyuser = (String) pluginSettings.get(Config.class.getName() + ".proxyuser");
+		String proxypass = (String) pluginSettings.get(Config.class.getName() + ".proxypass");		
 		if (config != null){
 			blazeBean.setUserKey(config);
+		}
+		if (proxyserver != null){
+			blazeBean.setProxyserver(proxyserver);
 		} 
+		if (proxyport != null){
+			blazeBean.setProxyport(proxyport);
+		} 
+		if (proxyuser != null){
+			blazeBean.setProxyuser(proxyuser);
+		} 
+		if (proxypass != null){
+			blazeBean.setProxypass(proxypass);
+		} 
+		
 	}
 
 }
