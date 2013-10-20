@@ -15,7 +15,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
-import com.atlassian.bamboo.template.TemplateRenderer;
+import com.atlassian.templaterenderer.TemplateRenderer;
 import com.atlassian.sal.api.transaction.TransactionTemplate;
 import com.atlassian.sal.api.transaction.TransactionCallback;
 import com.blazemeter.bamboo.plugin.api.BlazeBean;
