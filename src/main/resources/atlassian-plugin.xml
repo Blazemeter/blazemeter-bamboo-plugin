@@ -24,9 +24,8 @@
 	</web-resource>
 
 	<!-- import from the product container -->
+	<component-import key="velocity-renderer" interface="com.atlassian.templaterenderer.TemplateRenderer" />
 
-	<component-import key="renderer"
-		interface="com.atlassian.bamboo.template.TemplateRenderer" />
 	<servlet key="admin-servlet"
 		class="com.blazemeter.bamboo.plugin.servlet.AdminServlet">
 		<url-pattern>/blazemeter/admin</url-pattern>
@@ -42,7 +41,7 @@
 	<template-context-item key="applicationPropertiesContextItem"
 		component-ref="applicationProperties" context-key="applicationProperties"
 		name="Application Properties Context Item" />
-
+    
 	<web-section name="BlazeMeterAdministration" i18n-name-key="blaze-meter-administration.name"
 		key="blaze-meter-administration" location="system.admin" weight="10">
 		<description key="blaze-meter-administration.description">The BlazeMeter Administration Plugin
@@ -58,6 +57,7 @@
 		<link linkId="user-key-settingspage-link">/plugins/servlet/blazemeter/admin</link>
 	</web-item>
 	
+   
 	<!-- Definition for BlazeMeter task plugin -->
 	<taskType key="blazemeter" name="BlazeMeter Test"
 		class="com.blazemeter.bamboo.plugin.BlazeMeterTaskType">
