@@ -15,14 +15,15 @@
     <properties>
         <bamboo.version>5.1.1</bamboo.version>
         <bamboo.data.version>3.2.2</bamboo.data.version>
-        <amps.version>4.2.9</amps.version>
+        <amps.version>5.0.11</amps.version>
         <plugin.testrunner.version>1.1.1</plugin.testrunner.version>
     </properties>    
     <dependencies>
         <dependency>
-            <groupId>com.atlassian.bamboo</groupId>
-            <artifactId>atlassian-bamboo-web</artifactId>
-            <version>${bamboo.version}</version>
+            <groupId>com.atlassian.templaterenderer</groupId>
+            <artifactId>atlassian-template-renderer-api</artifactId>
+            <version>1.4.2.2</version>
+            <!--<version>${bamboo.version}</version>-->
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -94,7 +95,7 @@
 		    <artifactId>servlet-api</artifactId>
 		    <version>2.5</version>
 		    <scope>provided</scope>
-		</dependency>		
+		</dependency>
     </dependencies>
     <build>
         <plugins>
