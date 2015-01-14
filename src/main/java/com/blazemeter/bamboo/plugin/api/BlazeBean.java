@@ -9,8 +9,8 @@ import com.atlassian.bamboo.build.logger.BuildLogger;
 import com.atlassian.bamboo.v2.build.CurrentBuildResult;
 import com.atlassian.util.concurrent.NotNull;
 import com.blazemeter.bamboo.plugin.BlazeMeterConstants;
-import com.opensymphony.webwork.dispatcher.json.JSONException;
-import com.opensymphony.webwork.dispatcher.json.JSONObject;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * 

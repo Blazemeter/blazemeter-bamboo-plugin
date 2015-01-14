@@ -23,9 +23,9 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
 import com.blazemeter.bamboo.plugin.configuration.BlazeMeterConstants;
-import com.opensymphony.webwork.dispatcher.json.JSONArray;
-import com.opensymphony.webwork.dispatcher.json.JSONException;
-import com.opensymphony.webwork.dispatcher.json.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 
 /**
