@@ -18,6 +18,13 @@
         <amps.version>5.0.11</amps.version>
         <plugin.testrunner.version>1.1.1</plugin.testrunner.version>
     </properties>    
+    <repositories>
+        <repository>
+            <id>atlassian</id>
+            <url>https://maven.atlassian.com/content/repositories/atlassian-public/
+            </url>
+        </repository>
+    </repositories>
     <dependencies>
         <dependency>
             <groupId>com.atlassian.templaterenderer</groupId>
@@ -25,6 +32,11 @@
             <version>1.4.2.2</version>
             <!--<version>${bamboo.version}</version>-->
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.bamboo</groupId>
+            <artifactId>atlassian-bamboo-api</artifactId>
+            <version>5.7.2</version>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
