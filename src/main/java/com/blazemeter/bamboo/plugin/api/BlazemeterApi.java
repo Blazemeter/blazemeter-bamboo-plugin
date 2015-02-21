@@ -1,8 +1,5 @@
 package com.blazemeter.bamboo.plugin.api;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
@@ -12,17 +9,6 @@ import java.util.LinkedHashMap;
 
 import com.blazemeter.bamboo.plugin.Utils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpHost;
-import org.apache.http.HttpResponse;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.Credentials;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.params.ConnRoutePNames;
-import org.apache.http.entity.FileEntity;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.util.EntityUtils;
 
 import com.blazemeter.bamboo.plugin.configuration.BlazeMeterConstants;
 import org.json.JSONArray;
@@ -40,7 +26,7 @@ public class BlazemeterApi {
 
     public static final String APP_KEY = "bmboo0x98a8w9s4s7c4";
     BzmHttpClient bzmHttpClient;
-    BmUrlManager urlManager;
+    BmUrlManagerV2Impl urlManager;
 
 	private String serverName;
 	private int serverPort;
@@ -52,7 +38,7 @@ public class BlazemeterApi {
     	this.serverPort = serverPort;
     	this.username = username;
     	this.password = password;		
-        urlManager = new BmUrlManager("https://a.blazemeter.com");
+        urlManager = new BmUrlManagerV2Impl("https://a.blazemeter.com");
         try {
             bzmHttpClient = new BzmHttpClient();
             bzmHttpClient.configureProxy(serverName, serverPort, username, password);
@@ -201,7 +187,7 @@ public class BlazemeterApi {
     public JSONObject aggregateReport(String userKey, String reportId) {
         if (StringUtils.isBlank(userKey)&StringUtils.isBlank(reportId)) return null;
 
-        String url = this.urlManager.testAggregateReport(APP_KEY, userKey, reportId);
+        String url = this.urlManager.testReport(APP_KEY, userKey, reportId);
         return this.bzmHttpClient.getJson(url, null);
     }
 

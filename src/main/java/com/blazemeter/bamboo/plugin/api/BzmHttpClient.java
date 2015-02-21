@@ -26,7 +26,9 @@ public class BzmHttpClient {
     DefaultHttpClient httpClient;
 
 
-    public BzmHttpClient(){}
+    public BzmHttpClient(){
+        httpClient=new DefaultHttpClient();
+    }
 
 
     public DefaultHttpClient getHttpClient() {
