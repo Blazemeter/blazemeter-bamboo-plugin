@@ -23,7 +23,7 @@ public class BlazeBean {
 	private String proxyport;
 	private String proxyuser;
 	private String proxypass;	
-	private BlazemeterApi blazemeterApi;
+	private BlazemeterApiV2Impl blazemeterApi;
 	
 	//Default properties
 
@@ -35,7 +35,7 @@ public class BlazeBean {
 	}
 	
 	public BlazeBean(String userKey, String serverName, int serverPort, String username, String password) {
-		blazemeterApi = new BlazemeterApi(serverName, serverPort, username, password);
+		blazemeterApi = new BlazemeterApiV2Impl(serverName, serverPort, username, password);
 		this.userKey = userKey;
 	}
 
@@ -326,7 +326,7 @@ public class BlazeBean {
 		return getAPI().verifyUserKey(userKey);
 	}
 	
-	private BlazemeterApi getAPI(){
+	private BlazemeterApiV2Impl getAPI(){
 		if (blazemeterApi == null){
 			int proxyPortInt = -1;
 			try{
@@ -334,7 +334,7 @@ public class BlazeBean {
 			} catch (NumberFormatException nfe){
 				
 			}
-			blazemeterApi = new BlazemeterApi(proxyserver, proxyPortInt, proxyuser, proxypass);
+			blazemeterApi = new BlazemeterApiV2Impl(proxyserver, proxyPortInt, proxyuser, proxypass);
 		}
 		
 		return blazemeterApi;

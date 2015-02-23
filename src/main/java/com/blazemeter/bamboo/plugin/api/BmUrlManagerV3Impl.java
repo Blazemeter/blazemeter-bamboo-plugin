@@ -92,4 +92,8 @@ public class BmUrlManagerV3Impl implements BmUrlManager{
         return testAggregateReport;
     }
 
+    @Override
+    public String getUrlForTestList(String appKey, String userKey) {
+        return Constants.NOT_IMPLEMENTED;
+    }
 }

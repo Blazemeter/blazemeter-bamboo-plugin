@@ -25,4 +25,6 @@ public interface BmUrlManager {
     public String testReport(String appKey, String userKey, String reportId);
 
     public String getServerUrl();
+
+    public String getUrlForTestList(String appKey, String userKey);
 }
