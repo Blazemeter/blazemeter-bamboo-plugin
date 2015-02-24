@@ -125,12 +125,12 @@ public class BlazeMeterTaskType implements TaskType{
 			
 			logger.addBuildLogEntry("Check if the test is still running. Time passed since start:"+((currentCheck*CHECK_INTERVAL)/1000/60) + " minutes.");
 			testInfo = blazeBean.getTestStatus(testId);
-			if (testInfo.getStatus().equals(BlazeMeterConstants.TestStatus.NotRunning)){
+			if (testInfo.getStatus().equals(TestStatus.NotRunning.toString())){
 				logger.addBuildLogEntry("Test is finished earlier then estimated! Time passed since start:"+((currentCheck*CHECK_INTERVAL)/1000/60) + " minutes.");
 				break;
 			} 
 			else
-			if (testInfo.getStatus().equals(BlazeMeterConstants.TestStatus.NotFound)){
+			if (testInfo.getStatus().equals(TestStatus.NotFound.toString())){
 				addError("BlazeMeter test not found!", logger, currentBuildResult);
 				return resultBuilder.failed().build();
 			}

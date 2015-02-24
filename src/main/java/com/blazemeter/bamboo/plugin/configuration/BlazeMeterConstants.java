@@ -1,14 +1,14 @@
 package com.blazemeter.bamboo.plugin.configuration;
 
 public interface BlazeMeterConstants {
-	
-    public class TestStatus {
-        public static final String Running = "Running";
-        public static final String NotRunning = "Not Running";
-        public static final String NotFound = "NotFound";
-        public static final String Error = "error";
-    }
-	
+        /*
+        public class TestStatus {
+            public static final String Running = "Running";
+            public static final String NotRunning = "Not Running";
+            public static final String NotFound = "NotFound";
+            public static final String Error = "error";
+        }
+        */
     //runner properties
 	public final static String USER_KEY = "USER_KEY";
 	
@@ -21,7 +21,8 @@ public interface BlazeMeterConstants {
 	public final static String SETTINGS_TEST_DURATION = "test_duration";
 	public final static String SETTINGS_DATA_FOLDER = "data_folder";
 	public final static String SETTINGS_MAIN_JMX = "main_jmx";
-	
+	public final static String SETTINGS_API_VERSION = "api_version";
+
 	//Default properties
 	public final static String DEFAULT_SETTINGS_DATA_FOLDER = "DataFolder";
 	

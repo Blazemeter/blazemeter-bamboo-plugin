@@ -1,4 +1,5 @@
-[@ww.select cssClass="builderSelectWidget" labelKey='blazemeter.test' name='selectedtest' list='testlist' required='true' emptyOption='true'/]
+[@ww.select cssClass="builderSelectWidget" labelKey='blazemeter.test' name='selectedtest' list='testlist' required='true' emptyOption='false'/]
+[@ww.select cssClass="builderSelectWidget" labelKey='API Version' name='api_version' list='apiversionlist' required='true' emptyOption='false'/]
 [@ww.textfield labelKey="blazemeter.errorunstable" name="thr_unstable" required='false'/]
 [@ww.textfield labelKey="blazemeter.errorfail" name="thr_fail" required='false'/]
 [@ww.textfield labelKey="blazemeter.resptimeunstable" name="resp_unstable" required='false'/]

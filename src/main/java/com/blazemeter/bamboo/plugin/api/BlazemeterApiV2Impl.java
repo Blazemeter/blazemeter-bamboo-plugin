@@ -7,6 +7,7 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
+import com.blazemeter.bamboo.plugin.TestStatus;
 import com.blazemeter.bamboo.plugin.Utils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -111,7 +112,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi{
 
         if (StringUtils.isBlank(userKey)&StringUtils.isBlank(testId))
         {
-            ti.status = BlazeMeterConstants.TestStatus.NotFound;
+            ti.status = TestStatus.NotFound.toString();
             return ti;
         }
 
@@ -120,7 +121,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi{
             JSONObject jo = this.bzmHttpClient.getJson(url, null);
 
             if (jo.get("status") == "Test not found")
-                ti.status = BlazeMeterConstants.TestStatus.NotFound;
+                ti.status = TestStatus.NotFound.toString();
             else {
                 ti.id = jo.getString("test_id");
                 ti.name = jo.getString("test_name");
@@ -128,7 +129,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi{
             }
         } catch (Exception e) {
             logger.println("error getting status " + e);
-            ti.status = BlazeMeterConstants.TestStatus.Error;
+            ti.status = TestStatus.Error.toString();
         }
         return ti;
     }

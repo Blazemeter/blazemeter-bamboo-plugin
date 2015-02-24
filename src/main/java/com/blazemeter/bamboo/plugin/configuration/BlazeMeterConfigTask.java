@@ -24,13 +24,14 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 	BlazeBean blazeBean;
 	
 	private static final List<String> FIELDS_TO_COPY = ImmutableList.of(BlazeMeterConstants.SETTINGS_SELECTED_TEST_ID,
+            BlazeMeterConstants.SETTINGS_API_VERSION,
 			BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_UNSTABLE, BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_FAIL,
 			BlazeMeterConstants.SETTINGS_RESPONSE_TIME_UNSTABLE, BlazeMeterConstants.SETTINGS_RESPONSE_TIME_FAIL,
 			BlazeMeterConstants.SETTINGS_TEST_DURATION, BlazeMeterConstants.SETTINGS_DATA_FOLDER,
 			BlazeMeterConstants.SETTINGS_MAIN_JMX);
 
-	private static final List<String> DURATION_LIST = ImmutableList.of("60", "120", "180");
-	
+	private static final List<String> API_VERSION_LIST = ImmutableList.of("autoDetect","v3","v2");
+
 	private TextProvider textProvider;
 	
 	public BlazeMeterConfigTask() {
@@ -45,7 +46,7 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 		
 		setSessionId();
 		context.put("testlist", blazeBean.getTests());
-		context.put("durationlist", DURATION_LIST);
+		context.put("apiversionlist", API_VERSION_LIST);
 	}
 
 	@Override
@@ -57,8 +58,8 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 		setSessionId();
 		context.put("testlist", blazeBean.getTests());
 		
-		context.put("durationlist", DURATION_LIST);
-		
+		context.put("apiversionlist", API_VERSION_LIST);
+
 		context.put(BlazeMeterConstants.SETTINGS_DATA_FOLDER, taskDefinition.getConfiguration().get(BlazeMeterConstants.SETTINGS_DATA_FOLDER));
 	}
 
@@ -140,6 +141,7 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 		final Map<String, String> config = super.generateTaskConfigMap(params, previousTaskDefinition);
 
 		config.put(BlazeMeterConstants.SETTINGS_SELECTED_TEST_ID, params.getString(BlazeMeterConstants.SETTINGS_SELECTED_TEST_ID).trim());
+		config.put(BlazeMeterConstants.SETTINGS_API_VERSION, params.getString(BlazeMeterConstants.SETTINGS_API_VERSION).trim());
 		config.put(BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_UNSTABLE, params.getString(BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_UNSTABLE).trim());
 		config.put(BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_FAIL, params.getString(BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_FAIL).trim());
 		config.put(BlazeMeterConstants.SETTINGS_RESPONSE_TIME_UNSTABLE, params.getString(BlazeMeterConstants.SETTINGS_RESPONSE_TIME_UNSTABLE).trim());
