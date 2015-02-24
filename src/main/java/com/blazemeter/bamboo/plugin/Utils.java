@@ -59,5 +59,27 @@ public class Utils {
         return contents.toString();
     }
 
+    public static boolean checkNumber(String number, boolean isPercentage){
+        try{
+            if (number.equals("-0")){
+                throw new NumberFormatException("Value cannot be -0!");
+            }
+            Integer val = Integer.valueOf(number);
+            if (isPercentage){
+                if (!((val >= 0) && (val <= 100))){
+                    throw new NumberFormatException("Value is not between 0 and 100!");
+                }
+            } else {
+                if (!(val >= 0)){
+                    throw new NumberFormatException("Value must be greater than 0!");
+                }
+            }
+        } catch (NumberFormatException nfe){
+            return false;
+        }
+
+        return true;
+    }
+
 
 }

@@ -223,22 +223,22 @@ public class BlazeMeterTaskType implements TaskType{
 		String timeFail = params.get(BlazeMeterConstants.SETTINGS_RESPONSE_TIME_FAIL);
 
 		try{
-			errorFailedThreshold = Integer.valueOf(errorFail);
+			errorFailedThreshold = errorFail.isEmpty()?-1:Integer.valueOf(errorFail);
 		} catch (NumberFormatException nfe){
 			return "Error threshold failed is not a number.";
 		}
 		try{
-			errorUnstableThreshold = Integer.valueOf(errorUnstable);
+			errorUnstableThreshold = errorUnstable.isEmpty()?-1:Integer.valueOf(errorUnstable);
 		} catch (NumberFormatException nfe){
 			return "Error threshold unstable is not a number.";
 		}
 		try{
-			responseTimeFailedThreshold = Integer.valueOf(timeFail);
+			responseTimeFailedThreshold = timeFail.isEmpty()?-1:Integer.valueOf(timeFail);
 		} catch (NumberFormatException nfe){
 			return "Response time failed is not a number.";
 		}
 		try{
-			responseTimeUnstableThreshold = Integer.valueOf(timeUnstable);
+			responseTimeUnstableThreshold = timeUnstable.isEmpty()?-1:Integer.valueOf(timeUnstable);
 		} catch (NumberFormatException nfe){
 			return "Response time unstable is not a number.";
 		}

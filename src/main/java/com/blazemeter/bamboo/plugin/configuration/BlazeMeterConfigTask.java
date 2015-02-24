@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.blazemeter.bamboo.plugin.Utils;
 import org.apache.commons.lang.StringUtils;
 
 import com.atlassian.bamboo.collections.ActionParametersMap;
@@ -103,73 +104,36 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 			}
 		}
 		
-		if (StringUtils.isEmpty(errorUnstable)) {
-			errorCollection.addError(BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_UNSTABLE,
-					textProvider.getText("blazemeter.error." + BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_UNSTABLE));
-		} else {
-			if (!checkNumber(errorUnstable, true)) {
-				errorCollection.addError(BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_UNSTABLE,
-						textProvider.getText("blazemeter.error." + BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_UNSTABLE));
-			}
+		if (!StringUtils.isEmpty(errorUnstable)&&!Utils.checkNumber(errorUnstable, true)) {
+            errorCollection.addError(BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_UNSTABLE,
+                    textProvider.getText("blazemeter.error." + BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_UNSTABLE));
 		}
-		
-		if (StringUtils.isEmpty(errorFail)) {
-			errorCollection.addError(BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_FAIL,
-					textProvider.getText("blazemeter.error." + BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_FAIL));
-		} else {
-			if (!checkNumber(errorFail, true)) {
-				errorCollection.addError(BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_FAIL,
-						textProvider.getText("blazemeter.error." + BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_FAIL));
-			}
-		}
-		
-		if (StringUtils.isEmpty(respUnstable)) {
+
+		if (!StringUtils.isEmpty(errorFail)&&!Utils.checkNumber(errorFail, true)) {
+            errorCollection.addError(BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_FAIL,
+                    textProvider.getText("blazemeter.error." + BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_FAIL));
+
+        }
+
+		if (!StringUtils.isEmpty(respUnstable)&&!Utils.checkNumber(respUnstable, false)) {
 			errorCollection.addError(BlazeMeterConstants.SETTINGS_RESPONSE_TIME_UNSTABLE,
-					textProvider.getText("blazemeter.error." + BlazeMeterConstants.SETTINGS_RESPONSE_TIME_UNSTABLE));
-		} else {
-			if (!checkNumber(respUnstable, false)) {
-				errorCollection.addError(BlazeMeterConstants.SETTINGS_RESPONSE_TIME_UNSTABLE,
 						textProvider.getText("blazemeter.error." + BlazeMeterConstants.SETTINGS_RESPONSE_TIME_UNSTABLE));
-			}
 		}
 		
-		if (StringUtils.isEmpty(respFail)) {
-			errorCollection.addError(BlazeMeterConstants.SETTINGS_RESPONSE_TIME_FAIL,
-					textProvider.getText("blazemeter.error." + BlazeMeterConstants.SETTINGS_RESPONSE_TIME_FAIL));
-		} else {
-			if (!checkNumber(respFail, false)) {
+
+        if (!StringUtils.isEmpty(respFail)&&!Utils.checkNumber(respFail, false)) {
 				errorCollection.addError(BlazeMeterConstants.SETTINGS_RESPONSE_TIME_FAIL,
 						textProvider.getText("blazemeter.error." + BlazeMeterConstants.SETTINGS_RESPONSE_TIME_FAIL));
-			}
 		}
-		
-		if (StringUtils.isEmpty(testDuration)) {
+
+
+		if (!StringUtils.isEmpty(testDuration)&&!Utils.checkNumber(testDuration, false)) {
 			errorCollection.addError(BlazeMeterConstants.SETTINGS_TEST_DURATION,
 					textProvider.getText("blazemeter.error." + BlazeMeterConstants.SETTINGS_TEST_DURATION));
 		}
 	}
 
-	private boolean checkNumber(String number, boolean isPercentage){
-		try{
-			if (number.equals("-0")){
-				throw new NumberFormatException("Value cannot be -0!");
-			}
-			Integer val = Integer.valueOf(number);
-			if (isPercentage){
-				if (!((val >= 0) && (val <= 100))){
-					throw new NumberFormatException("Value is not between 0 and 100!");
-				}
-			} else {
-				if (!(val >= 0)){
-					throw new NumberFormatException("Value must be greater than 0!");
-				}
-			}
-		} catch (NumberFormatException nfe){
-			return false;
-		}
-		
-		return true;
-	}
+
 	
 	@Override
 	public Map<String, String> generateTaskConfigMap(ActionParametersMap params, TaskDefinition previousTaskDefinition) {
