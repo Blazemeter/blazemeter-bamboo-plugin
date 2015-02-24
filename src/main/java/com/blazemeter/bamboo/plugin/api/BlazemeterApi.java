@@ -1,16 +1,10 @@
 package com.blazemeter.bamboo.plugin.api;
 
-import com.blazemeter.bamboo.plugin.Utils;
-import com.blazemeter.bamboo.plugin.configuration.BlazeMeterConstants;
-import org.apache.commons.lang3.StringUtils;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 
 
 /**
@@ -35,5 +29,7 @@ public interface BlazemeterApi {
     public JSONObject aggregateReport(String userKey, String reportId);
 
     public HashMap<String, String> getTestList(String userKey) throws IOException;
+
+    public boolean verifyUserKey(String userKey);
 
 }

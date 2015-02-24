@@ -18,7 +18,7 @@ import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import com.atlassian.templaterenderer.TemplateRenderer;
 import com.atlassian.sal.api.transaction.TransactionTemplate;
 import com.atlassian.sal.api.transaction.TransactionCallback;
-import com.blazemeter.bamboo.plugin.api.BlazeBean;
+import com.blazemeter.bamboo.plugin.api.BzmServiceManager;
 
 public class AdminServlet extends HttpServlet {
 	private final TransactionTemplate transactionTemplate;
@@ -134,8 +134,12 @@ public class AdminServlet extends HttpServlet {
 		} catch (NumberFormatException nfe){
 			
 		}
-		BlazeBean blazeBean = new BlazeBean(userKey, proxyserver, proxyPortInt, proxyuser, proxypass);
-		if (blazeBean.verifyUserKey(userKey)){
+        /*
+        TODO
+        Add here auto-detect version
+         */
+		BzmServiceManager bzmServiceManager = new BzmServiceManager(userKey,"v3", proxyserver, proxyPortInt, proxyuser, proxypass);
+		if (bzmServiceManager.verifyUserKey(userKey)){
 		
 			transactionTemplate.execute(new TransactionCallback() {
 				public Object doInTransaction() {

@@ -14,14 +14,14 @@ import com.atlassian.bamboo.task.TaskDefinition;
 import com.atlassian.bamboo.utils.error.ErrorCollection;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
-import com.blazemeter.bamboo.plugin.api.BlazeBean;
+import com.blazemeter.bamboo.plugin.api.BzmServiceManager;
 import com.blazemeter.bamboo.plugin.servlet.AdminServlet.Config;
 import com.google.common.collect.ImmutableList;
 import com.opensymphony.xwork.TextProvider;
 
 public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements BuildTaskRequirementSupport{
 
-	BlazeBean blazeBean;
+	BzmServiceManager bzmServiceManager;
 	
 	private static final List<String> FIELDS_TO_COPY = ImmutableList.of(BlazeMeterConstants.SETTINGS_SELECTED_TEST_ID,
             BlazeMeterConstants.SETTINGS_API_VERSION,
@@ -36,7 +36,7 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 	
 	public BlazeMeterConfigTask() {
 		super();
-		blazeBean = new BlazeBean();
+		bzmServiceManager = new BzmServiceManager();
 	}
 
 	@Override
@@ -45,7 +45,7 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 		context.put(BlazeMeterConstants.SETTINGS_DATA_FOLDER, BlazeMeterConstants.DEFAULT_SETTINGS_DATA_FOLDER);
 		
 		setSessionId();
-		context.put("testlist", blazeBean.getTests());
+		context.put("testlist", bzmServiceManager.getTests());
 		context.put("apiversionlist", API_VERSION_LIST);
 	}
 
@@ -56,7 +56,7 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 		taskConfiguratorHelper.populateContextWithConfiguration(context, taskDefinition, FIELDS_TO_COPY);
 		
 		setSessionId();
-		context.put("testlist", blazeBean.getTests());
+		context.put("testlist", bzmServiceManager.getTests());
 		
 		context.put("apiversionlist", API_VERSION_LIST);
 
@@ -83,18 +83,18 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 //		final String mainJMX = params.getString(BlazeMeterConstants.SETTINGS_MAIN_JMX);
 
 		
-		if (StringUtils.isEmpty(blazeBean.getUserKey())) {
+		if (StringUtils.isEmpty(bzmServiceManager.getUserKey())) {
 			errorCollection.addErrorMessage("Cannot load tests from BlazeMeter server. Invalid user key!");
 		}
 
 		if (StringUtils.isEmpty(selectedTest)) {
 			errorCollection.addErrorMessage(textProvider.getText("blazemeter.error." + BlazeMeterConstants.SETTINGS_SELECTED_TEST_ID));
 		} else {
-			if (!blazeBean.verifyUserKey(blazeBean.getUserKey())){
+			if (!bzmServiceManager.verifyUserKey(bzmServiceManager.getUserKey())){
 				errorCollection.addErrorMessage("Cannot load tests from BlazeMeter server. Invalid user key!");
 			} else {
 				//verify if the test still exists on BlazeMeter server
-				HashMap<String, String> tests = blazeBean.getTests();
+				HashMap<String, String> tests = bzmServiceManager.getTests();
 				if (tests != null){
 					if (!tests.keySet().contains(selectedTest)) {
 						errorCollection.addErrorMessage("Test '"+selectedTest+"' doesn't exits on BlazeMeter server.");
@@ -166,19 +166,19 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 		String proxyuser = (String) pluginSettings.get(Config.class.getName() + ".proxyuser");
 		String proxypass = (String) pluginSettings.get(Config.class.getName() + ".proxypass");		
 		if (config != null){
-			blazeBean.setUserKey(config);
+			bzmServiceManager.setUserKey(config);
 		}
 		if (proxyserver != null){
-			blazeBean.setProxyserver(proxyserver);
+			bzmServiceManager.setProxyserver(proxyserver);
 		} 
 		if (proxyport != null){
-			blazeBean.setProxyport(proxyport);
+			bzmServiceManager.setProxyport(proxyport);
 		} 
 		if (proxyuser != null){
-			blazeBean.setProxyuser(proxyuser);
+			bzmServiceManager.setProxyuser(proxyuser);
 		} 
 		if (proxypass != null){
-			blazeBean.setProxypass(proxypass);
+			bzmServiceManager.setProxypass(proxypass);
 		} 
 		
 	}

@@ -25,6 +25,24 @@ public class Utils {
     }
 
 
+    public static boolean isFullPath(String path){
+        if (path.startsWith("/")){
+            return true;
+        }
+
+        if (path.length() < 3) {
+            return false;
+        }
+        if (path.substring(0,1).matches("[a-zA-Z]")){//like D:/
+            if (path.substring(1, 2).equals(":") && (path.substring(2, 3).equals("/") || path.substring(2, 3).equals("\\"))){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
     public static String getFileContents(String fn) {
 
         // ...checks on aFile are elided

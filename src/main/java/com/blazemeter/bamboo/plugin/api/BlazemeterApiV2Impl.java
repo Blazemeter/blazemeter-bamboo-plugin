@@ -2,8 +2,6 @@ package com.blazemeter.bamboo.plugin.api;
 
 import java.io.IOException;
 import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
@@ -11,7 +9,6 @@ import com.blazemeter.bamboo.plugin.TestStatus;
 import com.blazemeter.bamboo.plugin.Utils;
 import org.apache.commons.lang3.StringUtils;
 
-import com.blazemeter.bamboo.plugin.configuration.BlazeMeterConstants;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -235,11 +232,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi{
         return testListOrdered;
     }
 
-    /*
-    TODO
-    This method should be refactored to interface.
-    In current state it is ugly.
-     */
+    @Override
     public boolean verifyUserKey(String userKey) {
 
         if (userKey == null || userKey.trim().isEmpty()) {

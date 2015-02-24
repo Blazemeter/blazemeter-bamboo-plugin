@@ -16,15 +16,16 @@ import com.atlassian.bamboo.task.TaskType;
 import com.atlassian.bamboo.v2.build.CurrentBuildResult;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
-import com.blazemeter.bamboo.plugin.api.BlazeBean;
+import com.blazemeter.bamboo.plugin.api.BzmServiceManager;
 import com.blazemeter.bamboo.plugin.api.TestInfo;
 import com.blazemeter.bamboo.plugin.configuration.BlazeMeterConstants;
 import com.blazemeter.bamboo.plugin.servlet.AdminServlet.Config;
+import org.apache.commons.lang3.StringUtils;
 
 public class BlazeMeterTaskType implements TaskType{
 	private static final int CHECK_INTERVAL = 60000;
 	
-	private BlazeBean blazeBean;
+	private BzmServiceManager bzmServiceManager;
 	
 	private String testId;
 	private int testDuration;
@@ -44,8 +45,6 @@ public class BlazeMeterTaskType implements TaskType{
 	public BlazeMeterTaskType(final ProcessService processService, PluginSettingsFactory pluginSettingsFactory){
 		this.processService = processService;
 		this.pluginSettingsFactory = pluginSettingsFactory;
-		
-		blazeBean = new BlazeBean();
 	}
 	
 	private void addError(String error, BuildLogger logger, CurrentBuildResult currentBuildResult){
@@ -58,38 +57,37 @@ public class BlazeMeterTaskType implements TaskType{
 		final BuildLogger logger = context.getBuildLogger();
 		final CurrentBuildResult currentBuildResult = context.getBuildContext().getBuildResult();
 		TaskResultBuilder resultBuilder = TaskResultBuilder.create(context);
-		
+        ConfigurationMap configMap = context.getConfigurationMap();
+        String apiVersion=configMap.get(BlazeMeterConstants.SETTINGS_API_VERSION);
 		logger.addBuildLogEntry("BlazeMeter execute task");
-		
-		PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();	
+		PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
 		String config = (String) pluginSettings.get(Config.class.getName() + ".userkey");
 		String proxyserver = (String) pluginSettings.get(Config.class.getName() + ".proxyserver");
 		String proxyport = (String) pluginSettings.get(Config.class.getName() + ".proxyport");
 		String proxyuser = (String) pluginSettings.get(Config.class.getName() + ".proxyuser");
-		String proxypass = (String) pluginSettings.get(Config.class.getName() + ".proxypass");		
-		if (proxyserver != null){
-			blazeBean.setProxyserver(proxyserver);
-		} 
-		if (proxyport != null){
-			blazeBean.setProxyport(proxyport);
-		} 
-		if (proxyuser != null){
-			blazeBean.setProxyuser(proxyuser);
-		} 
-		if (proxypass != null){
-			blazeBean.setProxypass(proxypass);
-		} 		
-		if (config != null){
-			blazeBean.setUserKey(config);
-		} else {
-			addError("BlazeMeter user key not defined!", logger, currentBuildResult);
-			return resultBuilder.failed().build();
+		String proxypass = (String) pluginSettings.get(Config.class.getName() + ".proxypass");
+
+
+        if(!StringUtils.isBlank(apiVersion)&
+                proxyserver!=null&
+                !StringUtils.isAlpha(proxyport)&
+                proxyuser!=null&
+                proxypass!=null&
+                proxypass!=null&
+                !StringUtils.isBlank(config)){
+            this.bzmServiceManager = new BzmServiceManager(config,apiVersion,
+                    proxyserver,
+                    proxyport.isEmpty()?0:Integer.parseInt(proxyport),
+                    proxyuser,proxypass);
+        }
+        if (StringUtils.isBlank(config)){
+            addError("BlazeMeter user key not defined!", logger, currentBuildResult);
+            return resultBuilder.failed().build();
 		}
 		
 		rootDirectory = context.getRootDirectory();
 		
-		ConfigurationMap configMap = context.getConfigurationMap();
-		
+
 		String validation = initialize(configMap, logger, currentBuildResult);
 		
 		if (validation != null){
@@ -97,13 +95,13 @@ public class BlazeMeterTaskType implements TaskType{
 		}
 		
 		logger.addBuildLogEntry("Attempting to start test with id:"+testId);
-		boolean started = blazeBean.startTest(testId, logger, currentBuildResult);
+		boolean started = bzmServiceManager.startTest(testId, logger, currentBuildResult);
 		
 		if (!started){
 			return resultBuilder.failed().build();
 		} else {
-			if (blazeBean.getSession() != null){//save the session id to the build custom data map
-				context.getBuildContext().getBuildResult().getCustomBuildData().put("session_id", blazeBean.getSession());
+			if (bzmServiceManager.getSession() != null){//save the session id to the build custom data map
+				context.getBuildContext().getBuildResult().getCustomBuildData().put("session_id", bzmServiceManager.getSession());
 			} else {
 				addError("Failed to retrieve test session id! Report will not be available for this test!", logger, currentBuildResult);
 			}
@@ -124,7 +122,7 @@ public class BlazeMeterTaskType implements TaskType{
 			}
 			
 			logger.addBuildLogEntry("Check if the test is still running. Time passed since start:"+((currentCheck*CHECK_INTERVAL)/1000/60) + " minutes.");
-			testInfo = blazeBean.getTestStatus(testId);
+			testInfo = bzmServiceManager.getTestStatus(testId);
 			if (testInfo.getStatus().equals(TestStatus.NotRunning.toString())){
 				logger.addBuildLogEntry("Test is finished earlier then estimated! Time passed since start:"+((currentCheck*CHECK_INTERVAL)/1000/60) + " minutes.");
 				break;
@@ -138,19 +136,19 @@ public class BlazeMeterTaskType implements TaskType{
 		
 		//BlazeMeter test stopped due to user test duration setup reached
 		logger.addBuildLogEntry("Stopping test...");
-		blazeBean.stopTest(testId, logger, currentBuildResult);
+		bzmServiceManager.stopTest(testId, logger, currentBuildResult);
 		
 		logger.addBuildLogEntry("Test finished. Checking for test report...");
 		
         //get testGetArchive information
-        boolean waitForReport = blazeBean.waitForReport(logger, currentBuildResult);
+        boolean waitForReport = bzmServiceManager.waitForReport(logger, currentBuildResult);
         
         if (waitForReport){
-        	int reportStatus = blazeBean.getReport(errorFailedThreshold, errorUnstableThreshold, responseTimeFailedThreshold, responseTimeUnstableThreshold, logger, currentBuildResult);
+        	int reportStatus = bzmServiceManager.getReport(errorFailedThreshold, errorUnstableThreshold, responseTimeFailedThreshold, responseTimeUnstableThreshold, logger, currentBuildResult);
 
 //        	if (reportStatus != -1){
         		//TODO
-            	blazeBean.publishReportArtifact(context.getBuildContext().getBuildResult());
+            	bzmServiceManager.publishReportArtifact(context.getBuildContext().getBuildResult());
 //        	}
         	
         	switch (reportStatus) {
@@ -188,16 +186,16 @@ public class BlazeMeterTaskType implements TaskType{
 	
 	private String validateParams(Map<String, String> params, BuildLogger logger) {
 		
-		if (!blazeBean.verifyUserKey(blazeBean.getUserKey())){
+		if (!bzmServiceManager.verifyUserKey(bzmServiceManager.getUserKey())){
 			return "Invalid user key defined! Set a valid user key in BlazeMeter Administration page.";
 		}
 		
 		testId = params.get(BlazeMeterConstants.SETTINGS_SELECTED_TEST_ID);
-		if (isNullorEmpty(testId)) {
+		if (StringUtils.isBlank(testId)) {
 			return "No test was defined in the configuration page.";
 		} else {
 			//verify if the test still exists on BlazeMeter server
-			HashMap<String, String> tests = blazeBean.getTests();
+			HashMap<String, String> tests = bzmServiceManager.getTests();
 			if (tests != null){
 				if (!tests.keySet().contains(testId)) {
 					return "Test removed from BlazeMeter server.";
@@ -207,7 +205,7 @@ public class BlazeMeterTaskType implements TaskType{
 			}
 		}
 		String testDrt = params.get(BlazeMeterConstants.SETTINGS_TEST_DURATION);
-		if (isNullorEmpty(testDrt)) {
+		if (StringUtils.isBlank(testDrt)) {
 			return "Test duration not set.";
 		} else {
 			try{
@@ -244,7 +242,7 @@ public class BlazeMeterTaskType implements TaskType{
 		}
 		
 		dataFolder = params.get(BlazeMeterConstants.SETTINGS_DATA_FOLDER);
-		if (isNullorEmpty(dataFolder)){
+		if (StringUtils.isBlank(dataFolder)){
 			dataFolder = "";
 		}
 		
@@ -253,7 +251,7 @@ public class BlazeMeterTaskType implements TaskType{
 		
 		logger.addBuildLogEntry("File separator should be " + File.separator);
 
-		if (isNullorEmpty(mainJMX)) {
+		if (StringUtils.isBlank(mainJMX)) {
 			needTestUpload = false;
 		} else {
 			String agentCheckoutDir = rootDirectory.getAbsolutePath();
@@ -261,7 +259,7 @@ public class BlazeMeterTaskType implements TaskType{
 				agentCheckoutDir += File.separator;//make sure that the path ends with '/'
 			}
 									
-	        if (!isFullPath(dataFolder)){//full path
+	        if (!Utils.isFullPath(dataFolder)){//full path
 	        	dataFolder = agentCheckoutDir + dataFolder;
 	        } 
 	        
@@ -302,44 +300,14 @@ public class BlazeMeterTaskType implements TaskType{
                 file = listOfFiles[i].getName();
                 if (file.endsWith(mainJMX)){
                 	logger.addBuildLogEntry("Uploading main JMX "+mainJMX);
-                    blazeBean.uploadJMX(testId, mainJMX, dataFolder + File.separator + mainJMX);
+                    bzmServiceManager.uploadJMX(testId, mainJMX, dataFolder + File.separator + mainJMX);
                 }
                 else {
                 	logger.addBuildLogEntry("Uploading data files "+file);
-                	blazeBean.uploadFile(testId, dataFolder, file, logger, currentBuildResult);
+                	bzmServiceManager.uploadFile(testId, dataFolder, file, logger, currentBuildResult);
                 }
             }
         }
     }
 
-	
-	private boolean isFullPath(String path){
-		if (path.startsWith("/")){
-			return true;
-		}
-		
-		if (path.length() < 3) {
-			return false;
-		}
-		if (path.substring(0,1).matches("[a-zA-Z]")){//like D:/
-			if (path.substring(1, 2).equals(":") && (path.substring(2, 3).equals("/") || path.substring(2, 3).equals("\\"))){
-				return true;
-			}
-		}
-		
-		return false;
 	}
-	
-	/**
-	 * Check if the value is null or empty
-	 * @param value
-	 * @return true if the value is null or empty, false otherwise
-	 */
-	private boolean isNullorEmpty(String value){
-		if ((value == null) || ("".equals(value))){
-			return true;
-		}
-		return false;
-	}
-
-}
