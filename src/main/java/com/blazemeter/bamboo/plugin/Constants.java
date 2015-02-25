@@ -9,7 +9,7 @@ public interface Constants {
 	public final static String BLAZE_METER_STATISTICS_NAME = "BlazeMeterStatistics";
 	public final static String USER_KEY = "USER_KEY";
 	public final static String BLAZEMETER_URL = "BLAZEMETER_URL";
-	public final static String BLAZEMETER_API_VERSION = "BLAZEMETER_API_VERSION";
+	public final static String BLAZEMETER_API_VERSION = "api_version";
     public final static String DEFAULT_BZM_SERVER="https://a.blazemeter.com";
 
 	public final static String PROXY_SERVER_NAME = "SERVER_NAME";

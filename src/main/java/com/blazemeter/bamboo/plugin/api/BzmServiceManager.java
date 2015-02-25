@@ -45,7 +45,7 @@ public class BzmServiceManager {
                 proxyPort,
                 (String)context.get(Constants.PROXY_USERNAME),
                 (String)context.get(Constants.PROXY_PASSWORD),
-                "v3");
+                (String)context.get(Constants.BLAZEMETER_API_VERSION));
 	}
 
     public static BzmServiceManager getBzmServiceManager(){

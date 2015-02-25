@@ -15,7 +15,7 @@ public class APIFactory {
         BlazemeterApi blazemeterAPI=null;
         switch (ApiVersion.valueOf(blazeMeterApiVersion)) {
             case autoDetect:
-                blazemeterAPI = new BlazemeterApiV2Impl(serverName, serverPort, username, password);
+                blazemeterAPI = new BlazemeterApiV3Impl(serverName, serverPort, username, password);
                 break;
             case v3:
                 blazemeterAPI = new BlazemeterApiV2Impl(serverName, serverPort, username, password);
