@@ -138,7 +138,7 @@ public class AdminServlet extends HttpServlet {
         TODO
         Add here auto-detect version
          */
-		BzmServiceManager bzmServiceManager = new BzmServiceManager(userKey,"v3", proxyserver, proxyPortInt, proxyuser, proxypass);
+		BzmServiceManager bzmServiceManager = BzmServiceManager.getBzmServiceManager(proxyserver, proxyport, proxyuser, proxypass);
 		if (bzmServiceManager.verifyUserKey(userKey)){
 		
 			transactionTemplate.execute(new TransactionCallback() {

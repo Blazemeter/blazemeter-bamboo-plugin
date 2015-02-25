@@ -4,11 +4,14 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 
 import com.atlassian.bamboo.build.logger.BuildLogger;
 import com.atlassian.bamboo.v2.build.CurrentBuildResult;
 import com.atlassian.util.concurrent.NotNull;
 import com.blazemeter.bamboo.plugin.BlazeMeterConstants;
+import com.blazemeter.bamboo.plugin.Constants;
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -18,11 +21,11 @@ import org.json.JSONObject;
  *
  */
 public class BzmServiceManager {
-	private String userKey;
-	private String proxyserver;
-	private String proxyport;
-	private String proxyuser;
-	private String proxypass;
+
+    private static BzmServiceManager bzmServiceManager=null;
+
+
+    private String userKey;
     private String apiVersion;
 	private BlazemeterApi blazemeterApi;
 	
@@ -31,16 +34,54 @@ public class BzmServiceManager {
 	private String session;
 	private String aggregate;
 	
-	public BzmServiceManager(){
+	private BzmServiceManager(){
 	}
 	
-	public BzmServiceManager(String userKey, String apiVersion,String serverName, int serverPort, String username, String password) {
-		blazemeterApi = new BlazemeterApiV2Impl(serverName, serverPort, username, password);
-		this.userKey = userKey;
-        this.apiVersion=apiVersion;
+	private BzmServiceManager(Map<String, Object> context) {
+        int proxyPort= (StringUtils.isBlank((String)context.get(Constants.PROXY_SERVER_PORT))?0:
+                Integer.parseInt((String)context.get(Constants.PROXY_SERVER_PORT)));
+
+        blazemeterApi = APIFactory.getAPI((String)context.get(Constants.PROXY_SERVER_NAME),
+                proxyPort,
+                (String)context.get(Constants.PROXY_USERNAME),
+                (String)context.get(Constants.PROXY_PASSWORD),
+                "v3");
 	}
 
-	@NotNull
+    public static BzmServiceManager getBzmServiceManager(){
+        return bzmServiceManager;
+    }
+    public static BzmServiceManager getBzmServiceManager(String proxyserver,
+                                                         String proxyport,
+                                                         String proxyuser,
+                                                         String proxypass
+                                                         ) {
+        int proxyPort= (StringUtils.isBlank(proxyport)?0:Integer.parseInt(proxyport));
+
+        bzmServiceManager.blazemeterApi = APIFactory.getAPI(proxyserver,
+                proxyPort,proxyuser,proxypass,"v3");
+    return bzmServiceManager;
+    }
+
+        public static BzmServiceManager getBzmServiceManager(Map<String, Object> context) {
+        if(bzmServiceManager==null){
+            bzmServiceManager=new BzmServiceManager(context);
+        }else{
+            bzmServiceManager.setUserKey((String)context.get(BlazeMeterConstants.USER_KEY));
+            int proxyPort= (StringUtils.isBlank((String)context.get(Constants.PROXY_SERVER_PORT))?0:
+                    Integer.parseInt((String)context.get(Constants.PROXY_SERVER_PORT)));
+
+            bzmServiceManager.blazemeterApi = APIFactory.getAPI((String)context.get(Constants.PROXY_SERVER_NAME),
+                    proxyPort,
+                    (String)context.get(Constants.PROXY_USERNAME),
+                    (String)context.get(Constants.PROXY_PASSWORD),
+                    (String)context.get(Constants.BLAZEMETER_API_VERSION));
+        }
+        return bzmServiceManager;
+    }
+
+
+    @NotNull
 	public String getDebugKey() {
 		return "Debug Key";
 	}
@@ -51,7 +92,7 @@ public class BzmServiceManager {
 	 */
 	public HashMap<String, String> getTests() {
 		try {
-			return getAPI().getTestList(userKey);
+			return this.blazemeterApi.getTestList(userKey);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -70,7 +111,7 @@ public class BzmServiceManager {
         JSONObject json;
         int countStartRequests = 0;
         do {
-            json = getAPI().startTest(userKey, testId);
+            json = this.blazemeterApi.startTest(userKey, testId);
             countStartRequests++;
             if (countStartRequests > 5) {
             	addError("Could not start BlazeMeter Test", logger, currentBuildResult);
@@ -85,7 +126,7 @@ public class BzmServiceManager {
 					return false;
 				}
                 //Try again.
-				json = getAPI().startTest(userKey, testId);
+				json = this.blazemeterApi.startTest(userKey, testId);
                 if (!json.get("response_code").equals(200)) {
                 	addError("Could not start BlazeMeter Test -" + json.get("error").toString(), logger, currentBuildResult);
                     return false;
@@ -100,7 +141,7 @@ public class BzmServiceManager {
 
 	public boolean isReportReady(){
         //get testGetArchive information
-		JSONObject json = getAPI().aggregateReport(userKey, session);
+		JSONObject json = this.blazemeterApi.aggregateReport(userKey, session);
         try {
             if (json.get("response_code").equals(404))
                 return false;
@@ -116,11 +157,11 @@ public class BzmServiceManager {
 	@SuppressWarnings("static-access")
 	public boolean waitForReport(BuildLogger logger, CurrentBuildResult currentBuildResult){
         //get testGetArchive information
-		JSONObject json = getAPI().aggregateReport(userKey, session);
+		JSONObject json = this.blazemeterApi.aggregateReport(userKey, session);
         for (int i = 0; i < 200; i++) {
             try {
                 if (json.get("response_code").equals(404))
-                    json = getAPI().aggregateReport(userKey, session);
+                    json = this.blazemeterApi.aggregateReport(userKey, session);
                 else
                     break;
             } catch (JSONException e) {
@@ -153,7 +194,7 @@ public class BzmServiceManager {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-            json = getAPI().aggregateReport(userKey, session);
+            json = this.blazemeterApi.aggregateReport(userKey, session);
         }
 
         if (aggregate == null) {
@@ -210,11 +251,11 @@ public class BzmServiceManager {
 	}
 
 	public boolean uploadJMX(String testId, String filename, String pathname){
-		return getAPI().uploadJmx(userKey, testId, filename, pathname);
+		return this.blazemeterApi.uploadJmx(userKey, testId, filename, pathname);
 	}
 	
     public void uploadFile(String testId, String dataFolder, String fileName, BuildLogger logger, CurrentBuildResult currentBuildResult) {
-        JSONObject json = getAPI().uploadFile(userKey, testId, fileName, dataFolder + File.separator + fileName);
+        JSONObject json = this.blazemeterApi.uploadFile(userKey, testId, fileName, dataFolder + File.separator + fileName);
         try {
             if (!json.get("response_code").equals(new Integer(200))) {
             	addError("Could not upload file " + fileName + " " + json.get("error").toString(), logger, currentBuildResult);
@@ -229,7 +270,7 @@ public class BzmServiceManager {
 
     	int countStartRequests = 0;
         do {
-        	json = getAPI().stopTest(userKey, testId);
+        	json = this.blazemeterApi.stopTest(userKey, testId);
             countStartRequests++;
             if (countStartRequests > 5) {
             	addError("Could not stop BlazeMeter Test "+ testId, logger, currentBuildResult);
@@ -253,7 +294,7 @@ public class BzmServiceManager {
     }
     
     public TestInfo getTestStatus(String testId){
-    	return getAPI().getTestRunStatus(userKey, testId);
+    	return this.blazemeterApi.getTestRunStatus(userKey, testId);
     }
     
 	public String getUserKey() {
@@ -262,40 +303,6 @@ public class BzmServiceManager {
 
 	public void setUserKey(String userKey) {
 		this.userKey = userKey;
-	}
-	
-	
-
-	public String getProxyserver() {
-		return proxyserver;
-	}
-
-	public void setProxyserver(String proxyserver) {
-		this.proxyserver = proxyserver;
-	}
-
-	public String getProxyport() {
-		return proxyport;
-	}
-
-	public void setProxyport(String proxyport) {
-		this.proxyport = proxyport;
-	}
-
-	public String getProxyuser() {
-		return proxyuser;
-	}
-
-	public void setProxyuser(String proxyuser) {
-		this.proxyuser = proxyuser;
-	}
-
-	public String getProxypass() {
-		return proxypass;
-	}
-
-	public void setProxypass(String proxypass) {
-		this.proxypass = proxypass;
 	}
 
 	public String getSession() {
@@ -324,21 +331,7 @@ public class BzmServiceManager {
 	
 	
 	public boolean verifyUserKey(String userKey){
-		return getAPI().verifyUserKey(userKey);
-	}
-	
-	private BlazemeterApi getAPI(){
-		if (blazemeterApi == null){
-			int proxyPortInt = -1;
-			try{
-				proxyPortInt = Integer.parseInt(proxyport);
-			} catch (NumberFormatException nfe){
-				
-			}
-			blazemeterApi = new BlazemeterApiV2Impl(proxyserver, proxyPortInt, proxyuser, proxypass);
-		}
-		
-		return blazemeterApi;
+		return this.blazemeterApi.verifyUserKey(userKey);
 	}
 
     public String getApiVersion() {
@@ -348,4 +341,6 @@ public class BzmServiceManager {
     public void setApiVersion(String apiVersion) {
         this.apiVersion = apiVersion;
     }
+
+
 }

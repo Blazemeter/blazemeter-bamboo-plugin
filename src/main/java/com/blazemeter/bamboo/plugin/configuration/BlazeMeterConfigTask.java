@@ -21,8 +21,6 @@ import com.opensymphony.xwork.TextProvider;
 
 public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements BuildTaskRequirementSupport{
 
-	BzmServiceManager bzmServiceManager;
-	
 	private static final List<String> FIELDS_TO_COPY = ImmutableList.of(BlazeMeterConstants.SETTINGS_SELECTED_TEST_ID,
             BlazeMeterConstants.SETTINGS_API_VERSION,
 			BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_UNSTABLE, BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_FAIL,
@@ -36,15 +34,16 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 	
 	public BlazeMeterConfigTask() {
 		super();
-		bzmServiceManager = new BzmServiceManager();
 	}
 
 	@Override
 	public void populateContextForCreate(Map<String, Object> context) {
 		super.populateContextForCreate(context);
 		context.put(BlazeMeterConstants.SETTINGS_DATA_FOLDER, BlazeMeterConstants.DEFAULT_SETTINGS_DATA_FOLDER);
-		
-		setSessionId();
+
+        BzmServiceManager bzmServiceManager=BzmServiceManager.getBzmServiceManager(context);
+
+        setSessionId();
 		context.put("testlist", bzmServiceManager.getTests());
 		context.put("apiversionlist", API_VERSION_LIST);
 	}
@@ -54,7 +53,8 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 		super.populateContextForEdit(context, taskDefinition);
 
 		taskConfiguratorHelper.populateContextWithConfiguration(context, taskDefinition, FIELDS_TO_COPY);
-		
+
+        BzmServiceManager bzmServiceManager=BzmServiceManager.getBzmServiceManager(context);
 		setSessionId();
 		context.put("testlist", bzmServiceManager.getTests());
 		
@@ -82,7 +82,7 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 //		final String dataFolder = params.getString(BlazeMeterConstants.SETTINGS_DATA_FOLDER);
 //		final String mainJMX = params.getString(BlazeMeterConstants.SETTINGS_MAIN_JMX);
 
-		
+		BzmServiceManager bzmServiceManager=BzmServiceManager.getBzmServiceManager();
 		if (StringUtils.isEmpty(bzmServiceManager.getUserKey())) {
 			errorCollection.addErrorMessage("Cannot load tests from BlazeMeter server. Invalid user key!");
 		}
@@ -161,26 +161,10 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 		final PluginSettingsFactory pluginSettingsFactory = StaticAccessor.getSettingsFactory();
 		PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();	
 		String config = (String) pluginSettings.get(Config.class.getName() + ".userkey");
-		String proxyserver = (String) pluginSettings.get(Config.class.getName() + ".proxyserver");
-		String proxyport = (String) pluginSettings.get(Config.class.getName() + ".proxyport");
-		String proxyuser = (String) pluginSettings.get(Config.class.getName() + ".proxyuser");
-		String proxypass = (String) pluginSettings.get(Config.class.getName() + ".proxypass");		
-		if (config != null){
+	    BzmServiceManager bzmServiceManager=BzmServiceManager.getBzmServiceManager();
+        if (config != null){
 			bzmServiceManager.setUserKey(config);
 		}
-		if (proxyserver != null){
-			bzmServiceManager.setProxyserver(proxyserver);
-		} 
-		if (proxyport != null){
-			bzmServiceManager.setProxyport(proxyport);
-		} 
-		if (proxyuser != null){
-			bzmServiceManager.setProxyuser(proxyuser);
-		} 
-		if (proxypass != null){
-			bzmServiceManager.setProxypass(proxypass);
-		} 
-		
 	}
 
 }
