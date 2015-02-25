@@ -1,6 +1,6 @@
 package com.blazemeter.bamboo.plugin.api;
 
-import com.blazemeter.bamboo.plugin.Constants;
+import com.blazemeter.bamboo.plugin.BlazeMeterConstants;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -37,12 +37,12 @@ public class BmUrlManagerV3Impl implements BmUrlManager{
 
     @Override
     public String scriptUpload(String appKey, String userKey, String testId, String fileName) {
-        return Constants.NOT_IMPLEMENTED;
+        return BlazeMeterConstants.NOT_IMPLEMENTED;
     }
 
     @Override
     public String fileUpload(String appKey, String userKey, String testId, String fileName) {
-        return Constants.NOT_IMPLEMENTED;
+        return BlazeMeterConstants.NOT_IMPLEMENTED;
     }
 
 
@@ -94,6 +94,6 @@ public class BmUrlManagerV3Impl implements BmUrlManager{
 
     @Override
     public String getUrlForTestList(String appKey, String userKey) {
-        return Constants.NOT_IMPLEMENTED;
+        return BlazeMeterConstants.NOT_IMPLEMENTED;
     }
 }

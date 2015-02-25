@@ -2,13 +2,6 @@ package com.blazemeter.bamboo.plugin;
 
 public interface BlazeMeterConstants {
 	
-    public class TestStatus {
-        public static final String Running = "Running";
-        public static final String NotRunning = "Not Running";
-        public static final String NotFound = "NotFound";
-        public static final String Error = "error";
-    }
-	
     //runner properties
 	public final static String USER_KEY = "USER_KEY";
 	
@@ -28,5 +21,14 @@ public interface BlazeMeterConstants {
 	//Report properties
 	public final static String REPORT_ERROR_THRESHOLD = "report_thr";
 	public final static String REPORT_RESPONSE_TIME = "report_resptime";
-	
+
+    public final static String BLAZEMETER_API_VERSION = "api_version";
+
+    public final static String PROXY_SERVER_NAME = "SERVER_NAME";
+    public final static String PROXY_SERVER_PORT = "SERVER_PORT";
+    public final static String PROXY_USERNAME = "USERNAME";
+    public final static String PROXY_PASSWORD = "PASSWORD";
+
+    public final static String NOT_IMPLEMENTED="This call is not implemented.";
+
 }

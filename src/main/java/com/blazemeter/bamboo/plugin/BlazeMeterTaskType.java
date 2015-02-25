@@ -66,6 +66,7 @@ public class BlazeMeterTaskType implements TaskType{
         String proxyport = (String) pluginSettings.get(Config.class.getName() + ".proxyport");
         String proxyuser = (String) pluginSettings.get(Config.class.getName() + ".proxyuser");
         String proxypass = (String) pluginSettings.get(Config.class.getName() + ".proxypass");
+        String apiversion = (String) pluginSettings.get(Config.class.getName() + ".api_version");
 
 
         if (!StringUtils.isBlank(apiVersion) &
@@ -78,7 +79,8 @@ public class BlazeMeterTaskType implements TaskType{
                     proxyserver,
                     proxyport,
                     proxyuser,
-                    proxypass
+                    proxypass,
+                    apiversion
             );
         }
 

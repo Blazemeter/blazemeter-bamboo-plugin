@@ -11,7 +11,8 @@
         <input type="text" id="userkey" name="userkey" class="text" value="${userkey}">
         <br />
         <span class="errorText">${userkey_error}</span>
-      </div>
+
+     </div>
       <div class="field-group">
         <label for="name">${i18n.getText("blazemeter.admin.proxyserver")}</label>
         <input type="text" id="proxyserver" name="proxyserver" class="text" value="${proxyserver}"><span class="errorText">${proxyserver_error}</span>
@@ -30,9 +31,20 @@
         <br />
         
       </div>
+        <!--[@ww.select cssClass="builderSelectWidget" labelKey='API Version' name='api_version' list='apiversionlist' required='true' emptyOption='false'/]-->
+
+        <div class="field-group">
+        <label>API version:</label>
+        <select id="api_version" name="api_version">
+            <option value="autoDetect">Auto Detect</option>
+            <option value="v3">V3(force)</option>
+            <option value="v2">V2(deprecated)</option>
+        </select>
+    </div>
       <div class="field-group">
         <input type="submit" value="Save" class="button">
       </div>
+
     </form>
   </body>
 </html>

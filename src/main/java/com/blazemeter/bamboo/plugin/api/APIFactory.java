@@ -1,6 +1,7 @@
 package com.blazemeter.bamboo.plugin.api;
 
 import com.blazemeter.bamboo.plugin.ApiVersion;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Created by zmicer on 25.2.15.
@@ -13,9 +14,11 @@ public class APIFactory {
                                        String password,
                                        String blazeMeterApiVersion) {
         BlazemeterApi blazemeterAPI=null;
-        switch (ApiVersion.valueOf(blazeMeterApiVersion)) {
+        switch (StringUtils.isBlank(blazeMeterApiVersion)
+                ?ApiVersion.autoDetect:ApiVersion.valueOf(blazeMeterApiVersion)) {
             case autoDetect:
-                blazemeterAPI = new BlazemeterApiV3Impl(serverName, serverPort, username, password);
+//                blazemeterAPI = new BlazemeterApiV3Impl(serverName, serverPort, username, password);
+                blazemeterAPI = new BlazemeterApiV2Impl(serverName, serverPort, username, password);
                 break;
             case v3:
                 blazemeterAPI = new BlazemeterApiV2Impl(serverName, serverPort, username, password);
