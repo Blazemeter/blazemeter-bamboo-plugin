@@ -93,7 +93,15 @@ public class BmUrlManagerV3Impl implements BmUrlManager{
     }
 
     @Override
-    public String getUrlForTestList(String appKey, String userKey) {
-        return BlazeMeterConstants.NOT_IMPLEMENTED;
+    public String getTests(String appKey, String userKey) {
+        String getTests=null;
+        try {
+            appKey = URLEncoder.encode(appKey, "UTF-8");
+            userKey = URLEncoder.encode(userKey, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        getTests=SERVER_URL+"/api/latest/tests?api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
+        return getTests;
     }
 }

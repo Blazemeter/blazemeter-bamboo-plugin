@@ -130,12 +130,7 @@ public class AdminServlet extends HttpServlet {
 		context.put("proxyuser_error", "");
 		context.put("proxypass_error", "");
 		
-		int proxyPortInt = -1;
-		try{
-			proxyPortInt = Integer.parseInt(proxyport);
-		} catch (NumberFormatException nfe){
-			
-		}
+
         /*
         TODO
         Add here auto-detect version

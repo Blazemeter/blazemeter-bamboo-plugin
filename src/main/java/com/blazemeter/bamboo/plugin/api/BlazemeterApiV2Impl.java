@@ -39,8 +39,8 @@ public class BlazemeterApiV2Impl implements BlazemeterApi{
     	this.password = password;		
         urlManager = new BmUrlManagerV2Impl("https://a.blazemeter.com");
         try {
-            bzmHttpClient = new BzmHttpClient();
-            bzmHttpClient.configureProxy(serverName, serverPort, username, password);
+            bzmHttpClient = new BzmHttpClient(serverName, username, password,serverPort);
+            bzmHttpClient.configureProxy();
         } catch (Exception ex) {
             logger.format("error Instantiating HTTPClient. Exception received: %s", ex);
         }
@@ -73,7 +73,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi{
             return false;
         }
 
-        this.bzmHttpClient.getJson(url, jmxData);
+        this.bzmHttpClient.getResponseAsJson(url, jmxData,Method.GET);
         return true;
     }
 
@@ -100,7 +100,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi{
             System.err.format(e.getMessage());
         }
 
-        return this.bzmHttpClient.getJson(url, jmxData);
+        return this.bzmHttpClient.getResponseAsJson(url, jmxData, Method.POST);
     }
 
 
@@ -116,7 +116,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi{
 
         try {
             String url = this.urlManager.testStatus(APP_KEY, userKey, testId);
-            JSONObject jo = this.bzmHttpClient.getJson(url, null);
+            JSONObject jo = this.bzmHttpClient.getResponseAsJson(url, null, Method.GET);
 
             if (jo.get(JSON_NODES.STATUS) == JSON_NODES.TEST_NOT_FOUND)
                 ti.status = TestStatus.NotFound.toString();
@@ -138,7 +138,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi{
         if (StringUtils.isBlank(userKey)&StringUtils.isBlank(testId)) return null;
 
         String url = this.urlManager.testStart(APP_KEY, userKey, testId);
-        return this.bzmHttpClient.getJson(url, null);
+        return this.bzmHttpClient.getResponseAsJson(url, null, Method.GET);
     }
 
     @Override
@@ -148,9 +148,9 @@ public class BlazemeterApiV2Impl implements BlazemeterApi{
             return 0;
         }
 
-        String url = this.urlManager.getUrlForTestList(APP_KEY, userKey);
+        String url = this.urlManager.getTests(APP_KEY, userKey);
 
-        JSONObject jo = this.bzmHttpClient.getJson(url, null);
+        JSONObject jo = this.bzmHttpClient.getResponseAsJson(url, null, Method.GET);
         String r = jo.get(JSON_NODES.RESPONSE_CODE).toString();
         if (!r.equals("200"))
             return 0;
@@ -170,7 +170,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi{
         if (StringUtils.isBlank(userKey)&StringUtils.isBlank(testId)) return null;
 
         String url = this.urlManager.testStop(APP_KEY, userKey, testId);
-        return this.bzmHttpClient.getJson(url, null);
+        return this.bzmHttpClient.getResponseAsJson(url, null, Method.GET);
     }
 
     /**
@@ -184,7 +184,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi{
         if (StringUtils.isBlank(userKey)&StringUtils.isBlank(reportId)) return null;
 
         String url = this.urlManager.testReport(APP_KEY, userKey, reportId);
-        return this.bzmHttpClient.getJson(url, null);
+        return this.bzmHttpClient.getResponseAsJson(url, null, Method.GET);
     }
 
     @Override
@@ -195,9 +195,9 @@ public class BlazemeterApiV2Impl implements BlazemeterApi{
         if (userKey == null || userKey.trim().isEmpty()) {
             logger.println("getTests userKey is empty");
         } else {
-            String url = this.urlManager.getUrlForTestList(APP_KEY, userKey);
+            String url = this.urlManager.getTests(APP_KEY, userKey);
             logger.println(url);
-            JSONObject jo = this.bzmHttpClient.getJson(url, null);
+            JSONObject jo = this.bzmHttpClient.getResponseAsJson(url, null, Method.GET);
             try {
                 String r = jo.get(JSON_NODES.RESPONSE_CODE).toString();
                 if (r.equals("200")) {
@@ -239,9 +239,9 @@ public class BlazemeterApiV2Impl implements BlazemeterApi{
         if (userKey == null || userKey.trim().isEmpty()) {
             return false;
         } else {
-            String url = this.urlManager.getUrlForTestList(APP_KEY, userKey);
+            String url = this.urlManager.getTests(APP_KEY, userKey);
             try {
-            	JSONObject jo = this.bzmHttpClient.getJson(url, null);
+            	JSONObject jo = this.bzmHttpClient.getResponseAsJson(url, null, Method.GET);
                 String r = jo.get(JSON_NODES.RESPONSE_CODE).toString();
                 if (r.equals("200")) {
                     return true;

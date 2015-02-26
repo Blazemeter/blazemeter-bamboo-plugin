@@ -21,7 +21,7 @@ public class APIFactory {
                 blazemeterAPI = new BlazemeterApiV2Impl(serverName, serverPort, username, password);
                 break;
             case v3:
-                blazemeterAPI = new BlazemeterApiV2Impl(serverName, serverPort, username, password);
+                blazemeterAPI = new BlazemeterApiV3Impl(serverName, serverPort, username, password);
                 break;
             case v2:
                 blazemeterAPI = new BlazemeterApiV2Impl(serverName, serverPort, username, password);

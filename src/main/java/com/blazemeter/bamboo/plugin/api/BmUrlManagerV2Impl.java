@@ -95,7 +95,7 @@ public class BmUrlManagerV2Impl implements BmUrlManager{
 
 
     @Override
-    public String getUrlForTestList(String appKey, String userKey) {
+    public String getTests(String appKey, String userKey) {
         try {
             appKey = URLEncoder.encode(appKey, "UTF-8");
             userKey = URLEncoder.encode(userKey, "UTF-8");

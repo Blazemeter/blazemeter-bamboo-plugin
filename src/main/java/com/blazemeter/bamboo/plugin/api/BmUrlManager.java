@@ -9,7 +9,7 @@ import java.net.URLEncoder;
  * Created by zmicer on 21.2.15.
  */
 public interface BmUrlManager {
-    String CLIENT_IDENTIFICATION = "_clientId=CI_TEAMCITY&_clientVersion="
+    String CLIENT_IDENTIFICATION = "_clientId=CI_BAMBOO&_clientVersion="
             + Utils.getVersion()+"&​";
 
     public String testStatus(String appKey, String userKey, String testId);
@@ -26,5 +26,5 @@ public interface BmUrlManager {
 
     public String getServerUrl();
 
-    public String getUrlForTestList(String appKey, String userKey);
+    public String getTests(String appKey, String userKey);
 }
