@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 import com.atlassian.bamboo.index.CustomPostBuildIndexWriter;
 import com.atlassian.bamboo.resultsummary.BuildResultsSummary;
-import com.blazemeter.bamboo.plugin.BlazeMeterConstants;
+import com.blazemeter.bamboo.plugin.configuration.BlazeMeterConstants;
 
 public class BlazeMeterResultsWriter implements CustomPostBuildIndexWriter {
 

@@ -7,7 +7,7 @@ import org.apache.lucene.document.Field;
 
 import com.atlassian.bamboo.index.CustomIndexReader;
 import com.atlassian.bamboo.resultsummary.BuildResultsSummary;
-import com.blazemeter.bamboo.plugin.BlazeMeterConstants;
+import com.blazemeter.bamboo.plugin.configuration.BlazeMeterConstants;
 
 public class BlazeMeterIndexReader implements CustomIndexReader{
 

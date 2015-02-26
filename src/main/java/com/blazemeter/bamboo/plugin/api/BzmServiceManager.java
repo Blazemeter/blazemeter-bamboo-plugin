@@ -9,7 +9,8 @@ import java.util.Map;
 import com.atlassian.bamboo.build.logger.BuildLogger;
 import com.atlassian.bamboo.v2.build.CurrentBuildResult;
 import com.atlassian.util.concurrent.NotNull;
-import com.blazemeter.bamboo.plugin.BlazeMeterConstants;
+import com.blazemeter.bamboo.plugin.configuration.BlazeMeterConstants;
+import com.blazemeter.bamboo.plugin.configuration.JSON_NODES;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -56,7 +57,7 @@ public class BzmServiceManager {
                 proxyPort,
                 (String)context.get(BlazeMeterConstants.PROXY_USERNAME),
                 (String)context.get(BlazeMeterConstants.PROXY_PASSWORD),
-                (String)context.get(BlazeMeterConstants.BLAZEMETER_API_VERSION));
+                (String)context.get(BlazeMeterConstants.SETTINGS_API_VERSION));
 	}
 
     public static BzmServiceManager getBzmServiceManager(){
@@ -93,7 +94,7 @@ public class BzmServiceManager {
                     proxyPort,
                     (String)context.get(BlazeMeterConstants.PROXY_USERNAME),
                     (String)context.get(BlazeMeterConstants.PROXY_PASSWORD),
-                    (String)context.get(BlazeMeterConstants.BLAZEMETER_API_VERSION));
+                    (String)context.get(BlazeMeterConstants.SETTINGS_API_VERSION));
         }
         return bzmServiceManager;
     }
@@ -138,14 +139,14 @@ public class BzmServiceManager {
         } while (json == null);
         
         try {
-			if (!json.get("response_code").equals(200)) {
-				if (json.get("response_code").equals(500) && json.get("error").toString().startsWith("Test already running")) {
+			if (!json.get(JSON_NODES.RESPONSE_CODE).equals(200)) {
+				if (json.get(JSON_NODES.RESPONSE_CODE).equals(500) && json.get("error").toString().startsWith("Test already running")) {
 					addError("Test already running, please stop it first", logger, currentBuildResult);
 					return false;
 				}
                 //Try again.
 				json = this.blazemeterApi.startTest(userKey, testId);
-                if (!json.get("response_code").equals(200)) {
+                if (!json.get(JSON_NODES.RESPONSE_CODE).equals(200)) {
                 	addError("Could not start BlazeMeter Test -" + json.get("error").toString(), logger, currentBuildResult);
                     return false;
                 } 				
@@ -161,10 +162,10 @@ public class BzmServiceManager {
         //get testGetArchive information
 		JSONObject json = this.blazemeterApi.aggregateReport(userKey, session);
         try {
-            if (json.get("response_code").equals(404))
+            if (json.get(JSON_NODES.RESPONSE_CODE).equals(404))
                 return false;
             else
-            	if (json.get("response_code").equals(200)){
+            	if (json.get(JSON_NODES.RESPONSE_CODE).equals(200)){
             		return true;
             	}
         } catch (JSONException e) {
@@ -178,7 +179,7 @@ public class BzmServiceManager {
 		JSONObject json = this.blazemeterApi.aggregateReport(userKey, session);
         for (int i = 0; i < 200; i++) {
             try {
-                if (json.get("response_code").equals(404))
+                if (json.get(JSON_NODES.RESPONSE_CODE).equals(404))
                     json = this.blazemeterApi.aggregateReport(userKey, session);
                 else
                     break;
@@ -196,8 +197,8 @@ public class BzmServiceManager {
 
         for (int i = 0; i < 30; i++) {
             try {
-                if (!json.get("response_code").equals(200)){
-                	addError("Error: Requesting aggregate report response code:" + json.get("response_code"), logger, currentBuildResult);
+                if (!json.get(JSON_NODES.RESPONSE_CODE).equals(200)){
+                	addError("Error: Requesting aggregate report response code:" + json.get(JSON_NODES.RESPONSE_CODE), logger, currentBuildResult);
                 }
                 aggregate = json.getJSONObject("report").get("aggregate").toString();
             } catch (JSONException e) {
@@ -275,7 +276,7 @@ public class BzmServiceManager {
     public void uploadFile(String testId, String dataFolder, String fileName, BuildLogger logger, CurrentBuildResult currentBuildResult) {
         JSONObject json = this.blazemeterApi.uploadFile(userKey, testId, fileName, dataFolder + File.separator + fileName);
         try {
-            if (!json.get("response_code").equals(new Integer(200))) {
+            if (!json.get(JSON_NODES.RESPONSE_CODE).equals(new Integer(200))) {
             	addError("Could not upload file " + fileName + " " + json.get("error").toString(), logger, currentBuildResult);
             }
         } catch (JSONException e) {
@@ -297,7 +298,7 @@ public class BzmServiceManager {
         } while (json == null);
         
         try {
-			if (json.get("response_code").equals(200)) {
+			if (json.get(JSON_NODES.RESPONSE_CODE).equals(200)) {
 				logger.addBuildLogEntry("Test stopped succesfully.");
 			} else {
 				String error = json.get("error").toString();

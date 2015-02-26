@@ -2,6 +2,7 @@ package com.blazemeter.bamboo.plugin.api;
 
 import com.blazemeter.bamboo.plugin.TestStatus;
 import com.blazemeter.bamboo.plugin.Utils;
+import com.blazemeter.bamboo.plugin.configuration.JSON_NODES;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -65,7 +66,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
         String fileCon = Utils.getFileContents(pathName);
 
         try {
-            jmxData.put("data", fileCon);
+            jmxData.put(JSON_NODES.DATA, fileCon);
         } catch (JSONException e) {
             System.err.format(e.getMessage());
             return false;
@@ -93,7 +94,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
         String fileCon = Utils.getFileContents(pathName);
 
         try {
-            jmxData.put("data", fileCon);
+            jmxData.put(JSON_NODES.DATA, fileCon);
         } catch (JSONException e) {
             System.err.format(e.getMessage());
         }
@@ -116,12 +117,12 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
             String url = this.urlManager.testStatus(APP_KEY, userKey, testId);
             JSONObject jo = this.bzmHttpClient.getJson(url, null);
 
-            if (jo.get("status") == "Test not found")
+            if (jo.get(JSON_NODES.STATUS) == JSON_NODES.TEST_NOT_FOUND)
                 ti.status = TestStatus.NotFound.toString();
             else {
-                ti.id = jo.getString("test_id");
-                ti.name = jo.getString("test_name");
-                ti.status = jo.getString("status");
+                ti.id = jo.getString(JSON_NODES.TEST_ID);
+                ti.name = jo.getString(JSON_NODES.TEST_NAME);
+                ti.status = jo.getString(JSON_NODES.STATUS);
             }
         } catch (Exception e) {
             logger.println("error getting status " + e);
@@ -149,10 +150,10 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
         String url = this.urlManager.getUrlForTestList(APP_KEY, userKey);
 
         JSONObject jo = this.bzmHttpClient.getJson(url, null);
-        String r = jo.get("response_code").toString();
+        String r = jo.get(JSON_NODES.RESPONSE_CODE).toString();
         if (!r.equals("200"))
             return 0;
-        JSONArray arr = (JSONArray) jo.get("tests");
+        JSONArray arr = (JSONArray) jo.get(JSON_NODES.TESTS);
         return arr.length();
     }
 
@@ -197,9 +198,9 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
             logger.println(url);
             JSONObject jo = this.bzmHttpClient.getJson(url, null);
             try {
-                String r = jo.get("response_code").toString();
+                String r = jo.get(JSON_NODES.RESPONSE_CODE).toString();
                 if (r.equals("200")) {
-                    JSONArray arr = (JSONArray) jo.get("tests");
+                    JSONArray arr = (JSONArray) jo.get(JSON_NODES.TESTS);
                     testListOrdered = new LinkedHashMap<String, String>(arr.length());
                     for (int i = 0; i < arr.length(); i++) {
                         JSONObject en = null;
@@ -212,8 +213,8 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
                         String name;
                         try {
                             if (en != null) {
-                                id = en.getString("test_id");
-                                name = en.getString("test_name").replaceAll("&", "&amp;");
+                                id = en.getString(JSON_NODES.TEST_ID);
+                                name = en.getString(JSON_NODES.TEST_NAME).replaceAll("&", "&amp;");
                                 testListOrdered.put(id, name);
 
                             }
@@ -240,7 +241,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
             String url = this.urlManager.getUrlForTestList(APP_KEY, userKey);
             try {
             	JSONObject jo = this.bzmHttpClient.getJson(url, null);
-                String r = jo.get("response_code").toString();
+                String r = jo.get(JSON_NODES.RESPONSE_CODE).toString();
                 if (r.equals("200")) {
                     return true;
                 } else {

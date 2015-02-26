@@ -1,6 +1,6 @@
 package com.blazemeter.bamboo.plugin.api;
 
-import com.blazemeter.bamboo.plugin.BlazeMeterConstants;
+import com.blazemeter.bamboo.plugin.configuration.BlazeMeterConstants;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;

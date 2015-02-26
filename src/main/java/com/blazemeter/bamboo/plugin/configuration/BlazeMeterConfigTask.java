@@ -156,7 +156,7 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 	public void setSessionId(){
 		final PluginSettingsFactory pluginSettingsFactory = StaticAccessor.getSettingsFactory();
 		PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();	
-		String config = (String) pluginSettings.get(Config.class.getName() + ".userkey");
+		String config = (String) pluginSettings.get(Config.class.getName() + BlazeMeterConstants.PROXY_USER_KEY);
 	    BzmServiceManager bzmServiceManager=BzmServiceManager.getBzmServiceManager();
         if (config != null){
 			bzmServiceManager.setUserKey(config);

@@ -24,7 +24,7 @@ import org.jfree.data.xy.XYSeriesCollection;
 import com.atlassian.bamboo.build.ViewBuild;
 import com.atlassian.bamboo.resultsummary.ResultsSummary;
 import com.atlassian.core.util.RandomGenerator;
-import com.blazemeter.bamboo.plugin.BlazeMeterConstants;
+import com.blazemeter.bamboo.plugin.configuration.BlazeMeterConstants;
 
 public class ViewBlazeMeterStatistics extends ViewBuild {
 	/**

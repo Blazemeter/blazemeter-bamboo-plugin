@@ -61,12 +61,12 @@ public class BlazeMeterTaskType implements TaskType{
         String apiVersion = configMap.get(BlazeMeterConstants.SETTINGS_API_VERSION);
         logger.addBuildLogEntry("BlazeMeter execute task");
         PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
-        String config = (String) pluginSettings.get(Config.class.getName() + ".userkey");
-        String proxyserver = (String) pluginSettings.get(Config.class.getName() + ".proxyserver");
-        String proxyport = (String) pluginSettings.get(Config.class.getName() + ".proxyport");
-        String proxyuser = (String) pluginSettings.get(Config.class.getName() + ".proxyuser");
-        String proxypass = (String) pluginSettings.get(Config.class.getName() + ".proxypass");
-        String apiversion = (String) pluginSettings.get(Config.class.getName() + ".api_version");
+        String config = (String) pluginSettings.get(Config.class.getName() + BlazeMeterConstants.PROXY_USER_KEY);
+        String proxyserver = (String) pluginSettings.get(Config.class.getName() + BlazeMeterConstants.PROXY_SERVER);
+        String proxyport = (String) pluginSettings.get(Config.class.getName() + BlazeMeterConstants.PROXY_PORT);
+        String proxyuser = (String) pluginSettings.get(Config.class.getName() + BlazeMeterConstants.PROXY_USER);
+        String proxypass = (String) pluginSettings.get(Config.class.getName() + BlazeMeterConstants.PROXY_PASS);
+        String apiversion = (String) pluginSettings.get(Config.class.getName() + "."+BlazeMeterConstants.SETTINGS_API_VERSION);
 
 
         if (!StringUtils.isBlank(apiVersion) &

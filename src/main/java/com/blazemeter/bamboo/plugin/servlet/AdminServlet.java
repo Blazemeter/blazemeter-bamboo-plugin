@@ -19,6 +19,7 @@ import com.atlassian.templaterenderer.TemplateRenderer;
 import com.atlassian.sal.api.transaction.TransactionTemplate;
 import com.atlassian.sal.api.transaction.TransactionCallback;
 import com.blazemeter.bamboo.plugin.api.BzmServiceManager;
+import com.blazemeter.bamboo.plugin.configuration.BlazeMeterConstants;
 
 public class AdminServlet extends HttpServlet {
 	private final TransactionTemplate transactionTemplate;
@@ -46,11 +47,11 @@ public class AdminServlet extends HttpServlet {
 		resp.setContentType("text/html;charset=utf-8");
 
 		PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
-		String config = (String) pluginSettings.get(Config.class.getName() + ".userkey");
-		String proxyserver = (String) pluginSettings.get(Config.class.getName() + ".proxyserver");
-		String proxyport = (String) pluginSettings.get(Config.class.getName() + ".proxyport");
-		String proxyuser = (String) pluginSettings.get(Config.class.getName() + ".proxyuser");
-		String proxypass = (String) pluginSettings.get(Config.class.getName() + ".proxypass");
+		String config = (String) pluginSettings.get(Config.class.getName() + BlazeMeterConstants.PROXY_USER_KEY);
+		String proxyserver = (String) pluginSettings.get(Config.class.getName() + BlazeMeterConstants.PROXY_SERVER);
+		String proxyport = (String) pluginSettings.get(Config.class.getName() + BlazeMeterConstants.PROXY_PORT);
+		String proxyuser = (String) pluginSettings.get(Config.class.getName() + BlazeMeterConstants.PROXY_USER);
+		String proxypass = (String) pluginSettings.get(Config.class.getName() + BlazeMeterConstants.PROXY_PASS);
 		if (config != null){
 			context.put("userkey", config.trim());
 			context.put("userkey_error", "");
@@ -146,11 +147,11 @@ public class AdminServlet extends HttpServlet {
 			transactionTemplate.execute(new TransactionCallback() {
 				public Object doInTransaction() {
 					PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();		
-					pluginSettings.put(Config.class.getName() + ".userkey", req.getParameter("userkey").trim());
-					pluginSettings.put(Config.class.getName() + ".proxyserver", req.getParameter("proxyserver").trim());
-					pluginSettings.put(Config.class.getName() + ".proxyport", req.getParameter("proxyport").trim());
-					pluginSettings.put(Config.class.getName() + ".proxyuser", req.getParameter("proxyuser").trim());
-					pluginSettings.put(Config.class.getName() + ".proxypass", req.getParameter("proxypass").trim());
+					pluginSettings.put(Config.class.getName() + BlazeMeterConstants.PROXY_USER_KEY, req.getParameter("userkey").trim());
+					pluginSettings.put(Config.class.getName() + BlazeMeterConstants.PROXY_SERVER, req.getParameter("proxyserver").trim());
+					pluginSettings.put(Config.class.getName() + BlazeMeterConstants.PROXY_PORT, req.getParameter("proxyport").trim());
+					pluginSettings.put(Config.class.getName() + BlazeMeterConstants.PROXY_USER, req.getParameter("proxyuser").trim());
+					pluginSettings.put(Config.class.getName() + BlazeMeterConstants.PROXY_PASS, req.getParameter("proxypass").trim());
 					return null;
 				}
 			});
