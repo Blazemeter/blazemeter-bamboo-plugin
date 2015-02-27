@@ -20,11 +20,11 @@ public interface BlazemeterApi {
 
     public TestInfo getTestRunStatus(String userKey, String testId);
 
-    public JSONObject startTest(String userKey, String testId);
+    public String startTest(String userKey, String testId) throws JSONException;
 
     public int getTestCount(String userKey) throws JSONException, IOException;
 
-    public JSONObject stopTest(String userKey, String testId);
+    public boolean stopTest(String userKey, String testId) throws JSONException;
 
     public JSONObject aggregateReport(String userKey, String reportId);
 

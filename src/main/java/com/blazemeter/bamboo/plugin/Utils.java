@@ -14,6 +14,15 @@ public class Utils {
     private Utils() {
     }
 
+
+    public static void sleep(int sleepPeriod){
+        try {
+            Thread.currentThread().sleep(sleepPeriod);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static String getVersion() {
         Properties props = new Properties();
         try {

@@ -2,7 +2,7 @@ package com.blazemeter.bamboo.plugin.api;
 
 import com.blazemeter.bamboo.plugin.TestStatus;
 import com.blazemeter.bamboo.plugin.Utils;
-import com.blazemeter.bamboo.plugin.configuration.JSON_NODES;
+import com.blazemeter.bamboo.plugin.configuration.JsonNodes;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -66,7 +66,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
         String fileCon = Utils.getFileContents(pathName);
 
         try {
-            jmxData.put(JSON_NODES.DATA, fileCon);
+            jmxData.put(JsonNodes.DATA, fileCon);
         } catch (JSONException e) {
             System.err.format(e.getMessage());
             return false;
@@ -94,7 +94,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
         String fileCon = Utils.getFileContents(pathName);
 
         try {
-            jmxData.put(JSON_NODES.DATA, fileCon);
+            jmxData.put(JsonNodes.DATA, fileCon);
         } catch (JSONException e) {
             System.err.format(e.getMessage());
         }
@@ -104,40 +104,41 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
 
 
     @Override
-    public TestInfo getTestRunStatus(String userKey, String testId) {
+    public TestInfo getTestRunStatus(String userKey,String sessionId) throws JSONException{
         TestInfo ti = new TestInfo();
-
-        if (StringUtils.isBlank(userKey)&StringUtils.isBlank(testId))
-        {
-            ti.status = TestStatus.NotFound.toString();
+        if (StringUtils.isBlank(userKey)&StringUtils.isBlank(sessionId)) {
+            ti.setStatus(TestStatus.NotFound.toString());
             return ti;
         }
-
-        try {
-            String url = this.urlManager.testStatus(APP_KEY, userKey, testId);
-            JSONObject jo = this.bzmHttpClient.getResponseAsJson(url, null,Method.GET);
-
-            if (jo.get(JSON_NODES.STATUS) == JSON_NODES.TEST_NOT_FOUND)
-                ti.status = TestStatus.NotFound.toString();
-            else {
-                ti.id = jo.getString(JSON_NODES.TEST_ID);
-                ti.name = jo.getString(JSON_NODES.TEST_NAME);
-                ti.status = jo.getString(JSON_NODES.STATUS);
+        String url = this.urlManager.testStatus(APP_KEY, userKey, sessionId);
+        JSONObject jo = this.bzmHttpClient.getResponseAsJson(url, null, Method.GET);
+        JSONObject result = (JSONObject) jo.get(JsonNodes.RESULT);
+        if (result.get(JsonNodes.DATA_URL) == null) {
+            ti.setStatus(TestStatus.NotFound.toString());
+        } else {
+            ti.setId(String.valueOf(result.getInt("testId")));
+            ti.setName(result.getString(JsonNodes.NAME));
+            if (result.getString(JsonNodes.STATUS).equals("DATA_RECIEVED")) {
+                ti.setStatus(TestStatus.Running.toString());
+            } else if (result.getString(JsonNodes.STATUS).equals("ENDED")) {
+                ti.setStatus(TestStatus.NotRunning.toString());
+            } else {
+                ti.setStatus(TestStatus.NotRunning.toString());
             }
-        } catch (Exception e) {
-            logger.println("error getting status " + e);
-            ti.status = TestStatus.Error.toString();
         }
         return ti;
     }
 
-    @Override
-    public synchronized JSONObject startTest(String userKey, String testId) {
 
+    @Override
+    public synchronized String startTest(String userKey, String testId) {
+        String session=null;
         if (StringUtils.isBlank(userKey)&StringUtils.isBlank(testId)) return null;
 
         String url = this.urlManager.testStart(APP_KEY, userKey, testId);
-        return this.bzmHttpClient.getResponseAsJson(url, null,Method.GET);
+        JSONObject json=this.bzmHttpClient.getResponseAsJson(url, null,Method.GET);
+        session = json.getJSONObject(JsonNodes.RESULT).getJSONArray("sessionsId").getString(0);
+        return session;
     }
 
     @Override
@@ -150,10 +151,10 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
         String url = this.urlManager.getTests(APP_KEY, userKey);
 
         JSONObject jo = this.bzmHttpClient.getResponseAsJson(url, null,Method.GET);
-        String r = jo.get(JSON_NODES.RESPONSE_CODE).toString();
+        String r = jo.get(JsonNodes.RESPONSE_CODE).toString();
         if (!r.equals("200"))
             return 0;
-        JSONArray arr = (JSONArray) jo.get(JSON_NODES.TESTS);
+        JSONArray arr = (JSONArray) jo.get(JsonNodes.TESTS);
         return arr.length();
     }
 
@@ -165,11 +166,11 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
      *                //     * @throws ClientProtocolException
      */
     @Override
-    public JSONObject stopTest(String userKey, String testId) {
-        if (StringUtils.isBlank(userKey)&StringUtils.isBlank(testId)) return null;
-
+    public boolean stopTest(String userKey, String testId) throws JSONException{
+        if (StringUtils.isBlank(userKey)&StringUtils.isBlank(testId)) return false;
         String url = this.urlManager.testStop(APP_KEY, userKey, testId);
-        return this.bzmHttpClient.getResponseAsJson(url, null,Method.GET);
+        JSONArray stopArray=this.bzmHttpClient.getResponseAsJson(url, null,Method.GET).getJSONArray(JsonNodes.RESULT);
+        return stopArray.length()==0;
     }
 
     /**
@@ -198,9 +199,8 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
             logger.println(url);
             JSONObject jo = this.bzmHttpClient.getResponseAsJson(url, null,Method.GET);
             try {
-                String r = jo.get(JSON_NODES.RESPONSE_CODE).toString();
-                if (r.equals("200")) {
-                    JSONArray arr = (JSONArray) jo.get(JSON_NODES.TESTS);
+                JSONArray arr = (JSONArray) jo.get(JsonNodes.RESULT);
+                if (arr.length() > 0) {
                     testListOrdered = new LinkedHashMap<String, String>(arr.length());
                     for (int i = 0; i < arr.length(); i++) {
                         JSONObject en = null;
@@ -213,8 +213,8 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
                         String name;
                         try {
                             if (en != null) {
-                                id = en.getString(JSON_NODES.TEST_ID);
-                                name = en.getString(JSON_NODES.TEST_NAME).replaceAll("&", "&amp;");
+                                id = String.valueOf(en.getInt(JsonNodes.ID));
+                                name = en.getString(JsonNodes.NAME).replaceAll("&", "&amp;");
                                 testListOrdered.put(id, name);
 
                             }
@@ -241,7 +241,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
             String url = this.urlManager.getTests(APP_KEY, userKey);
             try {
                 JSONObject jo = this.bzmHttpClient.getResponseAsJson(url, null, Method.GET);
-                if (((JSONArray) jo.get("result")).length() > 0) {
+                if (((JSONArray) jo.get(JsonNodes.RESULT)).length() > 0) {
                     return true;
                 } else {
                     return false;

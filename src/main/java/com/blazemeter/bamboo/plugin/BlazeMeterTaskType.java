@@ -24,11 +24,9 @@ import org.apache.commons.lang3.StringUtils;
 
 public class BlazeMeterTaskType implements TaskType{
 	private static final int CHECK_INTERVAL = 60000;
-	
-//	private BzmServiceManager bzmServiceManager;
-	
-	private String testId;
-	private int testDuration;
+    private static final int INIT_TEST_TIMEOUT = 900000;
+
+    private int testDuration;
 	int errorUnstableThreshold;
 	int errorFailedThreshold;
 	int responseTimeUnstableThreshold;
@@ -98,15 +96,17 @@ public class BlazeMeterTaskType implements TaskType{
                 return resultBuilder.failedWithError().build();
             }
 
-            logger.addBuildLogEntry("Attempting to start test with id:" + testId);
             BzmServiceManager bzmServiceManager = BzmServiceManager.getBzmServiceManager();
-            boolean started = bzmServiceManager.startTest(testId, logger, currentBuildResult);
+        String testId = bzmServiceManager.getTestId();
+        logger.addBuildLogEntry("Attempting to start test with id:" + testId);
+        boolean started = bzmServiceManager.startTest(testId, logger, currentBuildResult);
+        long testInitStart=System.currentTimeMillis();
 
-            if (!started) {
+        if (!started) {
                 return resultBuilder.failed().build();
             } else {
                 if (bzmServiceManager.getSession() != null) {//save the session id to the build custom data map
-                    context.getBuildContext().getBuildResult().getCustomBuildData().put("session_id", bzmServiceManager.getSession());
+                    context.getBuildContext().getBuildResult().getCustomBuildData().put("session_id", bzmServiceManager.getSession().toString());
                 } else {
                     addError("Failed to retrieve test session id! Report will not be available for this test!", logger, currentBuildResult);
                 }
@@ -118,7 +118,17 @@ public class BlazeMeterTaskType implements TaskType{
             long currentCheck = 0;
 
             TestInfo testInfo;
-            while (currentCheck++ < nrOfCheckInterval) {
+        boolean initTimeOutPassed=false;
+
+        do{
+            Utils.sleep(CHECK_INTERVAL);
+            testInfo = bzmServiceManager.getTestStatus();
+            logger.addBuildLogEntry("Check if the test is initialized...");
+            initTimeOutPassed=System.currentTimeMillis()>testInitStart+INIT_TEST_TIMEOUT;
+        }while (!testInfo.getStatus().equals(TestStatus.Running.toString())|initTimeOutPassed);
+
+
+        while (currentCheck++ < nrOfCheckInterval) {
                 try {
                     Thread.currentThread().sleep(CHECK_INTERVAL);
                 } catch (InterruptedException e) {
@@ -127,7 +137,7 @@ public class BlazeMeterTaskType implements TaskType{
                 }
 
                 logger.addBuildLogEntry("Check if the test is still running. Time passed since start:" + ((currentCheck * CHECK_INTERVAL) / 1000 / 60) + " minutes.");
-                testInfo = bzmServiceManager.getTestStatus(testId);
+                testInfo = bzmServiceManager.getTestStatus();
                 if (testInfo.getStatus().equals(TestStatus.NotRunning.toString())) {
                     logger.addBuildLogEntry("Test is finished earlier then estimated! Time passed since start:" + ((currentCheck * CHECK_INTERVAL) / 1000 / 60) + " minutes.");
                     break;
@@ -195,12 +205,13 @@ public class BlazeMeterTaskType implements TaskType{
 			return "Invalid user key defined! Set a valid user key in BlazeMeter Administration page.";
 		}
 		
-		testId = params.get(BlazeMeterConstants.SETTINGS_SELECTED_TEST_ID);
+		String testId = params.get(BlazeMeterConstants.SETTINGS_SELECTED_TEST_ID);
 		if (StringUtils.isBlank(testId)) {
 			return "No test was defined in the configuration page.";
 		} else {
 			//verify if the test still exists on BlazeMeter server
-			HashMap<String, String> tests = bzmServiceManager.getTests();
+			bzmServiceManager.setTestId(testId);
+            HashMap<String, String> tests = bzmServiceManager.getTests();
 			if (tests != null){
 				if (!tests.keySet().contains(testId)) {
 					return "Test removed from BlazeMeter server.";
@@ -306,11 +317,11 @@ public class BlazeMeterTaskType implements TaskType{
                 file = listOfFiles[i].getName();
                 if (file.endsWith(mainJMX)){
                 	logger.addBuildLogEntry("Uploading main JMX "+mainJMX);
-                    bzmServiceManager.uploadJMX(testId, mainJMX, dataFolder + File.separator + mainJMX);
+                    bzmServiceManager.uploadJMX(bzmServiceManager.getTestId(), mainJMX, dataFolder + File.separator + mainJMX);
                 }
                 else {
                 	logger.addBuildLogEntry("Uploading data files "+file);
-                	bzmServiceManager.uploadFile(testId, dataFolder, file, logger, currentBuildResult);
+                	bzmServiceManager.uploadFile(bzmServiceManager.getTestId(), dataFolder, file, logger, currentBuildResult);
                 }
             }
         }
