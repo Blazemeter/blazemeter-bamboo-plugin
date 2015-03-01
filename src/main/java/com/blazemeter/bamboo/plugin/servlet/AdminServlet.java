@@ -105,7 +105,7 @@ public class AdminServlet extends HttpServlet {
 		String proxyport = req.getParameter("proxyport").trim();
 		String proxyuser = req.getParameter("proxyuser").trim();
 		String proxypass = req.getParameter("proxypass").trim();
-		String apiversion = req.getParameter("api_version").trim();
+//		String apiversion = req.getParameter("api_version").trim();
 		try{
 			if ((proxyport == null) || (proxyport == "")){
 				proxyport = "-1";
@@ -120,7 +120,7 @@ public class AdminServlet extends HttpServlet {
 		}
 		
 		context.put("userkey", req.getParameter("userkey").trim());
-		context.put("api_version", apiversion);
+//		context.put("api_version", apiversion);
 		context.put("proxyserver", proxyserver);
 		context.put("proxyport", proxyport == "-1" ? "" : proxyport);
 		context.put("proxyuser", proxyuser);
@@ -136,7 +136,8 @@ public class AdminServlet extends HttpServlet {
         Add here auto-detect version
          */
 		BzmServiceManager bzmServiceManager =
-                BzmServiceManager.getBzmServiceManager(proxyserver, proxyport, proxyuser, proxypass,apiversion);
+                BzmServiceManager.getBzmServiceManager(proxyserver, proxyport, proxyuser, proxypass,"v3");
+//                BzmServiceManager.getBzmServiceManager(proxyserver, proxyport, proxyuser, proxypass,apiversion);
 		if (bzmServiceManager.verifyUserKey(userKey)){
 		
 			transactionTemplate.execute(new TransactionCallback() {

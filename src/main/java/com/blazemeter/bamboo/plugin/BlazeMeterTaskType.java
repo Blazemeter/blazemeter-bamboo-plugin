@@ -2,7 +2,6 @@ package com.blazemeter.bamboo.plugin;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 
 import com.atlassian.bamboo.build.logger.BuildLogger;
@@ -56,7 +55,6 @@ public class BlazeMeterTaskType implements TaskType{
         final CurrentBuildResult currentBuildResult = context.getBuildContext().getBuildResult();
         TaskResultBuilder resultBuilder = TaskResultBuilder.create(context);
         ConfigurationMap configMap = context.getConfigurationMap();
-        String apiVersion = configMap.get(BlazeMeterConstants.SETTINGS_API_VERSION);
         logger.addBuildLogEntry("BlazeMeter execute task");
         PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
         String config = (String) pluginSettings.get(Config.class.getName() + BlazeMeterConstants.PROXY_USER_KEY);
@@ -64,40 +62,27 @@ public class BlazeMeterTaskType implements TaskType{
         String proxyport = (String) pluginSettings.get(Config.class.getName() + BlazeMeterConstants.PROXY_PORT);
         String proxyuser = (String) pluginSettings.get(Config.class.getName() + BlazeMeterConstants.PROXY_USER);
         String proxypass = (String) pluginSettings.get(Config.class.getName() + BlazeMeterConstants.PROXY_PASS);
-        String apiversion = (String) pluginSettings.get(Config.class.getName() + "."+BlazeMeterConstants.SETTINGS_API_VERSION);
+        String testId = configMap.get(BlazeMeterConstants.SETTINGS_SELECTED_TEST_ID);
 
-
-        if (!StringUtils.isBlank(apiVersion) &
-                proxyserver != null &
-                !StringUtils.isAlpha(proxyport) &
-                proxyuser != null &
-                proxypass != null &
-                !StringUtils.isBlank(config)) {
-            BzmServiceManager bzmServiceManager = BzmServiceManager.getBzmServiceManager(
-                    proxyserver,
-                    proxyport,
-                    proxyuser,
-                    proxypass,
-                    apiversion
-            );
-        }
 
             if (StringUtils.isBlank(config)) {
                 addError("BlazeMeter user key not defined!", logger, currentBuildResult);
                 return resultBuilder.failed().build();
             }
+        BzmServiceManager bzmServiceManager= bzmServiceManager = BzmServiceManager.getBzmServiceManager(
+                proxyserver,
+                proxyport,
+                proxyuser,
+                proxypass,
+                "v3");
+        if(!bzmServiceManager.verifyUserKey(config)){
+            return resultBuilder.failedWithError().build();
+        }
+        bzmServiceManager.setTestId(testId);
+        bzmServiceManager.setUserKey(config);
 
-            rootDirectory = context.getRootDirectory();
+        rootDirectory = context.getRootDirectory();
 
-
-            String validation = initialize(configMap, logger, currentBuildResult);
-
-            if (validation != null) {
-                return resultBuilder.failedWithError().build();
-            }
-
-            BzmServiceManager bzmServiceManager = BzmServiceManager.getBzmServiceManager();
-        String testId = bzmServiceManager.getTestId();
         logger.addBuildLogEntry("Attempting to start test with id:" + testId);
         boolean started = bzmServiceManager.startTest(testId, logger, currentBuildResult);
         long testInitStart=System.currentTimeMillis();
@@ -180,56 +165,7 @@ public class BlazeMeterTaskType implements TaskType{
 
         }
 
-	
-	public String initialize(ConfigurationMap configMap, BuildLogger logger, CurrentBuildResult currentBuildResult){
-		logger.addBuildLogEntry("Parameter validation");
-		
-		String validationError = validateParams(configMap, logger);
-		if (validationError != null){
-			addError(validationError, logger, currentBuildResult);
-		} else {
-			logger.addBuildLogEntry("Validation passed.");
-		}
-		
-		if (needTestUpload){
-			uploadDataFolderFiles(logger, currentBuildResult);
-		}
-
-		return validationError;
-	}
-	
-	private String validateParams(Map<String, String> params, BuildLogger logger) {
-
-        BzmServiceManager bzmServiceManager=BzmServiceManager.getBzmServiceManager();
-        if (!bzmServiceManager.verifyUserKey(bzmServiceManager.getUserKey())){
-			return "Invalid user key defined! Set a valid user key in BlazeMeter Administration page.";
-		}
-		
-		String testId = params.get(BlazeMeterConstants.SETTINGS_SELECTED_TEST_ID);
-		if (StringUtils.isBlank(testId)) {
-			return "No test was defined in the configuration page.";
-		} else {
-			//verify if the test still exists on BlazeMeter server
-			bzmServiceManager.setTestId(testId);
-            HashMap<String, String> tests = bzmServiceManager.getTests();
-			if (tests != null){
-				if (!tests.keySet().contains(testId)) {
-					return "Test removed from BlazeMeter server.";
-				}
-			} else {
-				return "No tests defined on BlazeMeter server!";
-			}
-		}
-		String testDrt = params.get(BlazeMeterConstants.SETTINGS_TEST_DURATION);
-		if (StringUtils.isBlank(testDrt)) {
-			return "Test duration not set.";
-		} else {
-			try{
-				testDuration = Integer.valueOf(testDrt);
-			} catch (NumberFormatException nfe){
-				return "Test duration is not a number.";
-			}
-		}
+	private String validateLocalTresholds(Map<String, String> params, BuildLogger logger) {
 
 		String errorUnstable = params.get(BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_UNSTABLE);
 		String errorFail = params.get(BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_FAIL);
@@ -256,37 +192,8 @@ public class BlazeMeterTaskType implements TaskType{
 		} catch (NumberFormatException nfe){
 			return "Response time unstable is not a number.";
 		}
-		
-		dataFolder = params.get(BlazeMeterConstants.SETTINGS_DATA_FOLDER);
-		if (StringUtils.isBlank(dataFolder)){
-			dataFolder = "";
-		}
-		
-		dataFolder = dataFolder.trim();
-		mainJMX = params.get(BlazeMeterConstants.SETTINGS_MAIN_JMX);
-		
-		logger.addBuildLogEntry("File separator should be " + File.separator);
 
-		if (StringUtils.isBlank(mainJMX)) {
-			needTestUpload = false;
-		} else {
-			String agentCheckoutDir = rootDirectory.getAbsolutePath();
-			if (!((agentCheckoutDir.endsWith("/") || agentCheckoutDir.endsWith("\\")))){//if the path doesn't have folder separator
-				agentCheckoutDir += File.separator;//make sure that the path ends with '/'
-			}
-									
-	        if (!Utils.isFullPath(dataFolder)){//full path
-	        	dataFolder = agentCheckoutDir + dataFolder;
-	        } 
-	        
-	        File folder = new File(dataFolder);
 
-	        if (!folder.exists() || !folder.isDirectory()){
-	            return dataFolder + " could not be found on local file system, please check that the folder exists.";
-	        }
-			needTestUpload = true;
-		}
-		
 		return null;
 	}
 	
