@@ -26,7 +26,7 @@ public interface BlazemeterApi {
 
     public boolean stopTest(String userKey, String testId) throws JSONException;
 
-    public JSONObject aggregateReport(String userKey, String reportId);
+    public JSONObject testReport(String userKey, String reportId);
 
     public HashMap<String, String> getTestList(String userKey) throws IOException;
 

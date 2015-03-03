@@ -43,13 +43,8 @@ public class BlazeMeterTaskType implements TaskType{
 		this.processService = processService;
 		this.pluginSettingsFactory = pluginSettingsFactory;
 	}
-	
-	private void addError(String error, BuildLogger logger, CurrentBuildResult currentBuildResult){
-		logger.addErrorLogEntry(error);
-		currentBuildResult.addBuildErrors(Arrays.asList(error));
-	}
-	
-	@Override
+
+ 	@Override
 	public TaskResult execute(TaskContext context) throws TaskException {
         final BuildLogger logger = context.getBuildLogger();
         final CurrentBuildResult currentBuildResult = context.getBuildContext().getBuildResult();
@@ -66,7 +61,7 @@ public class BlazeMeterTaskType implements TaskType{
 
 
             if (StringUtils.isBlank(config)) {
-                addError("BlazeMeter user key not defined!", logger, currentBuildResult);
+                logger.addErrorLogEntry("BlazeMeter user key not defined!");
                 return resultBuilder.failed().build();
             }
         BzmServiceManager bzmServiceManager= bzmServiceManager = BzmServiceManager.getBzmServiceManager(
@@ -93,9 +88,9 @@ public class BlazeMeterTaskType implements TaskType{
                 if (bzmServiceManager.getSession() != null) {//save the session id to the build custom data map
                     context.getBuildContext().getBuildResult().getCustomBuildData().put("session_id", bzmServiceManager.getSession().toString());
                 } else {
-                    addError("Failed to retrieve test session id! Report will not be available for this test!", logger, currentBuildResult);
+                    logger.addErrorLogEntry("Failed to retrieve test session id! Report will not be available for this test!");
                 }
-                logger.addBuildLogEntry("Test started. Waiting " + testDuration + " minutes to finish!");
+                logger.addBuildLogEntry("Test started. Waiting for finishing...");
             }
 
             long totalWaitTime = (testDuration + 2) * 60 * 1000;//the duration is in minutes so we multiply to get the value in ms
@@ -117,7 +112,7 @@ public class BlazeMeterTaskType implements TaskType{
                 try {
                     Thread.currentThread().sleep(CHECK_INTERVAL);
                 } catch (InterruptedException e) {
-                    addError("BlazeMeter Interrupted Exception: " + e.getMessage(), logger, currentBuildResult);
+                    logger.addErrorLogEntry("BlazeMeter Interrupted Exception: " + e.getMessage());
                     break;
                 }
 
@@ -127,7 +122,7 @@ public class BlazeMeterTaskType implements TaskType{
                     logger.addBuildLogEntry("Test is finished earlier then estimated! Time passed since start:" + ((currentCheck * CHECK_INTERVAL) / 1000 / 60) + " minutes.");
                     break;
                 } else if (testInfo.getStatus().equals(TestStatus.NotFound.toString())) {
-                    addError("BlazeMeter test not found!", logger, currentBuildResult);
+                    logger.addErrorLogEntry("BlazeMeter test not found!");
                     return resultBuilder.failed().build();
                 }
             }
@@ -137,32 +132,8 @@ public class BlazeMeterTaskType implements TaskType{
             bzmServiceManager.stopTest(testId, logger, currentBuildResult);
 
             logger.addBuildLogEntry("Test finished. Checking for test report...");
-
-            //get testGetArchive information
-            boolean waitForReport = bzmServiceManager.waitForReport(logger, currentBuildResult);
-
-            if (waitForReport) {
-                int reportStatus = bzmServiceManager.getReport(errorFailedThreshold, errorUnstableThreshold, responseTimeFailedThreshold, responseTimeUnstableThreshold, logger, currentBuildResult);
-
-//        	if (reportStatus != -1){
-                //TODO
-                bzmServiceManager.publishReportArtifact(context.getBuildContext().getBuildResult());
-//        	}
-
-                switch (reportStatus) {
-                    case -1:
-                        return resultBuilder.failed().build();
-                    case 0:
-                        return resultBuilder.success().build();
-                    case 1:
-                        return resultBuilder.success().build();
-                    default:
-                        return resultBuilder.success().build();
-                }
-            } else {
-                return resultBuilder.success().build();
-            }
-
+            bzmServiceManager.getReport(logger);
+            return resultBuilder.success().build();
         }
 
 	private String validateLocalTresholds(Map<String, String> params, BuildLogger logger) {
@@ -204,13 +175,13 @@ public class BlazeMeterTaskType implements TaskType{
         BzmServiceManager bzmServiceManager=BzmServiceManager.getBzmServiceManager();
         logger.addBuildLogEntry("Uploading data files");
         if (dataFolder == null || dataFolder.isEmpty()){
-        	addError("Empty data folder. Please enter the path to your data folder or '.' for main folder where the files are checked out.", logger, currentBuildResult);
+            logger.addErrorLogEntry("Empty data folder. Please enter the path to your data folder or '.' for main folder where the files are checked out.");
             return;
         }
         
         File folder = new File(dataFolder);
-        if (!folder.exists() || !folder.isDirectory()){
-            addError("dataFolder " + dataFolder + " could not be found on local file system, please check that the folder exists.", logger, currentBuildResult);
+        if (!folder.exists() || !folder.isDirectory()) {
+            logger.addErrorLogEntry("dataFolder " + dataFolder + " could not be found on local file system, please check that the folder exists.");
             return ;
         } else {
         	logger.addBuildLogEntry("DataFolder "+dataFolder+" exists.");
@@ -233,5 +204,4 @@ public class BlazeMeterTaskType implements TaskType{
             }
         }
     }
-
 	}

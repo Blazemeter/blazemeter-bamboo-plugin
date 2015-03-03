@@ -9,8 +9,11 @@ import java.util.Map;
 import com.atlassian.bamboo.build.logger.BuildLogger;
 import com.atlassian.bamboo.v2.build.CurrentBuildResult;
 import com.atlassian.util.concurrent.NotNull;
+import com.blazemeter.bamboo.plugin.ApiVersion;
 import com.blazemeter.bamboo.plugin.configuration.BlazeMeterConstants;
 import com.blazemeter.bamboo.plugin.configuration.JsonNodes;
+import com.blazemeter.bamboo.plugin.testresult.TestResult;
+import com.blazemeter.bamboo.plugin.testresult.TestResultFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,7 +36,7 @@ public class BzmServiceManager {
 
 	private StringBuilder session=new StringBuilder();
 	private String testId=new String();
-	private String aggregate;
+	private JSONObject aggregate;
 	
 	private BzmServiceManager(){
 	}
@@ -149,7 +152,7 @@ public class BzmServiceManager {
 
 	public boolean isReportReady(){
         //get testGetArchive information
-		JSONObject json = this.blazemeterApi.aggregateReport(userKey, session.toString());
+		JSONObject json = this.blazemeterApi.testReport(userKey, session.toString());
         try {
             if (json.get(JsonNodes.RESPONSE_CODE).equals(404))
                 return false;
@@ -161,103 +164,32 @@ public class BzmServiceManager {
         } 
         return false;
     }
-	
-	@SuppressWarnings("static-access")
-	public boolean waitForReport(BuildLogger logger, CurrentBuildResult currentBuildResult){
-        //get testGetArchive information
-		JSONObject json = this.blazemeterApi.aggregateReport(userKey, session.toString());
-        for (int i = 0; i < 200; i++) {
-            try {
-                if (json.get(JsonNodes.RESPONSE_CODE).equals(404))
-                    json = this.blazemeterApi.aggregateReport(userKey, session.toString());
-                else
-                    break;
-            } catch (JSONException e) {
-            } finally {
-                try {
-					Thread.currentThread().sleep(5 * 1000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-            }
-        }
-        
-        aggregate = null;
 
-        for (int i = 0; i < 30; i++) {
-            try {
-                if (!json.get(JsonNodes.RESPONSE_CODE).equals(200)){
-                	addError("Error: Requesting aggregate report response code:" + json.get(JsonNodes.RESPONSE_CODE), logger, currentBuildResult);
-                }
-                aggregate = json.getJSONObject("report").get("aggregate").toString();
-            } catch (JSONException e) {
-            	addError("Error: Exception while starting BlazeMeter Test [" + e.getMessage() + "]", logger, currentBuildResult);
-            }
-
-            if (!aggregate.equals("null"))
-                break;
-
-            try {
-				Thread.sleep(2 * 1000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-            json = this.blazemeterApi.aggregateReport(userKey, session.toString());
-        }
-
-        if (aggregate == null) {
-        	addError("Error: Requesting aggregate is not available", logger, currentBuildResult);
-            return false;
-        }
-     
-        return true;
-    }
 	
 	/**
 	 * Get report results.
 	 * @param logger 
 	 * @return -1 fail, 0 success, 1 unstable
 	 */
-	public int getReport(int errorFailedThreshold, int errorUnstableThreshold, int responseTimeFailedThreshold, int responseTimeUnstableThreshold, BuildLogger logger, CurrentBuildResult currentBuildResult){
-        AggregateTestResult aggregateTestResult;
-		try {
-			aggregateTestResult = AggregateTestResult.generate(aggregate);
+    public TestResult getReport(BuildLogger logger) {
+        TestResultFactory testResultFactory = TestResultFactory.getTestResultFactory();
+        testResultFactory.setVersion(ApiVersion.valueOf(apiVersion));
+        TestResult testResult = null;
+        try {
+            this.aggregate=this.blazemeterApi.testReport(this.userKey,this.session.toString());
+            testResult = testResultFactory.getTestResult(this.aggregate);
 
-		} catch (IOException e) {
-			addError("Error: Requesting aggregate Test Result is not available", logger, currentBuildResult);
-			return -1;
-		}
-		
-        if (aggregateTestResult == null) {
-        	addError("Error: Requesting aggregate Test Result is not available", logger, currentBuildResult);
-            return -1;
+        } catch (JSONException e) {
+            logger.addErrorLogEntry("Problems with getting aggregate test report...",e);
+        } catch (IOException e) {
+            logger.addErrorLogEntry("Problems with getting aggregate test report...", e);
+        } catch (NullPointerException e){
+            logger.addErrorLogEntry("Problems with getting aggregate test report...", e);
         }
-
-        double thresholdTolerance = 0.00005; //null hypothesis
-        double errorPercent = aggregateTestResult.getErrorPercentage();
-        double AverageResponseTime = aggregateTestResult.getAverage();
-
-        if (errorFailedThreshold >= 0 && errorPercent - errorFailedThreshold > thresholdTolerance) {
-        	addError("Test ended with failure on error percentage threshold", logger, currentBuildResult);
-            return -1;
-        } else if (errorUnstableThreshold >= 0
-                && errorPercent - errorUnstableThreshold > thresholdTolerance) {
-        	addError("Test ended with unstable on error percentage threshold", logger, currentBuildResult);
-            return 1;
+        finally {
+            return testResult;
         }
-
-        if (responseTimeFailedThreshold >= 0 && AverageResponseTime - responseTimeFailedThreshold > thresholdTolerance) {
-        	addError("Test ended with failure on response time threshold", logger, currentBuildResult);
-            return -1;
-        } else if (responseTimeUnstableThreshold >= 0
-                && AverageResponseTime - responseTimeUnstableThreshold > thresholdTolerance) {
-        	addError("Test ended with unstable on response time threshold", logger, currentBuildResult);
-            return 1;
-        }
-
-        return 0;   		
-	}
-
+    }
 	public boolean uploadJMX(String testId, String filename, String pathname){
 		return this.blazemeterApi.uploadJmx(userKey, testId, filename, pathname);
 	}
@@ -320,27 +252,7 @@ public class BzmServiceManager {
 		return session;
 	}
 
-	public boolean publishReportArtifact(CurrentBuildResult currentBuildResult) {
-        AggregateTestResult aggregateTestResult;
-		try {
-			aggregateTestResult = AggregateTestResult.generate(aggregate);
-			if (aggregateTestResult == null){
-				return false;
-			} 
-			//TODO
-	        double errorPercent = aggregateTestResult.getErrorPercentage();
-	        double AverageResponseTime = aggregateTestResult.getAverage();
 
-	        currentBuildResult.getCustomBuildData().put(BlazeMeterConstants.REPORT_RESPONSE_TIME, ""+AverageResponseTime);
-	        currentBuildResult.getCustomBuildData().put(BlazeMeterConstants.REPORT_ERROR_THRESHOLD, ""+errorPercent);
-	        return true;
-		} catch (IOException e) {
-//			logger.error("Error: Requesting aggregate Test Result is not available");
-		}
-		return false;
-	}
-	
-	
 	public boolean verifyUserKey(String userKey){
 		return this.blazemeterApi.verifyUserKey(userKey);
 	}
