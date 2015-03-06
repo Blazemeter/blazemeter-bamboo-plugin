@@ -42,10 +42,10 @@ public class TestResultV3Impl extends TestResult {
     public String toString() {
         return "######### Aggregate Test Result ####################" +
                "\nSamples=" + hits +
-               "\nErrors percentage=" + String.format("%.5g%n", errorPercentage)+
-               "\nAverage=" + average +
-               "\nMin=" + min +
-               "\nMax=" + max+"\n"+
+               "\n Errors percentage=" + String.format("%.5g%n", errorPercentage)+
+               "\n Average=" + average +
+               "\n Min=" + min +
+               "\n Max=" + max+"\n"+
                "#################################################";
     }
 

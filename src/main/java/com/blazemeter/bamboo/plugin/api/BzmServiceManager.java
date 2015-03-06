@@ -48,7 +48,7 @@ public class BzmServiceManager {
                               String api_version) {
         int proxyPort= (StringUtils.isBlank(proxyport)?0:
                 Integer.parseInt(proxyport));
-
+        this.apiVersion=api_version;
         blazemeterApi = APIFactory.getAPI(proxyserver,proxyPort,proxyuser,proxypass,api_version);
     }
 
@@ -150,22 +150,7 @@ public class BzmServiceManager {
         return true;
     }
 
-	public boolean isReportReady(){
-        //get testGetArchive information
-		JSONObject json = this.blazemeterApi.testReport(userKey, session.toString());
-        try {
-            if (json.get(JsonNodes.RESPONSE_CODE).equals(404))
-                return false;
-            else
-            	if (json.get(JsonNodes.RESPONSE_CODE).equals(200)){
-            		return true;
-            	}
-        } catch (JSONException e) {
-        } 
-        return false;
-    }
 
-	
 	/**
 	 * Get report results.
 	 * @param logger 
@@ -178,7 +163,7 @@ public class BzmServiceManager {
         try {
             this.aggregate=this.blazemeterApi.testReport(this.userKey,this.session.toString());
             testResult = testResultFactory.getTestResult(this.aggregate);
-
+            logger.addBuildLogEntry(testResult.toString());
         } catch (JSONException e) {
             logger.addErrorLogEntry("Problems with getting aggregate test report...",e);
         } catch (IOException e) {
