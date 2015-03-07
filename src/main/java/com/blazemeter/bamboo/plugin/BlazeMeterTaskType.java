@@ -90,7 +90,6 @@ public class BlazeMeterTaskType implements TaskType{
                 } else {
                     logger.addErrorLogEntry("Failed to retrieve test session id! Report will not be available for this test!");
                 }
-//                logger.addBuildLogEntry("Test started. Waiting for finishing...");
             }
 
             long totalWaitTime = (testDuration + 2) * 60 * 1000;//the duration is in minutes so we multiply to get the value in ms
@@ -111,6 +110,8 @@ public class BlazeMeterTaskType implements TaskType{
             logger.addErrorLogEntry("Test was not initialized, marking build as failed.");
             return resultBuilder.failedWithError().build();
         }
+        logger.addBuildLogEntry("Test was initialized on server, testId="+testId);
+        logger.addBuildLogEntry("Test report is available via link: "+"https://a.blazemeter.com/app/#reports/"+bzmServiceManager.getSession().toString()+"/summary");
 
         while (currentCheck++ < nrOfCheckInterval) {
                 try {
