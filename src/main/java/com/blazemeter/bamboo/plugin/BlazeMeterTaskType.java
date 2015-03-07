@@ -23,7 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class BlazeMeterTaskType implements TaskType{
 	private static final int CHECK_INTERVAL = 60000;
-    private static final int INIT_TEST_TIMEOUT = 900000;
+    private static final int INIT_TEST_TIMEOUT = 600000;
 
     private int testDuration;
 	int errorUnstableThreshold;
@@ -90,7 +90,7 @@ public class BlazeMeterTaskType implements TaskType{
                 } else {
                     logger.addErrorLogEntry("Failed to retrieve test session id! Report will not be available for this test!");
                 }
-                logger.addBuildLogEntry("Test started. Waiting for finishing...");
+//                logger.addBuildLogEntry("Test started. Waiting for finishing...");
             }
 
             long totalWaitTime = (testDuration + 2) * 60 * 1000;//the duration is in minutes so we multiply to get the value in ms
@@ -105,8 +105,12 @@ public class BlazeMeterTaskType implements TaskType{
             testInfo = bzmServiceManager.getTestStatus();
             logger.addBuildLogEntry("Check if the test is initialized...");
             initTimeOutPassed=System.currentTimeMillis()>testInitStart+INIT_TEST_TIMEOUT;
-        }while (!testInfo.getStatus().equals(TestStatus.Running.toString())|initTimeOutPassed);
+        }while (!(initTimeOutPassed|testInfo.getStatus().equals(TestStatus.Running.toString())));
 
+        if(testInfo.getStatus().equals(TestStatus.NotRunning.toString())){
+            logger.addErrorLogEntry("Test was not initialized, marking build as failed.");
+            return resultBuilder.failedWithError().build();
+        }
 
         while (currentCheck++ < nrOfCheckInterval) {
                 try {
