@@ -136,6 +136,7 @@ public class BzmServiceManager {
 	public boolean startTest(String testId, BuildLogger logger, CurrentBuildResult currentBuildResult) {
         int countStartRequests = 0;
         try {
+            logger.addBuildLogEntry("Trying to start test with testId="+testId+" for userKey="+userKey);
             do {
                 this.session.append(this.blazemeterApi.startTest(userKey, testId));
                 countStartRequests++;
@@ -144,6 +145,7 @@ public class BzmServiceManager {
                     return false;
                 }
             } while (session.length()==0);
+            logger.addBuildLogEntry("Test with testId="+testId+" was started with session="+session.toString());
         } catch (JSONException e) {
             addError("Error: Exception while starting BlazeMeter Test [" + e.getMessage() + "]", logger, currentBuildResult);
         }
@@ -161,6 +163,7 @@ public class BzmServiceManager {
         testResultFactory.setVersion(ApiVersion.valueOf(apiVersion));
         TestResult testResult = null;
         try {
+            logger.addBuildLogEntry("Trying to request aggregate report. UserKey="+userKey+" session="+this.session.toString());
             this.aggregate=this.blazemeterApi.testReport(this.userKey,this.session.toString());
             testResult = testResultFactory.getTestResult(this.aggregate);
             logger.addBuildLogEntry(testResult.toString());
@@ -193,6 +196,7 @@ public class BzmServiceManager {
     public void stopTest(String testId, BuildLogger logger, CurrentBuildResult currentBuildResult){
          boolean stopTest=true;
     	int countStartRequests = 0;
+        logger.addBuildLogEntry("Trying to stop test with testId="+testId+" for session="+this.session.toString()+" for userKey="+userKey);
         try {
             do {
         	stopTest = this.blazemeterApi.stopTest(userKey, testId);
@@ -205,7 +209,7 @@ public class BzmServiceManager {
         
 
 			if (stopTest==true) {
-				logger.addBuildLogEntry("Test stopped succesfully.");
+				logger.addBuildLogEntry("Test stopped succesfully. testId="+testId+" userKey="+this.userKey+" session="+this.session.toString());
 			} else {
 				addError("Error stopping test: ",logger, currentBuildResult);
 				addError("Please use BlazeMeter website to manually stop the test with ID: " + testId, logger, currentBuildResult);
