@@ -48,6 +48,7 @@ public class AdminServlet extends HttpServlet {
 
 		PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
 		String config = (String) pluginSettings.get(Config.class.getName() + BlazeMeterConstants.PROXY_USER_KEY);
+		String url = (String) pluginSettings.get(Config.class.getName() + BlazeMeterConstants.SERVER_URL);
 		String proxyserver = (String) pluginSettings.get(Config.class.getName() + BlazeMeterConstants.PROXY_SERVER);
 		String proxyport = (String) pluginSettings.get(Config.class.getName() + BlazeMeterConstants.PROXY_PORT);
 		String proxyuser = (String) pluginSettings.get(Config.class.getName() + BlazeMeterConstants.PROXY_USER);
@@ -59,6 +60,8 @@ public class AdminServlet extends HttpServlet {
 			context.put("userkey", "");
 			context.put("userkey_error", "Please set the BlazeMeter user key!");
 		}
+
+        context.put("url",url.trim());
 
 		if (proxyserver != null){
 			context.put("proxyserver", proxyserver.trim());
@@ -101,11 +104,11 @@ public class AdminServlet extends HttpServlet {
 		resp.setContentType("text/html;charset=utf-8");
 		
 		String userKey = req.getParameter("userkey").trim();
+		String url = req.getParameter("url").trim();
 		String proxyserver = req.getParameter("proxyserver").trim();
 		String proxyport = req.getParameter("proxyport").trim();
 		String proxyuser = req.getParameter("proxyuser").trim();
 		String proxypass = req.getParameter("proxypass").trim();
-//		String apiversion = req.getParameter("api_version").trim();
 		try{
 			if ((proxyport == null) || (proxyport == "")){
 				proxyport = "-1";
@@ -119,8 +122,8 @@ public class AdminServlet extends HttpServlet {
 			proxyport = "-1";
 		}
 		
-		context.put("userkey", req.getParameter("userkey").trim());
-//		context.put("api_version", apiversion);
+		context.put("userkey", userKey);
+		context.put("url", url);
 		context.put("proxyserver", proxyserver);
 		context.put("proxyport", proxyport == "-1" ? "" : proxyport);
 		context.put("proxyuser", proxyuser);
@@ -137,13 +140,13 @@ public class AdminServlet extends HttpServlet {
          */
 		BzmServiceManager bzmServiceManager =
                 BzmServiceManager.getBzmServiceManager(proxyserver, proxyport, proxyuser, proxypass,"v3");
-//                BzmServiceManager.getBzmServiceManager(proxyserver, proxyport, proxyuser, proxypass,apiversion);
 		if (bzmServiceManager.verifyUserKey(userKey)){
 		
 			transactionTemplate.execute(new TransactionCallback() {
 				public Object doInTransaction() {
 					PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();		
 					pluginSettings.put(Config.class.getName() + BlazeMeterConstants.PROXY_USER_KEY, req.getParameter("userkey").trim());
+					pluginSettings.put(Config.class.getName() + BlazeMeterConstants.SERVER_URL, req.getParameter("url").trim());
 					pluginSettings.put(Config.class.getName() + BlazeMeterConstants.PROXY_SERVER, req.getParameter("proxyserver").trim());
 					pluginSettings.put(Config.class.getName() + BlazeMeterConstants.PROXY_PORT, req.getParameter("proxyport").trim());
 					pluginSettings.put(Config.class.getName() + BlazeMeterConstants.PROXY_USER, req.getParameter("proxyuser").trim());
