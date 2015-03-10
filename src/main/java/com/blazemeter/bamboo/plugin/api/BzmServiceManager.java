@@ -2,12 +2,10 @@ package com.blazemeter.bamboo.plugin.api;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.atlassian.bamboo.build.logger.BuildLogger;
-import com.atlassian.bamboo.v2.build.CurrentBuildResult;
 import com.atlassian.util.concurrent.NotNull;
 import com.blazemeter.bamboo.plugin.ApiVersion;
 import com.blazemeter.bamboo.plugin.configuration.BlazeMeterConstants;
@@ -117,23 +115,19 @@ public class BzmServiceManager {
 	 * @return
 	 */
 	public HashMap<String, String> getTests() {
-		try {
-			return this.blazemeterApi.getTestList(userKey);
+		HashMap<String,String> tests= new HashMap<String, String>();
+        try {
+			tests=this.blazemeterApi.getTestList(userKey);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            return tests;
+        }
+    }
 
-		HashMap<String, String> temp = new HashMap<String, String>();
-		return temp;//no tests found, return an empty hashmap
-	}
-
-	private void addError(String error, BuildLogger logger, CurrentBuildResult currentBuildResult){
-		logger.addErrorLogEntry(error);
-		currentBuildResult.addBuildErrors(Arrays.asList(error));
-	}
-	
-	public boolean startTest(String testId, BuildLogger logger, CurrentBuildResult currentBuildResult) {
+	public boolean startTest(String testId, BuildLogger logger) {
         int countStartRequests = 0;
         try {
             logger.addBuildLogEntry("Trying to start test with testId="+testId+" for userKey="+userKey);
@@ -141,13 +135,13 @@ public class BzmServiceManager {
                 this.session.append(this.blazemeterApi.startTest(userKey, testId));
                 countStartRequests++;
                 if (countStartRequests > 5) {
-                    addError("Could not start BlazeMeter Test", logger, currentBuildResult);
+                    logger.addErrorLogEntry("Could not start BlazeMeter Test with userKey=" + userKey + " testId=" + testId);
                     return false;
                 }
             } while (session.length()==0);
             logger.addBuildLogEntry("Test with testId="+testId+" was started with session="+session.toString());
         } catch (JSONException e) {
-            addError("Error: Exception while starting BlazeMeter Test [" + e.getMessage() + "]", logger, currentBuildResult);
+            logger.addErrorLogEntry("Error: Exception while starting BlazeMeter Test [" + e.getMessage() + "]");
         }
         return true;
     }
@@ -182,18 +176,18 @@ public class BzmServiceManager {
 		return this.blazemeterApi.uploadJmx(userKey, testId, filename, pathname);
 	}
 	
-    public void uploadFile(String testId, String dataFolder, String fileName, BuildLogger logger, CurrentBuildResult currentBuildResult) {
+    public void uploadFile(String testId, String dataFolder, String fileName, BuildLogger logger) {
         JSONObject json = this.blazemeterApi.uploadFile(userKey, testId, fileName, dataFolder + File.separator + fileName);
         try {
             if (!json.get(JsonNodes.RESPONSE_CODE).equals(new Integer(200))) {
-            	addError("Could not upload file " + fileName + " " + json.get("error").toString(), logger, currentBuildResult);
+                logger.addErrorLogEntry("Could not upload file " + fileName + " " + json.get("error").toString());
             }
         } catch (JSONException e) {
-        	addError("Could not upload file " + fileName + " " + e.getMessage(), logger, currentBuildResult);
+            logger.addErrorLogEntry("Could not upload file " + e.getMessage());
         }
     } 	
 
-    public void stopTest(String testId, BuildLogger logger, CurrentBuildResult currentBuildResult){
+    public void stopTest(String testId, BuildLogger logger){
          boolean stopTest=true;
     	int countStartRequests = 0;
         logger.addBuildLogEntry("Trying to stop test with testId="+testId+" for session="+this.session.toString()+" for userKey="+userKey);
@@ -202,23 +196,20 @@ public class BzmServiceManager {
         	stopTest = this.blazemeterApi.stopTest(userKey, testId);
             countStartRequests++;
             if (countStartRequests > 5) {
-            	addError("Could not stop BlazeMeter Test "+ testId, logger, currentBuildResult);
+                logger.addErrorLogEntry("Could not stop BlazeMeter test with testId=" + testId + " userKey=" + userKey);
             	return;
             }
         } while (stopTest == false);
-        
+
 
 			if (stopTest==true) {
 				logger.addBuildLogEntry("Test stopped succesfully. testId="+testId+" userKey="+this.userKey+" session="+this.session.toString());
 			} else {
-				addError("Error stopping test: ",logger, currentBuildResult);
-				addError("Please use BlazeMeter website to manually stop the test with ID: " + testId, logger, currentBuildResult);
+                logger.addErrorLogEntry("Error while stopping test with testId=" + testId + " userKey=" + this.userKey + " session=" + this.session.toString());
 			}
 		} catch (JSONException e) {
-			addError("Error: Exception while stopping BlazeMeter Test [" + e.getMessage() + "]", logger, currentBuildResult);
-			addError("Please use BlazeMeter website to manually stop the test with ID: " + testId, logger, currentBuildResult);
+            logger.addErrorLogEntry("Error: Exception while stopping BlazeMeter Test [" + e.getMessage() + "]");
 		}
-    	
     }
     
     public TestInfo getTestStatus(){

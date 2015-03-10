@@ -50,7 +50,7 @@ public class BlazeMeterTaskType implements TaskType{
         final CurrentBuildResult currentBuildResult = context.getBuildContext().getBuildResult();
         TaskResultBuilder resultBuilder = TaskResultBuilder.create(context);
         ConfigurationMap configMap = context.getConfigurationMap();
-        logger.addBuildLogEntry("BlazeMeter execute task");
+        logger.addBuildLogEntry("Executing BlazeMeter task...");
         PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
         String config = (String) pluginSettings.get(Config.class.getName() + BlazeMeterConstants.PROXY_USER_KEY);
         String proxyserver = (String) pluginSettings.get(Config.class.getName() + BlazeMeterConstants.PROXY_SERVER);
@@ -64,13 +64,14 @@ public class BlazeMeterTaskType implements TaskType{
                 logger.addErrorLogEntry("BlazeMeter user key not defined!");
                 return resultBuilder.failed().build();
             }
-        BzmServiceManager bzmServiceManager= bzmServiceManager = BzmServiceManager.getBzmServiceManager(
+        BzmServiceManager bzmServiceManager= BzmServiceManager.getBzmServiceManager(
                 proxyserver,
                 proxyport,
                 proxyuser,
                 proxypass,
                 "v3");
         if(!bzmServiceManager.verifyUserKey(config)){
+            logger.addBuildLogEntry("Failed to verify userKey: userKey is invalid.");
             return resultBuilder.failedWithError().build();
         }
         bzmServiceManager.setTestId(testId);
@@ -79,7 +80,7 @@ public class BlazeMeterTaskType implements TaskType{
         rootDirectory = context.getRootDirectory();
 
         logger.addBuildLogEntry("Attempting to start test with id:" + testId);
-        boolean started = bzmServiceManager.startTest(testId, logger, currentBuildResult);
+        boolean started = bzmServiceManager.startTest(testId, logger);
         long testInitStart=System.currentTimeMillis();
 
         if (!started) {
@@ -88,7 +89,7 @@ public class BlazeMeterTaskType implements TaskType{
                 if (bzmServiceManager.getSession() != null) {//save the session id to the build custom data map
                     context.getBuildContext().getBuildResult().getCustomBuildData().put("session_id", bzmServiceManager.getSession().toString());
                 } else {
-                    logger.addErrorLogEntry("Failed to retrieve test session id! Report will not be available for this test!");
+                    logger.addErrorLogEntry("Failed to retrieve test session id! Check, that test was started correctly on server.");
                 }
             }
 
@@ -134,7 +135,7 @@ public class BlazeMeterTaskType implements TaskType{
 
             //BlazeMeter test stopped due to user test duration setup reached
             logger.addBuildLogEntry("Stopping test...");
-            bzmServiceManager.stopTest(testId, logger, currentBuildResult);
+            bzmServiceManager.stopTest(testId, logger);
 
             logger.addBuildLogEntry("Test finished. Checking for test report...");
             bzmServiceManager.getReport(logger);
@@ -204,7 +205,7 @@ public class BlazeMeterTaskType implements TaskType{
                 }
                 else {
                 	logger.addBuildLogEntry("Uploading data files "+file);
-                	bzmServiceManager.uploadFile(bzmServiceManager.getTestId(), dataFolder, file, logger, currentBuildResult);
+                	bzmServiceManager.uploadFile(bzmServiceManager.getTestId(), dataFolder, file, logger);
                 }
             }
         }
