@@ -15,7 +15,7 @@
      </div>
         <div class="field-group">
             <label for="name">${i18n.getText("blazemeter.admin.url")}</label>
-            <input type="text" id="url" name="url" class="text" value="${url}">
+            <input type="text" id="url" name="url" class="text">
             <br />
         </div>
       <div class="field-group">

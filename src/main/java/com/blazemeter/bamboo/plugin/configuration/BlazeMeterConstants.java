@@ -30,8 +30,10 @@ public interface BlazeMeterConstants {
 
     public final static String NOT_IMPLEMENTED="This call is not implemented.";
 
-    //Proxy constants
+
+    //Admin page constants
     public final static String PROXY_USER_KEY=".userkey";
+    public final static String SERVER_URL=".url";
     public final static String PROXY_SERVER=".proxyserver";
     public final static String PROXY_PORT=".proxyport";
     public final static String PROXY_USER=".proxyuser";
