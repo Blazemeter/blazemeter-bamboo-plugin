@@ -24,7 +24,7 @@ import org.jfree.data.xy.XYSeriesCollection;
 import com.atlassian.bamboo.build.ViewBuild;
 import com.atlassian.bamboo.resultsummary.ResultsSummary;
 import com.atlassian.core.util.RandomGenerator;
-import com.blazemeter.bamboo.plugin.configuration.BlazeMeterConstants;
+import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
 
 public class ViewBlazeMeterStatistics extends ViewBuild {
 	/**
@@ -62,14 +62,14 @@ public class ViewBlazeMeterStatistics extends ViewBuild {
         XYSeries s2 = new XYSeries("Response Time");
 
         for (ResultsSummary summary : summaries) {
-            String errThr = summary.getCustomBuildData().get(BlazeMeterConstants.REPORT_ERROR_THRESHOLD);
+            String errThr = summary.getCustomBuildData().get(Constants.REPORT_ERROR_THRESHOLD);
             if (errThr != null){
             	s1.add(summary.getBuildNumber(), new Double(errThr));
             } else {
             	s1.add(summary.getBuildNumber(), 0);
             }
             
-            String respTime = summary.getCustomBuildData().get(BlazeMeterConstants.REPORT_RESPONSE_TIME);
+            String respTime = summary.getCustomBuildData().get(Constants.REPORT_RESPONSE_TIME);
             if (respTime != null){
             	s2.add(summary.getBuildNumber(), new Double(respTime));
             } else {

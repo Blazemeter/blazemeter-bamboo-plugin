@@ -1,7 +1,6 @@
 package com.blazemeter.bamboo.plugin;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.Map;
 
 import com.atlassian.bamboo.build.logger.BuildLogger;
@@ -17,7 +16,8 @@ import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import com.blazemeter.bamboo.plugin.api.BzmServiceManager;
 import com.blazemeter.bamboo.plugin.api.TestInfo;
-import com.blazemeter.bamboo.plugin.configuration.BlazeMeterConstants;
+import com.blazemeter.bamboo.plugin.configuration.constants.AdminServletConst;
+import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
 import com.blazemeter.bamboo.plugin.servlet.AdminServlet.Config;
 import org.apache.commons.lang3.StringUtils;
 
@@ -52,12 +52,12 @@ public class BlazeMeterTaskType implements TaskType{
         ConfigurationMap configMap = context.getConfigurationMap();
         logger.addBuildLogEntry("Executing BlazeMeter task...");
         PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
-        String config = (String) pluginSettings.get(Config.class.getName() + BlazeMeterConstants.PROXY_USER_KEY);
-        String proxyserver = (String) pluginSettings.get(Config.class.getName() + BlazeMeterConstants.PROXY_SERVER);
-        String proxyport = (String) pluginSettings.get(Config.class.getName() + BlazeMeterConstants.PROXY_PORT);
-        String proxyuser = (String) pluginSettings.get(Config.class.getName() + BlazeMeterConstants.PROXY_USER);
-        String proxypass = (String) pluginSettings.get(Config.class.getName() + BlazeMeterConstants.PROXY_PASS);
-        String testId = configMap.get(BlazeMeterConstants.SETTINGS_SELECTED_TEST_ID);
+        String config = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
+        String proxyserver = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_SERVER);
+        String proxyport = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_PORT);
+        String proxyuser = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_USER);
+        String proxypass = (String) pluginSettings.get(Config.class.getName() + Constants.TEST_LIST);
+        String testId = configMap.get(Constants.SETTINGS_SELECTED_TEST_ID);
 
 
             if (StringUtils.isBlank(config)) {
@@ -144,10 +144,10 @@ public class BlazeMeterTaskType implements TaskType{
 
 	private String validateLocalTresholds(Map<String, String> params, BuildLogger logger) {
 
-		String errorUnstable = params.get(BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_UNSTABLE);
-		String errorFail = params.get(BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_FAIL);
-		String timeUnstable = params.get(BlazeMeterConstants.SETTINGS_RESPONSE_TIME_UNSTABLE);
-		String timeFail = params.get(BlazeMeterConstants.SETTINGS_RESPONSE_TIME_FAIL);
+		String errorUnstable = params.get(Constants.SETTINGS_ERROR_THRESHOLD_UNSTABLE);
+		String errorFail = params.get(Constants.SETTINGS_ERROR_THRESHOLD_FAIL);
+		String timeUnstable = params.get(Constants.SETTINGS_RESPONSE_TIME_UNSTABLE);
+		String timeFail = params.get(Constants.SETTINGS_RESPONSE_TIME_FAIL);
 
 		try{
 			errorFailedThreshold = errorFail.isEmpty()?-1:Integer.valueOf(errorFail);

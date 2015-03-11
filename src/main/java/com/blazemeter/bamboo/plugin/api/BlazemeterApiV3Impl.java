@@ -2,7 +2,7 @@ package com.blazemeter.bamboo.plugin.api;
 
 import com.blazemeter.bamboo.plugin.TestStatus;
 import com.blazemeter.bamboo.plugin.Utils;
-import com.blazemeter.bamboo.plugin.configuration.JsonNodes;
+import com.blazemeter.bamboo.plugin.configuration.constants.JsonNodes;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;

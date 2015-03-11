@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.blazemeter.bamboo.plugin.Utils;
+import com.blazemeter.bamboo.plugin.configuration.constants.AdminServletConst;
+import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
 import org.apache.commons.lang.StringUtils;
 
 import com.atlassian.bamboo.collections.ActionParametersMap;
@@ -21,12 +23,12 @@ import com.opensymphony.xwork.TextProvider;
 
 public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements BuildTaskRequirementSupport{
 
-	private static final List<String> FIELDS_TO_COPY = ImmutableList.of(BlazeMeterConstants.SETTINGS_SELECTED_TEST_ID,
-            BlazeMeterConstants.SETTINGS_API_VERSION,
-			BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_UNSTABLE, BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_FAIL,
-			BlazeMeterConstants.SETTINGS_RESPONSE_TIME_UNSTABLE, BlazeMeterConstants.SETTINGS_RESPONSE_TIME_FAIL,
-			BlazeMeterConstants.SETTINGS_TEST_DURATION, BlazeMeterConstants.SETTINGS_DATA_FOLDER,
-			BlazeMeterConstants.SETTINGS_MAIN_JMX);
+	private static final List<String> FIELDS_TO_COPY = ImmutableList.of(Constants.SETTINGS_SELECTED_TEST_ID,
+            Constants.SETTINGS_API_VERSION,
+			Constants.SETTINGS_ERROR_THRESHOLD_UNSTABLE, Constants.SETTINGS_ERROR_THRESHOLD_FAIL,
+			Constants.SETTINGS_RESPONSE_TIME_UNSTABLE, Constants.SETTINGS_RESPONSE_TIME_FAIL,
+			Constants.SETTINGS_TEST_DURATION, Constants.SETTINGS_DATA_FOLDER,
+			Constants.SETTINGS_MAIN_JMX);
 
 
 	private TextProvider textProvider;
@@ -38,12 +40,12 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 	@Override
 	public void populateContextForCreate(Map<String, Object> context) {
 		super.populateContextForCreate(context);
-		context.put(BlazeMeterConstants.SETTINGS_DATA_FOLDER, BlazeMeterConstants.DEFAULT_SETTINGS_DATA_FOLDER);
+		context.put(Constants.SETTINGS_DATA_FOLDER, Constants.DEFAULT_SETTINGS_DATA_FOLDER);
 
         BzmServiceManager bzmServiceManager=BzmServiceManager.getBzmServiceManager(context);
 
         setSessionId();
-		context.put("testlist", bzmServiceManager.getTests());
+		context.put(Constants.TEST_LIST, bzmServiceManager.getTests());
 	}
 
 	@Override
@@ -54,10 +56,10 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 
         BzmServiceManager bzmServiceManager=BzmServiceManager.getBzmServiceManager(context);
 		setSessionId();
-		context.put("testlist", bzmServiceManager.getTests());
+		context.put(Constants.TEST_LIST, bzmServiceManager.getTests());
 		
 
-		context.put(BlazeMeterConstants.SETTINGS_DATA_FOLDER, taskDefinition.getConfiguration().get(BlazeMeterConstants.SETTINGS_DATA_FOLDER));
+		context.put(Constants.SETTINGS_DATA_FOLDER, taskDefinition.getConfiguration().get(Constants.SETTINGS_DATA_FOLDER));
 	}
 
 	@Override
@@ -70,12 +72,12 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 	public void validate(ActionParametersMap params, ErrorCollection errorCollection) {
 		super.validate(params, errorCollection);
 
-		final String selectedTest = params.getString(BlazeMeterConstants.SETTINGS_SELECTED_TEST_ID);
-		final String errorUnstable = params.getString(BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_UNSTABLE);
-		final String errorFail = params.getString(BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_FAIL);
-		final String respUnstable = params.getString(BlazeMeterConstants.SETTINGS_RESPONSE_TIME_UNSTABLE);
-		final String respFail = params.getString(BlazeMeterConstants.SETTINGS_RESPONSE_TIME_FAIL);
-		final String testDuration = params.getString(BlazeMeterConstants.SETTINGS_TEST_DURATION);
+		final String selectedTest = params.getString(Constants.SETTINGS_SELECTED_TEST_ID);
+		final String errorUnstable = params.getString(Constants.SETTINGS_ERROR_THRESHOLD_UNSTABLE);
+		final String errorFail = params.getString(Constants.SETTINGS_ERROR_THRESHOLD_FAIL);
+		final String respUnstable = params.getString(Constants.SETTINGS_RESPONSE_TIME_UNSTABLE);
+		final String respFail = params.getString(Constants.SETTINGS_RESPONSE_TIME_FAIL);
+		final String testDuration = params.getString(Constants.SETTINGS_TEST_DURATION);
 //		final String dataFolder = params.getString(BlazeMeterConstants.SETTINGS_DATA_FOLDER);
 //		final String mainJMX = params.getString(BlazeMeterConstants.SETTINGS_MAIN_JMX);
 
@@ -85,7 +87,7 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 		}
 
 		if (StringUtils.isEmpty(selectedTest)) {
-			errorCollection.addErrorMessage(textProvider.getText("blazemeter.error." + BlazeMeterConstants.SETTINGS_SELECTED_TEST_ID));
+			errorCollection.addErrorMessage(textProvider.getText(Constants.BLAZEMETER_ERROR + Constants.SETTINGS_SELECTED_TEST_ID));
 		} else {
 			if (!bzmServiceManager.verifyUserKey(bzmServiceManager.getUserKey())){
 				errorCollection.addErrorMessage("Cannot load tests from BlazeMeter server. Invalid user key!");
@@ -103,31 +105,31 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 		}
 		
 		if (!StringUtils.isEmpty(errorUnstable)&&!Utils.checkNumber(errorUnstable, true)) {
-            errorCollection.addError(BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_UNSTABLE,
-                    textProvider.getText("blazemeter.error." + BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_UNSTABLE));
+            errorCollection.addError(Constants.SETTINGS_ERROR_THRESHOLD_UNSTABLE,
+                    textProvider.getText(Constants.BLAZEMETER_ERROR + Constants.SETTINGS_ERROR_THRESHOLD_UNSTABLE));
 		}
 
 		if (!StringUtils.isEmpty(errorFail)&&!Utils.checkNumber(errorFail, true)) {
-            errorCollection.addError(BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_FAIL,
-                    textProvider.getText("blazemeter.error." + BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_FAIL));
+            errorCollection.addError(Constants.SETTINGS_ERROR_THRESHOLD_FAIL,
+                    textProvider.getText(Constants.BLAZEMETER_ERROR + Constants.SETTINGS_ERROR_THRESHOLD_FAIL));
 
         }
 
 		if (!StringUtils.isEmpty(respUnstable)&&!Utils.checkNumber(respUnstable, false)) {
-			errorCollection.addError(BlazeMeterConstants.SETTINGS_RESPONSE_TIME_UNSTABLE,
-						textProvider.getText("blazemeter.error." + BlazeMeterConstants.SETTINGS_RESPONSE_TIME_UNSTABLE));
+			errorCollection.addError(Constants.SETTINGS_RESPONSE_TIME_UNSTABLE,
+						textProvider.getText(Constants.BLAZEMETER_ERROR + Constants.SETTINGS_RESPONSE_TIME_UNSTABLE));
 		}
 		
 
         if (!StringUtils.isEmpty(respFail)&&!Utils.checkNumber(respFail, false)) {
-				errorCollection.addError(BlazeMeterConstants.SETTINGS_RESPONSE_TIME_FAIL,
-						textProvider.getText("blazemeter.error." + BlazeMeterConstants.SETTINGS_RESPONSE_TIME_FAIL));
+				errorCollection.addError(Constants.SETTINGS_RESPONSE_TIME_FAIL,
+						textProvider.getText(Constants.BLAZEMETER_ERROR + Constants.SETTINGS_RESPONSE_TIME_FAIL));
 		}
 
 
 		if (!StringUtils.isEmpty(testDuration)&&!Utils.checkNumber(testDuration, false)) {
-			errorCollection.addError(BlazeMeterConstants.SETTINGS_TEST_DURATION,
-					textProvider.getText("blazemeter.error." + BlazeMeterConstants.SETTINGS_TEST_DURATION));
+			errorCollection.addError(Constants.SETTINGS_TEST_DURATION,
+					textProvider.getText(Constants.BLAZEMETER_ERROR + Constants.SETTINGS_TEST_DURATION));
 		}
 	}
 
@@ -137,14 +139,14 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 	public Map<String, String> generateTaskConfigMap(ActionParametersMap params, TaskDefinition previousTaskDefinition) {
 		final Map<String, String> config = super.generateTaskConfigMap(params, previousTaskDefinition);
 
-		config.put(BlazeMeterConstants.SETTINGS_SELECTED_TEST_ID, params.getString(BlazeMeterConstants.SETTINGS_SELECTED_TEST_ID).trim());
-		config.put(BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_UNSTABLE, params.getString(BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_UNSTABLE).trim());
-		config.put(BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_FAIL, params.getString(BlazeMeterConstants.SETTINGS_ERROR_THRESHOLD_FAIL).trim());
-		config.put(BlazeMeterConstants.SETTINGS_RESPONSE_TIME_UNSTABLE, params.getString(BlazeMeterConstants.SETTINGS_RESPONSE_TIME_UNSTABLE).trim());
-		config.put(BlazeMeterConstants.SETTINGS_RESPONSE_TIME_FAIL, params.getString(BlazeMeterConstants.SETTINGS_RESPONSE_TIME_FAIL).trim());
-		config.put(BlazeMeterConstants.SETTINGS_TEST_DURATION, params.getString(BlazeMeterConstants.SETTINGS_TEST_DURATION).trim());
-		config.put(BlazeMeterConstants.SETTINGS_DATA_FOLDER, params.getString(BlazeMeterConstants.SETTINGS_DATA_FOLDER).trim());
-		config.put(BlazeMeterConstants.SETTINGS_MAIN_JMX, params.getString(BlazeMeterConstants.SETTINGS_MAIN_JMX).trim());
+		config.put(Constants.SETTINGS_SELECTED_TEST_ID, params.getString(Constants.SETTINGS_SELECTED_TEST_ID).trim());
+		config.put(Constants.SETTINGS_ERROR_THRESHOLD_UNSTABLE, params.getString(Constants.SETTINGS_ERROR_THRESHOLD_UNSTABLE).trim());
+		config.put(Constants.SETTINGS_ERROR_THRESHOLD_FAIL, params.getString(Constants.SETTINGS_ERROR_THRESHOLD_FAIL).trim());
+		config.put(Constants.SETTINGS_RESPONSE_TIME_UNSTABLE, params.getString(Constants.SETTINGS_RESPONSE_TIME_UNSTABLE).trim());
+		config.put(Constants.SETTINGS_RESPONSE_TIME_FAIL, params.getString(Constants.SETTINGS_RESPONSE_TIME_FAIL).trim());
+		config.put(Constants.SETTINGS_TEST_DURATION, params.getString(Constants.SETTINGS_TEST_DURATION).trim());
+		config.put(Constants.SETTINGS_DATA_FOLDER, params.getString(Constants.SETTINGS_DATA_FOLDER).trim());
+		config.put(Constants.SETTINGS_MAIN_JMX, params.getString(Constants.SETTINGS_MAIN_JMX).trim());
 
 		return config;
 	}
@@ -156,7 +158,7 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 	public void setSessionId(){
 		final PluginSettingsFactory pluginSettingsFactory = StaticAccessor.getSettingsFactory();
 		PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();	
-		String config = (String) pluginSettings.get(Config.class.getName() + BlazeMeterConstants.PROXY_USER_KEY);
+		String config = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
 	    BzmServiceManager bzmServiceManager=BzmServiceManager.getBzmServiceManager();
         if (config != null){
 			bzmServiceManager.setUserKey(config);

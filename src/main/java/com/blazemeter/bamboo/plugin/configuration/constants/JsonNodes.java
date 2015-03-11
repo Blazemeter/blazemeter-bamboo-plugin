@@ -1,4 +1,4 @@
-package com.blazemeter.bamboo.plugin.configuration;
+package com.blazemeter.bamboo.plugin.configuration.constants;
 
 /**
  * Created by zmicer on 26.2.15.
