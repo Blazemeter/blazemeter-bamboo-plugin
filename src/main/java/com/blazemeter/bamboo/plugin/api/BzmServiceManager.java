@@ -65,13 +65,7 @@ public class BzmServiceManager {
                 (String)context.get(Constants.SETTINGS_API_VERSION));
 	}
 
-    public static BzmServiceManager getBzmServiceManager(){
-        if(bzmServiceManager==null){
-            bzmServiceManager=new BzmServiceManager("","","","","v3");
-        }
-        return bzmServiceManager;
-    }
-    public static BzmServiceManager getBzmServiceManager(String proxyserver,
+     public static BzmServiceManager getBzmServiceManager(String proxyserver,
                                                          String proxyport,
                                                          String proxyuser,
                                                          String proxypass,

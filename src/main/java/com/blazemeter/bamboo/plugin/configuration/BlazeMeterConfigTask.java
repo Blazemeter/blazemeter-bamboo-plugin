@@ -41,24 +41,28 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 	@Override
 	public void populateContextForCreate(Map<String, Object> context) {
 		super.populateContextForCreate(context);
-        PluginSettings settings=StaticAccessor.getSettings();
-		context.put(Constants.SETTINGS_DATA_FOLDER, Constants.DEFAULT_SETTINGS_DATA_FOLDER);
+        PluginSettingsFactory pluginSettingsFactory=StaticAccessor.getSettingsFactory();
+        PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
+        String serverUrl = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
+
+        context.put(Constants.SETTINGS_DATA_FOLDER, Constants.DEFAULT_SETTINGS_DATA_FOLDER);
 
         BzmServiceManager bzmServiceManager=BzmServiceManager.getBzmServiceManager(context);
 
-        setSessionId();
-		context.put(Constants.TEST_LIST, bzmServiceManager.getTests());
+        setSessionId(bzmServiceManager);
+		context.put(Constants.TEST_LIST, bzmServiceManager.getTestsAsMap());
 	}
 
 	@Override
 	public void populateContextForEdit(Map<String, Object> context, TaskDefinition taskDefinition) {
 		super.populateContextForEdit(context, taskDefinition);
-        PluginSettings settings=StaticAccessor.getSettings();
-
         taskConfiguratorHelper.populateContextWithConfiguration(context, taskDefinition, FIELDS_TO_COPY);
+        PluginSettingsFactory pluginSettingsFactory=StaticAccessor.getSettingsFactory();
+        PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
+        String serverUrl = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
 
         BzmServiceManager bzmServiceManager=BzmServiceManager.getBzmServiceManager(context);
-		setSessionId();
+		setSessionId(bzmServiceManager);
 		context.put(Constants.TEST_LIST, bzmServiceManager.getTestsAsMap());
 		
 
@@ -81,11 +85,30 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 		final String respUnstable = params.getString(Constants.SETTINGS_RESPONSE_TIME_UNSTABLE);
 		final String respFail = params.getString(Constants.SETTINGS_RESPONSE_TIME_FAIL);
 		final String testDuration = params.getString(Constants.SETTINGS_TEST_DURATION);
+
+
 //		final String dataFolder = params.getString(BlazeMeterConstants.SETTINGS_DATA_FOLDER);
 //		final String mainJMX = params.getString(BlazeMeterConstants.SETTINGS_MAIN_JMX);
 
-		BzmServiceManager bzmServiceManager=BzmServiceManager.getBzmServiceManager();
-		if (StringUtils.isEmpty(bzmServiceManager.getUserKey())) {
+
+        PluginSettingsFactory pluginSettingsFactory=StaticAccessor.getSettingsFactory();
+        PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
+        String config = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
+        String serverUrl = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
+        String proxyserver = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_SERVER);
+        String proxyport = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_PORT);
+        String proxyuser = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_USER);
+        String proxypass = (String) pluginSettings.get(Config.class.getName() + Constants.TEST_LIST);
+
+        BzmServiceManager bzmServiceManager= BzmServiceManager.getBzmServiceManager(
+                proxyserver,
+                proxyport,
+                proxyuser,
+                proxypass,
+                "v3");
+
+
+        if (StringUtils.isEmpty(bzmServiceManager.getUserKey())) {
 			errorCollection.addErrorMessage("Cannot load tests from BlazeMeter server. Invalid user key!");
 		}
 
@@ -158,11 +181,10 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 		this.textProvider = textProvider;
 	}
 
-	public void setSessionId(){
+	public void setSessionId(BzmServiceManager bzmServiceManager){
 		final PluginSettingsFactory pluginSettingsFactory = StaticAccessor.getSettingsFactory();
 		PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();	
 		String config = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
-	    BzmServiceManager bzmServiceManager=BzmServiceManager.getBzmServiceManager();
         if (config != null){
 			bzmServiceManager.setUserKey(config);
 		}

@@ -149,7 +149,6 @@ public class AdminServlet extends HttpServlet {
 					pluginSettings.put(Config.class.getName() + AdminServletConst.DOT_PROXY_PORT, req.getParameter(AdminServletConst.PROXY_PORT).trim());
 					pluginSettings.put(Config.class.getName() + AdminServletConst.DOT_PROXY_USER, req.getParameter(AdminServletConst.PROXY_USER).trim());
 					pluginSettings.put(Config.class.getName() + Constants.TEST_LIST, req.getParameter(AdminServletConst.PROXY_PASS).trim());
-                    StaticAccessor.setSettings(pluginSettings);
                     return null;
 				}
 			});

@@ -47,12 +47,12 @@ public class BlazeMeterTaskType implements TaskType{
  	@Override
 	public TaskResult execute(TaskContext context) throws TaskException {
         final BuildLogger logger = context.getBuildLogger();
-        final CurrentBuildResult currentBuildResult = context.getBuildContext().getBuildResult();
         TaskResultBuilder resultBuilder = TaskResultBuilder.create(context);
         ConfigurationMap configMap = context.getConfigurationMap();
         logger.addBuildLogEntry("Executing BlazeMeter task...");
         PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
         String config = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
+        String serverUrl = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
         String proxyserver = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_SERVER);
         String proxyport = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_PORT);
         String proxyuser = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_USER);
@@ -166,48 +166,12 @@ public class BlazeMeterTaskType implements TaskType{
 		}
 		try{
 			responseTimeUnstableThreshold = timeUnstable.isEmpty()?-1:Integer.valueOf(timeUnstable);
-		} catch (NumberFormatException nfe){
-			return "Response time unstable is not a number.";
-		}
-
-
-		return null;
-	}
-	
-	/**
-	 * Upload main JMX file and all the files from the data folder
-	 */
-    private void uploadDataFolderFiles(BuildLogger logger, CurrentBuildResult currentBuildResult) {
-        BzmServiceManager bzmServiceManager=BzmServiceManager.getBzmServiceManager();
-        logger.addBuildLogEntry("Uploading data files");
-        if (dataFolder == null || dataFolder.isEmpty()){
-            logger.addErrorLogEntry("Empty data folder. Please enter the path to your data folder or '.' for main folder where the files are checked out.");
-            return;
-        }
-        
-        File folder = new File(dataFolder);
-        if (!folder.exists() || !folder.isDirectory()) {
-            logger.addErrorLogEntry("dataFolder " + dataFolder + " could not be found on local file system, please check that the folder exists.");
-            return ;
-        } else {
-        	logger.addBuildLogEntry("DataFolder "+dataFolder+" exists.");
+        } catch (NumberFormatException nfe) {
+            return "Response time unstable is not a number.";
         }
 
-        File[] listOfFiles = folder.listFiles();
 
-        for (int i = 0; i < listOfFiles.length; i++) {
-            String file;
-            if (listOfFiles[i].isFile()) {
-                file = listOfFiles[i].getName();
-                if (file.endsWith(mainJMX)){
-                	logger.addBuildLogEntry("Uploading main JMX "+mainJMX);
-                    bzmServiceManager.uploadJMX(bzmServiceManager.getTestId(), mainJMX, dataFolder + File.separator + mainJMX);
-                }
-                else {
-                	logger.addBuildLogEntry("Uploading data files "+file);
-                	bzmServiceManager.uploadFile(bzmServiceManager.getTestId(), dataFolder, file, logger);
-                }
-            }
-        }
+        return null;
     }
-	}
+
+}
