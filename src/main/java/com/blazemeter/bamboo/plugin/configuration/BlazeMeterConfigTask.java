@@ -7,6 +7,7 @@ import java.util.Map;
 import com.blazemeter.bamboo.plugin.Utils;
 import com.blazemeter.bamboo.plugin.configuration.constants.AdminServletConst;
 import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
+import com.google.common.collect.LinkedHashMultimap;
 import org.apache.commons.lang.StringUtils;
 
 import com.atlassian.bamboo.collections.ActionParametersMap;
@@ -40,6 +41,7 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 	@Override
 	public void populateContextForCreate(Map<String, Object> context) {
 		super.populateContextForCreate(context);
+        PluginSettings settings=StaticAccessor.getSettings();
 		context.put(Constants.SETTINGS_DATA_FOLDER, Constants.DEFAULT_SETTINGS_DATA_FOLDER);
 
         BzmServiceManager bzmServiceManager=BzmServiceManager.getBzmServiceManager(context);
@@ -51,12 +53,13 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 	@Override
 	public void populateContextForEdit(Map<String, Object> context, TaskDefinition taskDefinition) {
 		super.populateContextForEdit(context, taskDefinition);
+        PluginSettings settings=StaticAccessor.getSettings();
 
-		taskConfiguratorHelper.populateContextWithConfiguration(context, taskDefinition, FIELDS_TO_COPY);
+        taskConfiguratorHelper.populateContextWithConfiguration(context, taskDefinition, FIELDS_TO_COPY);
 
         BzmServiceManager bzmServiceManager=BzmServiceManager.getBzmServiceManager(context);
 		setSessionId();
-		context.put(Constants.TEST_LIST, bzmServiceManager.getTests());
+		context.put(Constants.TEST_LIST, bzmServiceManager.getTestsAsMap());
 		
 
 		context.put(Constants.SETTINGS_DATA_FOLDER, taskDefinition.getConfiguration().get(Constants.SETTINGS_DATA_FOLDER));
@@ -93,7 +96,7 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 				errorCollection.addErrorMessage("Cannot load tests from BlazeMeter server. Invalid user key!");
 			} else {
 				//verify if the test still exists on BlazeMeter server
-				HashMap<String, String> tests = bzmServiceManager.getTests();
+                LinkedHashMultimap<String, String> tests = bzmServiceManager.getTests();
 				if (tests != null){
 					if (!tests.keySet().contains(selectedTest)) {
 						errorCollection.addErrorMessage("Test '"+selectedTest+"' doesn't exits on BlazeMeter server.");

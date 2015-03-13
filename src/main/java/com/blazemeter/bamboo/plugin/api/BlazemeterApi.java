@@ -1,5 +1,6 @@
 package com.blazemeter.bamboo.plugin.api;
 
+import com.google.common.collect.LinkedHashMultimap;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -28,7 +29,7 @@ public interface BlazemeterApi {
 
     public JSONObject testReport(String userKey, String reportId);
 
-    public HashMap<String, String> getTestList(String userKey) throws IOException;
+    public LinkedHashMultimap<String, String> getTestList(String userKey) throws IOException;
 
     public boolean verifyUserKey(String userKey);
 

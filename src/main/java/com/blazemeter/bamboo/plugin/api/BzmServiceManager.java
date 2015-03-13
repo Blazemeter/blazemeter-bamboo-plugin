@@ -2,6 +2,7 @@ package com.blazemeter.bamboo.plugin.api;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,6 +14,7 @@ import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
 import com.blazemeter.bamboo.plugin.configuration.constants.JsonNodes;
 import com.blazemeter.bamboo.plugin.testresult.TestResult;
 import com.blazemeter.bamboo.plugin.testresult.TestResultFactory;
+import com.google.common.collect.LinkedHashMultimap;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -115,8 +117,8 @@ public class BzmServiceManager {
 	 * returns a hash map with test id as key and test name as value
 	 * @return
 	 */
-	public HashMap<String, String> getTests() {
-		HashMap<String,String> tests= new HashMap<String, String>();
+	public LinkedHashMultimap<String, String> getTests() {
+        LinkedHashMultimap<String,String> tests= LinkedHashMultimap.create();
         try {
 			tests=this.blazemeterApi.getTestList(userKey);
 		} catch (IOException e) {
@@ -126,6 +128,10 @@ public class BzmServiceManager {
         }finally {
             return tests;
         }
+    }
+
+    public Map<String, Collection<String>> getTestsAsMap() {
+        return this.getTests().asMap();
     }
 
 	public boolean startTest(String testId, BuildLogger logger) {

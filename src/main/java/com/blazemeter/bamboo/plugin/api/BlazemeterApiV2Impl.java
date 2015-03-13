@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import com.blazemeter.bamboo.plugin.TestStatus;
 import com.blazemeter.bamboo.plugin.Utils;
 import com.blazemeter.bamboo.plugin.configuration.constants.JsonNodes;
+import com.google.common.collect.LinkedHashMultimap;
 import org.apache.commons.lang3.StringUtils;
 
 import org.json.JSONArray;
@@ -194,9 +195,9 @@ public class BlazemeterApiV2Impl implements BlazemeterApi{
     }
 
     @Override
-    public HashMap<String, String> getTestList(String userKey) throws IOException {
+    public LinkedHashMultimap<String, String> getTestList(String userKey) throws IOException {
 
-        LinkedHashMap<String, String> testListOrdered = null;
+        LinkedHashMultimap<String, String> testListOrdered = null;
 
         if (userKey == null || userKey.trim().isEmpty()) {
             logger.println("getTests userKey is empty");
@@ -208,7 +209,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi{
                 String r = jo.get(JsonNodes.RESPONSE_CODE).toString();
                 if (r.equals("200")) {
                     JSONArray arr = (JSONArray) jo.get(JsonNodes.TESTS);
-                    testListOrdered = new LinkedHashMap<String, String>(arr.length());
+                    testListOrdered = LinkedHashMultimap.create(arr.length(),arr.length());
                     for (int i = 0; i < arr.length(); i++) {
                         JSONObject en = null;
                         try {
