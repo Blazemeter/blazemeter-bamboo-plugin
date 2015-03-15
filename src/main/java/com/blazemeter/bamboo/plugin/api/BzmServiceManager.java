@@ -3,7 +3,6 @@ package com.blazemeter.bamboo.plugin.api;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
 import com.atlassian.bamboo.build.logger.BuildLogger;
@@ -53,18 +52,6 @@ public class BzmServiceManager {
         blazemeterApi = APIFactory.getAPI(proxyserver,proxyPort,proxyuser,proxypass,api_version);
     }
 
-
-	private BzmServiceManager(Map<String, Object> context) {
-        int proxyPort= (StringUtils.isBlank((String)context.get(AdminServletConst.PROXY_SERVER_PORT))?0:
-                Integer.parseInt((String)context.get(AdminServletConst.PROXY_SERVER_PORT)));
-
-        blazemeterApi = APIFactory.getAPI((String)context.get(AdminServletConst.PROXY_SERVER_NAME),
-                proxyPort,
-                (String)context.get(AdminServletConst.PROXY_USERNAME),
-                (String)context.get(AdminServletConst.PROXY_PASSWORD),
-                (String)context.get(Constants.SETTINGS_API_VERSION));
-	}
-
      public static BzmServiceManager getBzmServiceManager(String proxyserver,
                                                          String proxyport,
                                                          String proxyuser,
@@ -86,7 +73,11 @@ public class BzmServiceManager {
 
         public static BzmServiceManager getBzmServiceManager(Map<String, Object> context) {
         if(bzmServiceManager==null){
-            bzmServiceManager=new BzmServiceManager(context);
+            bzmServiceManager=new BzmServiceManager((String)context.get(AdminServletConst.PROXY_SERVER_NAME),
+                    (String)context.get(AdminServletConst.PROXY_SERVER_PORT),
+                    (String)context.get(AdminServletConst.PROXY_USERNAME),
+                    (String)context.get(AdminServletConst.PROXY_PASSWORD),
+                            (String)context.get(Constants.SETTINGS_API_VERSION));
         }else{
             bzmServiceManager.setUserKey((String)context.get(Constants.USER_KEY));
             int proxyPort= (StringUtils.isBlank((String)context.get(AdminServletConst.PROXY_SERVER_PORT))?0:
