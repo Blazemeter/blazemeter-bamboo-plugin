@@ -59,7 +59,13 @@ public class AdminServlet extends HttpServlet {
 			context.put(AdminServletConst.USER_KEY_ERROR, "Please set the BlazeMeter user key!");
 		}
 
-        context.put(AdminServletConst.URL,url.trim());
+        if (url != null){
+            context.put(AdminServletConst.URL, url);
+            context.put(AdminServletConst.URL_ERROR, "");
+        } else {
+            context.put(AdminServletConst.URL, "");
+            context.put(AdminServletConst.URL_ERROR, "Please set the BlazeMeter server url!");
+        }
 
 		if (proxyserver != null){
 			context.put(AdminServletConst.PROXY_SERVER, proxyserver.trim());
@@ -137,7 +143,7 @@ public class AdminServlet extends HttpServlet {
         Add here auto-detect version
          */
 		BzmServiceManager bzmServiceManager =
-                BzmServiceManager.getBzmServiceManager(proxyserver, proxyport, proxyuser, proxypass,"v3");
+                BzmServiceManager.getBzmServiceManager(url,proxyserver, proxyport, proxyuser, proxypass,"v3");
 		if (bzmServiceManager.verifyUserKey(userKey)){
 		
 			transactionTemplate.execute(new TransactionCallback() {
@@ -154,10 +160,13 @@ public class AdminServlet extends HttpServlet {
 			});
 			
 			context.put(AdminServletConst.USER_KEY_ERROR, "");
+			context.put(AdminServletConst.URL_ERROR, "");
 		} else {
-			context.put(AdminServletConst.USER_KEY_ERROR, "Error! User key not saved! The user key " + req.getParameter(AdminServletConst.USER_KEY).trim() + " is invalid!");
-		}
-				
+			context.put(AdminServletConst.USER_KEY_ERROR, "User key is not saved! Check that user key "
+                    + req.getParameter(AdminServletConst.USER_KEY).trim() + " is valid!");
+            context.put(AdminServletConst.URL_ERROR, "Server url is not saved! Check that server url "
+                    + req.getParameter(AdminServletConst.URL).trim() + " is valid!");
+        }
 		renderer.render(AdminServletConst.BLAZEMETER_ADMIN_VM, context, resp.getWriter());
 	}
 

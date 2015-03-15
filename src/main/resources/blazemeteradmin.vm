@@ -17,6 +17,7 @@
             <label for="name">${i18n.getText("blazemeter.admin.url")}</label>
             <input type="text" id="url" name="url" class="text" value="${url}">
             <br />
+            <span class="errorText">${url_error}</span>
         </div>
       <div class="field-group">
         <label for="name">${i18n.getText("blazemeter.admin.proxyserver")}</label>

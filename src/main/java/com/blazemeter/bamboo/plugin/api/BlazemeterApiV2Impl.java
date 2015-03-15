@@ -33,17 +33,17 @@ public class BlazemeterApiV2Impl implements BlazemeterApi{
 	private String username;
 	private String password;
 	
-	public BlazemeterApiV2Impl(String serverName, int serverPort, String username, String password) {
+	public BlazemeterApiV2Impl(String serverUrl, String serverName, int serverPort, String username, String password) {
     	this.serverName = serverName;
     	this.serverPort = serverPort;
     	this.username = username;
     	this.password = password;		
-        urlManager = new BmUrlManagerV2Impl("https://a.blazemeter.com");
+        urlManager = new BmUrlManagerV2Impl(serverUrl);
         try {
             bzmHttpClient = new BzmHttpClient(serverName, username, password,serverPort);
             bzmHttpClient.configureProxy();
         } catch (Exception ex) {
-            logger.format("error Instantiating HTTPClient. Exception received: %s", ex);
+            logger.format("Error while instantiating HTTPClient. Exception received: %s", ex);
         }
     }
 

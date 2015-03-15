@@ -64,7 +64,7 @@ public class BlazeMeterTaskType implements TaskType{
                 logger.addErrorLogEntry("BlazeMeter user key not defined!");
                 return resultBuilder.failed().build();
             }
-        BzmServiceManager bzmServiceManager= BzmServiceManager.getBzmServiceManager(
+        BzmServiceManager bzmServiceManager= BzmServiceManager.getBzmServiceManager(serverUrl,
                 proxyserver,
                 proxyport,
                 proxyuser,

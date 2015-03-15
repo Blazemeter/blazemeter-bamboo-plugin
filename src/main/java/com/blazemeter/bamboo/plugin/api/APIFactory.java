@@ -9,7 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 public class APIFactory {
     private APIFactory(){}
 
-    public static BlazemeterApi getAPI(String serverName,
+    public static BlazemeterApi getAPI(String serverUrl, String serverName,
                                        int serverPort, String username,
                                        String password,
                                        String blazeMeterApiVersion) {
@@ -17,15 +17,13 @@ public class APIFactory {
         switch (StringUtils.isBlank(blazeMeterApiVersion)
                 ?ApiVersion.autoDetect:ApiVersion.valueOf(blazeMeterApiVersion)) {
             case autoDetect:
-                blazemeterAPI = new BlazemeterApiV3Impl(serverName, serverPort, username, password);
-//                blazemeterAPI = new BlazemeterApiV2Impl(serverName, serverPort, username, password);
+                blazemeterAPI = new BlazemeterApiV3Impl(serverUrl,serverName, serverPort, username, password);
                 break;
             case v3:
-                blazemeterAPI = new BlazemeterApiV3Impl(serverName, serverPort, username, password);
+                blazemeterAPI = new BlazemeterApiV3Impl(serverUrl,serverName, serverPort, username, password);
                 break;
             case v2:
-//                blazemeterAPI = new BlazemeterApiV2Impl(serverName, serverPort, username, password);
-                blazemeterAPI = new BlazemeterApiV3Impl(serverName, serverPort, username, password);
+                blazemeterAPI = new BlazemeterApiV3Impl(serverUrl,serverName, serverPort, username, password);
                 break;
         }
         return blazemeterAPI;

@@ -29,6 +29,7 @@ public interface AdminServletConst {
     public final static String DOT_PROXY_PASS =".proxypass";
 
     public final static String URL ="url";
+    public final static String URL_ERROR ="url_error";
     public final static String BLAZEMETER_ADMIN_VM ="blazemeteradmin.vm";
 
 }

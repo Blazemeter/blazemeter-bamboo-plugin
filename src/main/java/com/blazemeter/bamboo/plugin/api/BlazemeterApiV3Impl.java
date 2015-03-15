@@ -32,12 +32,12 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
 	private String username;
 	private String password;
 
-	public BlazemeterApiV3Impl(String serverName, int serverPort, String username, String password) {
+	public BlazemeterApiV3Impl(String serverUrl, String serverName, int serverPort, String username, String password) {
     	this.serverName = serverName;
     	this.serverPort = serverPort;
     	this.username = username;
     	this.password = password;		
-        urlManager = new BmUrlManagerV3Impl("https://a.blazemeter.com");
+        urlManager = new BmUrlManagerV3Impl(serverUrl);
         try {
             bzmHttpClient = new BzmHttpClient(serverName, username, password, serverPort);
             bzmHttpClient.configureProxy();

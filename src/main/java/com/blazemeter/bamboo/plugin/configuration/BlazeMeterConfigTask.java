@@ -44,7 +44,7 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
         PluginSettingsFactory pluginSettingsFactory=StaticAccessor.getSettingsFactory();
         PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
         String serverUrl = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
-
+        context.put(AdminServletConst.URL, serverUrl);
         context.put(Constants.SETTINGS_DATA_FOLDER, Constants.DEFAULT_SETTINGS_DATA_FOLDER);
 
         BzmServiceManager bzmServiceManager=BzmServiceManager.getBzmServiceManager(context);
@@ -60,6 +60,7 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
         PluginSettingsFactory pluginSettingsFactory=StaticAccessor.getSettingsFactory();
         PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
         String serverUrl = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
+        context.put(AdminServletConst.URL, serverUrl);
 
         BzmServiceManager bzmServiceManager=BzmServiceManager.getBzmServiceManager(context);
 		setSessionId(bzmServiceManager);
@@ -100,7 +101,7 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
         String proxyuser = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_USER);
         String proxypass = (String) pluginSettings.get(Config.class.getName() + Constants.TEST_LIST);
 
-        BzmServiceManager bzmServiceManager= BzmServiceManager.getBzmServiceManager(
+        BzmServiceManager bzmServiceManager= BzmServiceManager.getBzmServiceManager(serverUrl,
                 proxyserver,
                 proxyport,
                 proxyuser,

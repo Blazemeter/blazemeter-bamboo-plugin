@@ -49,14 +49,15 @@ public class BzmServiceManager {
         int proxyPort= (StringUtils.isBlank(proxyport)?0:
                 Integer.parseInt(proxyport));
         this.apiVersion=api_version;
-        blazemeterApi = APIFactory.getAPI(proxyserver,proxyPort,proxyuser,proxypass,api_version);
+        blazemeterApi = APIFactory.getAPI("https://a.blazemeter.com",proxyserver,proxyPort,proxyuser,proxypass,api_version);
     }
 
-     public static BzmServiceManager getBzmServiceManager(String proxyserver,
-                                                         String proxyport,
-                                                         String proxyuser,
-                                                         String proxypass,
-                                                         String api_version
+     public static BzmServiceManager getBzmServiceManager(String serverUrl,
+                                                          String proxyserver,
+                                                          String proxyport,
+                                                          String proxyuser,
+                                                          String proxypass,
+                                                          String api_version
     ) {
         int proxyPort= (StringUtils.isBlank(proxyport)?0:Integer.parseInt(proxyport));
         if(bzmServiceManager==null){
@@ -66,14 +67,14 @@ public class BzmServiceManager {
                     proxypass,
                     api_version);
         }
-        bzmServiceManager.blazemeterApi = APIFactory.getAPI(proxyserver,
+        bzmServiceManager.blazemeterApi = APIFactory.getAPI(serverUrl,proxyserver,
                 proxyPort,proxyuser,proxypass,api_version);
     return bzmServiceManager;
     }
 
         public static BzmServiceManager getBzmServiceManager(Map<String, Object> context) {
         if(bzmServiceManager==null){
-            bzmServiceManager=new BzmServiceManager((String)context.get(AdminServletConst.PROXY_SERVER_NAME),
+            bzmServiceManager=new BzmServiceManager((String)context.get(AdminServletConst.URL),
                     (String)context.get(AdminServletConst.PROXY_SERVER_PORT),
                     (String)context.get(AdminServletConst.PROXY_USERNAME),
                     (String)context.get(AdminServletConst.PROXY_PASSWORD),
@@ -83,7 +84,8 @@ public class BzmServiceManager {
             int proxyPort= (StringUtils.isBlank((String)context.get(AdminServletConst.PROXY_SERVER_PORT))?0:
                     Integer.parseInt((String)context.get(AdminServletConst.PROXY_SERVER_PORT)));
 
-            bzmServiceManager.blazemeterApi = APIFactory.getAPI((String)context.get(AdminServletConst.PROXY_SERVER_NAME),
+            bzmServiceManager.blazemeterApi = APIFactory.getAPI((String)context.get(AdminServletConst.URL),
+                    (String)context.get(AdminServletConst.PROXY_SERVER_NAME),
                     proxyPort,
                     (String)context.get(AdminServletConst.PROXY_USERNAME),
                     (String)context.get(AdminServletConst.PROXY_PASSWORD),
