@@ -37,20 +37,9 @@
         <br />
         
       </div>
-        <!--[@ww.select cssClass="builderSelectWidget" labelKey='API Version' name='api_version' list='apiversionlist' required='true' emptyOption='false'/]-->
-<!--
-        <div class="field-group">
-        <label>API version:</label>
-        <select id="api_version" name="api_version">
-            <option value="autoDetect">Auto Detect</option>
-            <option value="v3">V3(force)</option>
-            <option value="v2">V2(deprecated)</option>
-        </select>
-    </div>-->
       <div class="field-group">
         <input type="submit" value="Save" class="button">
       </div>
-
     </form>
   </body>
 </html>

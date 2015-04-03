@@ -24,6 +24,7 @@ import com.opensymphony.xwork.TextProvider;
 
 public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements BuildTaskRequirementSupport{
 
+	private static final List<String> API_VERSION_LIST = ImmutableList.of("V3","V2");
 	private static final List<String> FIELDS_TO_COPY = ImmutableList.of(Constants.SETTINGS_SELECTED_TEST_ID,
             Constants.SETTINGS_API_VERSION,
 			Constants.SETTINGS_ERROR_THRESHOLD_UNSTABLE, Constants.SETTINGS_ERROR_THRESHOLD_FAIL,
@@ -51,6 +52,7 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 
         setSessionId(bzmServiceManager);
 		context.put(Constants.TEST_LIST, bzmServiceManager.getTestsAsMap());
+		context.put(Constants.API_VERSION_LIST, API_VERSION_LIST);
 	}
 
 	@Override
@@ -65,7 +67,8 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
         BzmServiceManager bzmServiceManager=BzmServiceManager.getBzmServiceManager(context);
 		setSessionId(bzmServiceManager);
 		context.put(Constants.TEST_LIST, bzmServiceManager.getTestsAsMap());
-		
+		context.put(Constants.API_VERSION_LIST, API_VERSION_LIST);
+
 
 		context.put(Constants.SETTINGS_DATA_FOLDER, taskDefinition.getConfiguration().get(Constants.SETTINGS_DATA_FOLDER));
 	}
@@ -172,6 +175,7 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 		config.put(Constants.SETTINGS_RESPONSE_TIME_UNSTABLE, params.getString(Constants.SETTINGS_RESPONSE_TIME_UNSTABLE).trim());
 		config.put(Constants.SETTINGS_RESPONSE_TIME_FAIL, params.getString(Constants.SETTINGS_RESPONSE_TIME_FAIL).trim());
 		config.put(Constants.SETTINGS_TEST_DURATION, params.getString(Constants.SETTINGS_TEST_DURATION).trim());
+		config.put(Constants.SETTINGS_API_VERSION, params.getString(Constants.SETTINGS_API_VERSION).trim());
 		config.put(Constants.SETTINGS_DATA_FOLDER, params.getString(Constants.SETTINGS_DATA_FOLDER).trim());
 		config.put(Constants.SETTINGS_MAIN_JMX, params.getString(Constants.SETTINGS_MAIN_JMX).trim());
 

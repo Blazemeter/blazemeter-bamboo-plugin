@@ -28,6 +28,7 @@ public interface Constants {
 
     //BlazeMeterConfigTask
     public final static String TEST_LIST ="testlist";
+    public final static String API_VERSION_LIST ="apiVersionlist";
     public final static String BLAZEMETER_ERROR ="blazemeter.error.";
 
 

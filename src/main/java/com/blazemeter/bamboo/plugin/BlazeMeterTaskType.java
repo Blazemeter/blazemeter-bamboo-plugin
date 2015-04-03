@@ -56,9 +56,9 @@ public class BlazeMeterTaskType implements TaskType{
         String proxyserver = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_SERVER);
         String proxyport = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_PORT);
         String proxyuser = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_USER);
-        String proxypass = (String) pluginSettings.get(Config.class.getName() + Constants.TEST_LIST);
+        String proxypass = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_PASS);
         String testId = configMap.get(Constants.SETTINGS_SELECTED_TEST_ID);
-
+        String apiVersion = configMap.get(Constants.SETTINGS_API_VERSION);
 
             if (StringUtils.isBlank(config)) {
                 logger.addErrorLogEntry("BlazeMeter user key not defined!");
