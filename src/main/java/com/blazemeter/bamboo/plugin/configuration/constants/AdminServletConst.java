@@ -20,6 +20,7 @@ public interface AdminServletConst {
     public final static String PROXY_USER_ERROR ="proxyuser_error";
     public final static String PROXY_PASS ="proxypass";
     public final static String PROXY_PASS_ERROR ="proxypass_error";
+    public final static String API_VERSION ="api_version";
 
     public final static String DOT_USER_KEY =".userkey";
     public final static String DOT_SERVER_URL =".url";
@@ -27,6 +28,7 @@ public interface AdminServletConst {
     public final static String DOT_PROXY_PORT =".proxyport";
     public final static String DOT_PROXY_USER =".proxyuser";
     public final static String DOT_PROXY_PASS =".proxypass";
+    public final static String DOT_API_VERSION =".api_version";
 
     public final static String URL ="url";
     public final static String URL_ERROR ="url_error";

@@ -18,6 +18,7 @@ import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import com.atlassian.templaterenderer.TemplateRenderer;
 import com.atlassian.sal.api.transaction.TransactionTemplate;
 import com.atlassian.sal.api.transaction.TransactionCallback;
+import com.blazemeter.bamboo.plugin.ApiVersion;
 import com.blazemeter.bamboo.plugin.api.BzmServiceManager;
 import com.blazemeter.bamboo.plugin.configuration.StaticAccessor;
 import com.blazemeter.bamboo.plugin.configuration.constants.AdminServletConst;
@@ -50,7 +51,8 @@ public class AdminServlet extends HttpServlet {
 		String proxyserver = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_SERVER);
 		String proxyport = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_PORT);
 		String proxyuser = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_USER);
-		String proxypass = (String) pluginSettings.get(Config.class.getName() + Constants.TEST_LIST);
+		String apiVersion = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_API_VERSION);
+		String proxypass = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_PASS);
 		if (config != null){
 			context.put(AdminServletConst.USER_KEY, config.trim());
 			context.put(AdminServletConst.USER_KEY_ERROR, "");
@@ -98,7 +100,7 @@ public class AdminServlet extends HttpServlet {
 			context.put(AdminServletConst.PROXY_PASS, "");
 			context.put(AdminServletConst.PROXY_PASS_ERROR, "");
 		}
-		
+		context.put(AdminServletConst.API_VERSION, apiVersion!=null?apiVersion.trim():ApiVersion.v3.name());
 		renderer.render(AdminServletConst.BLAZEMETER_ADMIN_VM, context, resp.getWriter());
 	}
 
@@ -113,6 +115,7 @@ public class AdminServlet extends HttpServlet {
 		String proxyport = req.getParameter(AdminServletConst.PROXY_PORT).trim();
 		String proxyuser = req.getParameter(AdminServletConst.PROXY_USER).trim();
 		String proxypass = req.getParameter(AdminServletConst.PROXY_PASS).trim();
+		String apiVersion = req.getParameter(AdminServletConst.API_VERSION).trim();
 		try{
 			if ((proxyport == null) || (proxyport == "")){
 				proxyport = "-1";
@@ -132,6 +135,7 @@ public class AdminServlet extends HttpServlet {
 		context.put(AdminServletConst.PROXY_PORT, proxyport == "-1" ? "" : proxyport);
 		context.put(AdminServletConst.PROXY_USER, proxyuser);
 		context.put(AdminServletConst.PROXY_PASS, proxypass);
+		context.put(AdminServletConst.API_VERSION, apiVersion);
 
 		context.put(AdminServletConst.PROXY_SERVER_ERROR, "");
 		context.put(AdminServletConst.PROXY_USER_ERROR, "");
@@ -143,7 +147,7 @@ public class AdminServlet extends HttpServlet {
         Add here auto-detect version
          */
 		BzmServiceManager bzmServiceManager =
-                BzmServiceManager.getBzmServiceManager(url,proxyserver, proxyport, proxyuser, proxypass,"v3");
+                BzmServiceManager.getBzmServiceManager(url,proxyserver, proxyport, proxyuser, proxypass, ApiVersion.v3.name());
 		if (bzmServiceManager.verifyUserKey(userKey)){
 		
 			transactionTemplate.execute(new TransactionCallback() {
@@ -154,7 +158,8 @@ public class AdminServlet extends HttpServlet {
 					pluginSettings.put(Config.class.getName() + AdminServletConst.DOT_PROXY_SERVER, req.getParameter(AdminServletConst.PROXY_SERVER).trim());
 					pluginSettings.put(Config.class.getName() + AdminServletConst.DOT_PROXY_PORT, req.getParameter(AdminServletConst.PROXY_PORT).trim());
 					pluginSettings.put(Config.class.getName() + AdminServletConst.DOT_PROXY_USER, req.getParameter(AdminServletConst.PROXY_USER).trim());
-					pluginSettings.put(Config.class.getName() + Constants.TEST_LIST, req.getParameter(AdminServletConst.PROXY_PASS).trim());
+					pluginSettings.put(Config.class.getName() + AdminServletConst.DOT_API_VERSION, req.getParameter(AdminServletConst.API_VERSION).trim());
+					pluginSettings.put(Config.class.getName() + AdminServletConst.DOT_PROXY_PASS, req.getParameter(AdminServletConst.PROXY_PASS).trim());
                     return null;
 				}
 			});

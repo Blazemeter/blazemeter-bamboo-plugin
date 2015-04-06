@@ -37,6 +37,16 @@
         <br />
         
       </div>
+
+      <div class="field-group">
+      <label for="name">${i18n.getText("blazemeter.apiVersion")}</label>
+      <select type="text" id="api_version" name="api_version" class="text" value="${api_version}">
+                              <option value="autoDetect">Auto Detect</option>
+                              <option value="v3">V3(force)</option>
+                              <option value="v2">V2(deprecated)</option>
+      </select>
+      </div>
+
       <div class="field-group">
         <input type="submit" value="Save" class="button">
       </div>

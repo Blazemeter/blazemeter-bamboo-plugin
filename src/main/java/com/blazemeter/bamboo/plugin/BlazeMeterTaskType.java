@@ -50,16 +50,16 @@ public class BlazeMeterTaskType implements TaskType{
         ConfigurationMap configMap = context.getConfigurationMap();
         logger.addBuildLogEntry("Executing BlazeMeter task...");
         PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
-        String config = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
+        String userKey = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
         String serverUrl = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
         String proxyserver = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_SERVER);
         String proxyport = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_PORT);
         String proxyuser = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_USER);
         String proxypass = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_PASS);
+        String apiVersion = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_API_VERSION);
         String testId = configMap.get(Constants.SETTINGS_SELECTED_TEST_ID);
-        String apiVersion = configMap.get(Constants.SETTINGS_API_VERSION);
 
-            if (StringUtils.isBlank(config)) {
+            if (StringUtils.isBlank(userKey)) {
                 logger.addErrorLogEntry("BlazeMeter user key not defined!");
                 return resultBuilder.failed().build();
             }
@@ -68,13 +68,13 @@ public class BlazeMeterTaskType implements TaskType{
                 proxyport,
                 proxyuser,
                 proxypass,
-                "v3");
-        if(!bzmServiceManager.verifyUserKey(config)){
+                apiVersion);
+        if(!bzmServiceManager.verifyUserKey(userKey)){
             logger.addBuildLogEntry("Failed to verify userKey: userKey is invalid.");
             return resultBuilder.failedWithError().build();
         }
         bzmServiceManager.setTestId(testId);
-        bzmServiceManager.setUserKey(config);
+        bzmServiceManager.setUserKey(userKey);
 
         rootDirectory = context.getRootDirectory();
 

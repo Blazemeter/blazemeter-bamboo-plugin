@@ -78,7 +78,7 @@ public class BzmServiceManager {
                     (String)context.get(AdminServletConst.PROXY_SERVER_PORT),
                     (String)context.get(AdminServletConst.PROXY_USERNAME),
                     (String)context.get(AdminServletConst.PROXY_PASSWORD),
-                            (String)context.get(Constants.SETTINGS_API_VERSION));
+                            (String)context.get(AdminServletConst.API_VERSION));
         }else{
             bzmServiceManager.setUserKey((String)context.get(Constants.USER_KEY));
             int proxyPort= (StringUtils.isBlank((String)context.get(AdminServletConst.PROXY_SERVER_PORT))?0:
@@ -89,7 +89,7 @@ public class BzmServiceManager {
                     proxyPort,
                     (String)context.get(AdminServletConst.PROXY_USERNAME),
                     (String)context.get(AdminServletConst.PROXY_PASSWORD),
-                    (String)context.get(Constants.SETTINGS_API_VERSION));
+                    (String)context.get(AdminServletConst.API_VERSION));
         }
         return bzmServiceManager;
     }

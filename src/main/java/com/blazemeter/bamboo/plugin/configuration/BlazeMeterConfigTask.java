@@ -26,7 +26,6 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 
 	private static final List<String> API_VERSION_LIST = ImmutableList.of("v3","v2");
 	private static final List<String> FIELDS_TO_COPY = ImmutableList.of(Constants.SETTINGS_SELECTED_TEST_ID,
-            Constants.SETTINGS_API_VERSION,
 			Constants.SETTINGS_ERROR_THRESHOLD_UNSTABLE, Constants.SETTINGS_ERROR_THRESHOLD_FAIL,
 			Constants.SETTINGS_RESPONSE_TIME_UNSTABLE, Constants.SETTINGS_RESPONSE_TIME_FAIL,
 			Constants.SETTINGS_TEST_DURATION, Constants.SETTINGS_DATA_FOLDER,
@@ -47,8 +46,6 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
         String serverUrl = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
         context.put(AdminServletConst.URL, serverUrl);
         context.put(Constants.SETTINGS_DATA_FOLDER, Constants.DEFAULT_SETTINGS_DATA_FOLDER);
-		context.put(Constants.API_VERSION_LIST, API_VERSION_LIST);
-		context.put(Constants.SETTINGS_API_VERSION, "v3");
         BzmServiceManager bzmServiceManager=BzmServiceManager.getBzmServiceManager(context);
 
         setSessionId(bzmServiceManager);
@@ -67,8 +64,6 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
         BzmServiceManager bzmServiceManager=BzmServiceManager.getBzmServiceManager(context);
 		setSessionId(bzmServiceManager);
 		context.put(Constants.TEST_LIST, bzmServiceManager.getTestsAsMap());
-		context.put(Constants.API_VERSION_LIST, API_VERSION_LIST);
-
 
 		context.put(Constants.SETTINGS_DATA_FOLDER, taskDefinition.getConfiguration().get(Constants.SETTINGS_DATA_FOLDER));
 	}
@@ -175,7 +170,6 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 		config.put(Constants.SETTINGS_RESPONSE_TIME_UNSTABLE, params.getString(Constants.SETTINGS_RESPONSE_TIME_UNSTABLE).trim());
 		config.put(Constants.SETTINGS_RESPONSE_TIME_FAIL, params.getString(Constants.SETTINGS_RESPONSE_TIME_FAIL).trim());
 		config.put(Constants.SETTINGS_TEST_DURATION, params.getString(Constants.SETTINGS_TEST_DURATION).trim());
-		config.put(Constants.SETTINGS_API_VERSION, params.getString(Constants.SETTINGS_API_VERSION).trim());
 		config.put(Constants.SETTINGS_DATA_FOLDER, params.getString(Constants.SETTINGS_DATA_FOLDER).trim());
 		config.put(Constants.SETTINGS_MAIN_JMX, params.getString(Constants.SETTINGS_MAIN_JMX).trim());
 

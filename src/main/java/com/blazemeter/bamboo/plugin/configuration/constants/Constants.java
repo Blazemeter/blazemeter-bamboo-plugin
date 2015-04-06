@@ -4,7 +4,7 @@ public interface Constants {
     //runner properties
 	public final static String USER_KEY = "USER_KEY";
 	
-	public final static String SETTINGS_API_VERSION = "api_version";
+//	public final static String SETTINGS_API_VERSION = "api_version";
 
     //settings properties
     public final static String SETTINGS_SELECTED_TEST_ID = "selectedtest";
@@ -28,7 +28,7 @@ public interface Constants {
 
     //BlazeMeterConfigTask
     public final static String TEST_LIST ="testlist";
-    public final static String API_VERSION_LIST ="apiVersionlist";
+//    public final static String API_VERSION_LIST ="apiVersionlist";
     public final static String BLAZEMETER_ERROR ="blazemeter.error.";
 
 
