@@ -213,6 +213,29 @@ public class BzmServiceManager {
             return this.blazemeterApi.getTestRunStatus(userKey, session.toString());
         }
     }
+
+
+    public boolean validateServerTresholds(BuildLogger logger) {
+        JSONObject jo = null;
+        boolean tresholdsValid=true;
+        JSONObject result=null;
+        logger.addBuildLogEntry("Going to validate server tresholds...");
+        try {
+            jo=this.blazemeterApi.getTresholds(session.toString(),userKey);
+            result=jo.getJSONObject(JsonNodes.RESULT);
+            tresholdsValid=result.getJSONObject(JsonNodes.DATA).getBoolean("success");
+        } catch (NullPointerException e){
+            logger.addErrorLogEntry("Server tresholds validation was not executed");
+            logger.addErrorLogEntry(e.getMessage());
+        }catch (JSONException je) {
+            logger.addErrorLogEntry("Server tresholds validation was not executed");
+            logger.addErrorLogEntry("Failed to get tresholds for  session=" + session);
+        }finally {
+            logger.addBuildLogEntry("Server tresholds validation " +
+                    (tresholdsValid ? "passed. Marking build as PASSED" : "failed. Marking build as FAILED"));
+            return tresholdsValid;
+        }
+    }
     
 	public String getUserKey() {
 		return userKey;

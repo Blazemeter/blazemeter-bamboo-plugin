@@ -33,4 +33,5 @@ public interface BlazemeterApi {
 
     public boolean verifyUserKey(String userKey);
 
+    public JSONObject getTresholds(String sessionId,String userKey);
 }

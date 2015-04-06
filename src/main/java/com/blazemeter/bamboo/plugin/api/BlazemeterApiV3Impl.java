@@ -11,8 +11,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 
 
 /**
@@ -256,8 +254,16 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
         }
     }
 
-    
-    
+    @Override
+    public JSONObject getTresholds(String sessionId,String userKey) {
+        if (userKey == null || userKey.trim().isEmpty()) {
+            return null;
+        }
+        String url = this.urlManager.getTresholds(APP_KEY, userKey, sessionId);
+        JSONObject jo = this.bzmHttpClient.getResponseAsJson(url, null, Method.GET);
+        return jo;
+    }
+
     public String getServerName() {
 		return serverName;
 	}

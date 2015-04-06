@@ -104,4 +104,19 @@ public class BmUrlManagerV3Impl implements BmUrlManager{
         getTests=SERVER_URL+"/api/latest/tests?api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
         return getTests;
     }
+
+    @Override
+    public String getTresholds(String appKey, String userKey, String sessionId) {
+        String getTresholds=null;
+        try {
+            appKey = URLEncoder.encode(appKey, "UTF-8");
+            userKey = URLEncoder.encode(userKey, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        getTresholds=SERVER_URL+"/api/latest/sessions/"+sessionId+"/reports/thresholds?api_key="
+                +userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
+
+        return getTresholds;
+    }
 }

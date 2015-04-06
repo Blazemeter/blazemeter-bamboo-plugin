@@ -11,7 +11,6 @@ import com.atlassian.bamboo.task.TaskException;
 import com.atlassian.bamboo.task.TaskResult;
 import com.atlassian.bamboo.task.TaskResultBuilder;
 import com.atlassian.bamboo.task.TaskType;
-import com.atlassian.bamboo.v2.build.CurrentBuildResult;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import com.blazemeter.bamboo.plugin.api.BzmServiceManager;
@@ -139,7 +138,8 @@ public class BlazeMeterTaskType implements TaskType{
 
             logger.addBuildLogEntry("Test finished. Checking for test report...");
             bzmServiceManager.getReport(logger);
-            return resultBuilder.success().build();
+        boolean isServerTresholdsPassed=bzmServiceManager.validateServerTresholds(logger);
+        return isServerTresholdsPassed?resultBuilder.success().build():resultBuilder.failed().build();
         }
 
 	private String validateLocalTresholds(Map<String, String> params, BuildLogger logger) {

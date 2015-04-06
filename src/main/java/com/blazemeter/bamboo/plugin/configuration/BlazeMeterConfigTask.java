@@ -24,7 +24,7 @@ import com.opensymphony.xwork.TextProvider;
 
 public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements BuildTaskRequirementSupport{
 
-	private static final List<String> API_VERSION_LIST = ImmutableList.of("V3","V2");
+	private static final List<String> API_VERSION_LIST = ImmutableList.of("v3","v2");
 	private static final List<String> FIELDS_TO_COPY = ImmutableList.of(Constants.SETTINGS_SELECTED_TEST_ID,
             Constants.SETTINGS_API_VERSION,
 			Constants.SETTINGS_ERROR_THRESHOLD_UNSTABLE, Constants.SETTINGS_ERROR_THRESHOLD_FAIL,
@@ -47,12 +47,12 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
         String serverUrl = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
         context.put(AdminServletConst.URL, serverUrl);
         context.put(Constants.SETTINGS_DATA_FOLDER, Constants.DEFAULT_SETTINGS_DATA_FOLDER);
-
+		context.put(Constants.API_VERSION_LIST, API_VERSION_LIST);
+		context.put(Constants.SETTINGS_API_VERSION, "v3");
         BzmServiceManager bzmServiceManager=BzmServiceManager.getBzmServiceManager(context);
 
         setSessionId(bzmServiceManager);
 		context.put(Constants.TEST_LIST, bzmServiceManager.getTestsAsMap());
-		context.put(Constants.API_VERSION_LIST, API_VERSION_LIST);
 	}
 
 	@Override

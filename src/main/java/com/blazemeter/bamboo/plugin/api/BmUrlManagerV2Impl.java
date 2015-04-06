@@ -1,5 +1,7 @@
 package com.blazemeter.bamboo.plugin.api;
 
+import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
@@ -104,5 +106,10 @@ public class BmUrlManagerV2Impl implements BmUrlManager{
         }
         return String.format("https://a.blazemeter.com/api/rest/blazemeter/getTests.json/?app_key=%s&user_key=%s&test_id=all", appKey, userKey);
 
+    }
+
+    @Override
+    public String getTresholds(String appKey, String userKey, String sessionId) {
+        return Constants.NOT_IMPLEMENTED;
     }
 }

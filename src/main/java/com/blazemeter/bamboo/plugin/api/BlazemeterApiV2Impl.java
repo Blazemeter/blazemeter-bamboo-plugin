@@ -2,11 +2,10 @@ package com.blazemeter.bamboo.plugin.api;
 
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 
 import com.blazemeter.bamboo.plugin.TestStatus;
 import com.blazemeter.bamboo.plugin.Utils;
+import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
 import com.blazemeter.bamboo.plugin.configuration.constants.JsonNodes;
 import com.google.common.collect.LinkedHashMultimap;
 import org.apache.commons.lang3.StringUtils;
@@ -27,6 +26,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi{
     public static final String APP_KEY = "bmboo0x98a8w9s4s7c4";
     BzmHttpClient bzmHttpClient;
     BmUrlManagerV2Impl urlManager;
+    private final JSONObject not_implemented;
 
 	private String serverName;
 	private int serverPort;
@@ -39,9 +39,11 @@ public class BlazemeterApiV2Impl implements BlazemeterApi{
     	this.username = username;
     	this.password = password;		
         urlManager = new BmUrlManagerV2Impl(serverUrl);
+        not_implemented=new JSONObject();
         try {
             bzmHttpClient = new BzmHttpClient(serverName, username, password,serverPort);
             bzmHttpClient.configureProxy();
+            not_implemented.put(Constants.NOT_IMPLEMENTED, Constants.NOT_IMPLEMENTED);
         } catch (Exception ex) {
             logger.format("Error while instantiating HTTPClient. Exception received: %s", ex);
         }
@@ -296,4 +298,9 @@ public class BlazemeterApiV2Impl implements BlazemeterApi{
 		this.password = password;
 	}
 
+
+    @Override
+    public JSONObject getTresholds(String sessionId,String userKey) {
+        return not_implemented;
+    }
 }
