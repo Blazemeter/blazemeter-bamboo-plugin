@@ -47,6 +47,17 @@
       </select>
       </div>
 
+<script type="text/javascript">
+var apiVersionSelect=document.getElementById("api_version")
+var apiVersionValue=apiVersionSelect.getAttribute("value")
+var selectedLength = apiVersionSelect.options.length;
+for(var i=0;i<selectedLength;i++){
+   if(apiVersionSelect.options[i].value==apiVersionValue){
+      apiVersionSelect.selectedIndex=i;
+   }
+}
+</script>
+
       <div class="field-group">
         <input type="submit" value="Save" class="button">
       </div>

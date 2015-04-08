@@ -24,7 +24,7 @@ import com.opensymphony.xwork.TextProvider;
 
 public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements BuildTaskRequirementSupport{
 
-	private static final List<String> API_VERSION_LIST = ImmutableList.of("v3","v2");
+	private static final List<String> API_VERSION_LIST = ImmutableList.of("autoDetect","v3","v2");
 	private static final List<String> FIELDS_TO_COPY = ImmutableList.of(Constants.SETTINGS_SELECTED_TEST_ID,
 			Constants.SETTINGS_ERROR_THRESHOLD_UNSTABLE, Constants.SETTINGS_ERROR_THRESHOLD_FAIL,
 			Constants.SETTINGS_RESPONSE_TIME_UNSTABLE, Constants.SETTINGS_RESPONSE_TIME_FAIL,
@@ -44,8 +44,10 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
         PluginSettingsFactory pluginSettingsFactory=StaticAccessor.getSettingsFactory();
         PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
         String serverUrl = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
-        context.put(AdminServletConst.URL, serverUrl);
-        context.put(Constants.SETTINGS_DATA_FOLDER, Constants.DEFAULT_SETTINGS_DATA_FOLDER);
+		String apiVersion = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_API_VERSION);
+		context.put(AdminServletConst.URL, serverUrl);
+		context.put(AdminServletConst.API_VERSION, apiVersion);
+		context.put(Constants.SETTINGS_DATA_FOLDER, Constants.DEFAULT_SETTINGS_DATA_FOLDER);
         BzmServiceManager bzmServiceManager=BzmServiceManager.getBzmServiceManager(context);
 
         setSessionId(bzmServiceManager);
@@ -59,7 +61,9 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
         PluginSettingsFactory pluginSettingsFactory=StaticAccessor.getSettingsFactory();
         PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
         String serverUrl = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
+        String apiVersion = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_API_VERSION);
         context.put(AdminServletConst.URL, serverUrl);
+        context.put(AdminServletConst.API_VERSION, apiVersion);
 
         BzmServiceManager bzmServiceManager=BzmServiceManager.getBzmServiceManager(context);
 		setSessionId(bzmServiceManager);
@@ -92,19 +96,20 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 
         PluginSettingsFactory pluginSettingsFactory=StaticAccessor.getSettingsFactory();
         PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
-        String config = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
+        String userKey = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
         String serverUrl = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
         String proxyserver = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_SERVER);
         String proxyport = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_PORT);
         String proxyuser = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_USER);
         String proxypass = (String) pluginSettings.get(Config.class.getName() + Constants.TEST_LIST);
+        String apiVersion = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_API_VERSION);
 
         BzmServiceManager bzmServiceManager= BzmServiceManager.getBzmServiceManager(serverUrl,
                 proxyserver,
                 proxyport,
                 proxyuser,
                 proxypass,
-                "v3");
+                apiVersion);
 
 
         if (StringUtils.isEmpty(bzmServiceManager.getUserKey())) {
