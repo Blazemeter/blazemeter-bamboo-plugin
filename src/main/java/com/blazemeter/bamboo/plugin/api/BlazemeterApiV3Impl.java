@@ -24,14 +24,15 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
     public static final String APP_KEY = "bmboo0x98a8w9s4s7c4";
     BzmHttpClient bzmHttpClient;
     BmUrlManagerV3Impl urlManager;
-
+    private String userKey;
 	private String serverName;
 	private int serverPort;
 	private String username;
 	private String password;
 
-	public BlazemeterApiV3Impl(String serverUrl, String serverName, int serverPort, String username, String password) {
-    	this.serverName = serverName;
+	public BlazemeterApiV3Impl(String userKey, String serverUrl, String serverName, int serverPort, String username, String password) {
+    	this.userKey=userKey;
+        this.serverName = serverName;
     	this.serverPort = serverPort;
     	this.username = username;
     	this.password = password;		
@@ -48,7 +49,6 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
 
 
     /**
-     * @param userKey  - user key
      * @param testId   - test id
      * @param fileName - test name
      * @param pathName - jmx file path
@@ -57,7 +57,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
      *                 //     * @throws org.json.JSONException
      */
     @Override
-    public synchronized boolean uploadJmx(String userKey, String testId, String fileName, String pathName) {
+    public synchronized boolean uploadJmx(String testId, String fileName, String pathName) {
         if (StringUtils.isBlank(userKey)&StringUtils.isBlank(testId)) return false;
 
         String url = this.urlManager.scriptUpload(APP_KEY, userKey, testId, fileName);
@@ -76,7 +76,6 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
     }
 
     /**
-     * @param userKey  - user key
      * @param testId   - test id
      * @return test id
      *         //     * @throws java.io.IOException
@@ -85,7 +84,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
 
 
     @Override
-    public synchronized JSONObject uploadFile(String userKey, String testId, String fileName, String pathName) {
+    public synchronized JSONObject uploadFile(String testId, String fileName, String pathName) {
         if (StringUtils.isBlank(userKey)&StringUtils.isBlank(testId)) return null;
 
         String url = this.urlManager.fileUpload(APP_KEY, userKey, testId, fileName);
@@ -103,7 +102,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
 
 
     @Override
-    public TestInfo getTestRunStatus(String userKey,String sessionId) throws JSONException{
+    public TestInfo getTestRunStatus(String sessionId) throws JSONException{
         TestInfo ti = new TestInfo();
         if (StringUtils.isBlank(userKey)&StringUtils.isBlank(sessionId)) {
             ti.setStatus(TestStatus.NotFound.toString());
@@ -130,18 +129,18 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
 
 
     @Override
-    public synchronized String startTest(String userKey, String testId) {
+    public synchronized String startTest(String testId) {
         String session=null;
         if (StringUtils.isBlank(userKey)&StringUtils.isBlank(testId)) return null;
 
         String url = this.urlManager.testStart(APP_KEY, userKey, testId);
-        JSONObject json=this.bzmHttpClient.getResponseAsJson(url, null,Method.GET);
+        JSONObject json=this.bzmHttpClient.getResponseAsJson(url, null, Method.GET);
         session = json.getJSONObject(JsonNodes.RESULT).getJSONArray("sessionsId").getString(0);
         return session;
     }
 
     @Override
-    public int getTestCount(String userKey) throws JSONException, IOException {
+    public int getTestCount() throws JSONException, IOException {
         if (StringUtils.isBlank(userKey)) {
             logger.println("getTests userKey is empty");
             return 0;
@@ -159,13 +158,12 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
 
 
     /**
-     * @param userKey - user key
      * @param testId  - test id
      *                //     * @throws IOException
      *                //     * @throws ClientProtocolException
      */
     @Override
-    public boolean stopTest(String userKey, String testId) throws JSONException{
+    public boolean stopTest(String testId) throws JSONException{
         if (StringUtils.isBlank(userKey)&StringUtils.isBlank(testId)) return false;
         String url = this.urlManager.testStop(APP_KEY, userKey, testId);
         JSONArray stopArray=this.bzmHttpClient.getResponseAsJson(url, null,Method.GET).getJSONArray(JsonNodes.RESULT);
@@ -173,13 +171,12 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
     }
 
     /**
-     * @param userKey  - user key
      * @param reportId - report Id same as Session Id, can be obtained from start stop status.
      *                 //     * @throws IOException
      *                 //     * @throws ClientProtocolException
      */
     @Override
-    public JSONObject testReport(String userKey, String reportId) {
+    public JSONObject testReport(String reportId) {
         if (StringUtils.isBlank(userKey)&StringUtils.isBlank(reportId)) return null;
 
         String url = this.urlManager.testReport(APP_KEY, userKey, reportId);
@@ -190,7 +187,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
     }
 
     @Override
-    public LinkedHashMultimap<String, String> getTestList(String userKey) throws IOException {
+    public LinkedHashMultimap<String, String> getTestList() throws IOException {
 
         LinkedHashMultimap<String, String> testListOrdered = null;
 
@@ -235,7 +232,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
     }
 
     @Override
-    public boolean verifyUserKey(String userKey) {
+    public boolean verifyUserKey() {
 
         if (userKey == null || userKey.trim().isEmpty()) {
             return false;
@@ -255,7 +252,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
     }
 
     @Override
-    public JSONObject getTresholds(String sessionId,String userKey) {
+    public JSONObject getTresholds(String sessionId) {
         if (userKey == null || userKey.trim().isEmpty()) {
             return null;
         }
@@ -296,4 +293,15 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
 		this.password = password;
 	}
 
+
+
+    @Override
+    public String getUserKey() {
+        return this.userKey;
+    }
+
+    @Override
+    public void setUserKey(String userKey) {
+        this.userKey=userKey;
+    }
 }

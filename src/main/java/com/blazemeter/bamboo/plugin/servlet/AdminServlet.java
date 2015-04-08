@@ -19,15 +19,13 @@ import com.atlassian.templaterenderer.TemplateRenderer;
 import com.atlassian.sal.api.transaction.TransactionTemplate;
 import com.atlassian.sal.api.transaction.TransactionCallback;
 import com.blazemeter.bamboo.plugin.ApiVersion;
-import com.blazemeter.bamboo.plugin.api.BzmServiceManager;
-import com.blazemeter.bamboo.plugin.configuration.StaticAccessor;
+import com.blazemeter.bamboo.plugin.api.APIFactory;
+import com.blazemeter.bamboo.plugin.api.BlazemeterApi;
 import com.blazemeter.bamboo.plugin.configuration.constants.AdminServletConst;
-import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
 
 public class AdminServlet extends HttpServlet {
 	private final TransactionTemplate transactionTemplate;
 	private final PluginSettingsFactory pluginSettingsFactory;
-
 	private static final long serialVersionUID = 1L;
 
 	private final TemplateRenderer renderer;
@@ -146,10 +144,8 @@ public class AdminServlet extends HttpServlet {
         TODO
         Add here auto-detect version
          */
-		BzmServiceManager bzmServiceManager =
-                BzmServiceManager.getBzmServiceManager(url,proxyserver, proxyport, proxyuser, proxypass, ApiVersion.v3.name());
-		if (bzmServiceManager.verifyUserKey(userKey)){
-		
+		BlazemeterApi api= APIFactory.getAPI(userKey, url, proxyserver, proxyport, proxyuser, proxypass, ApiVersion.v3.name());
+		if (api.verifyUserKey()){
 			transactionTemplate.execute(new TransactionCallback() {
 				public Object doInTransaction() {
 					PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();		

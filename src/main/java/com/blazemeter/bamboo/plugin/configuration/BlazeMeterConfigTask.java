@@ -1,10 +1,11 @@
 package com.blazemeter.bamboo.plugin.configuration;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.blazemeter.bamboo.plugin.Utils;
+import com.blazemeter.bamboo.plugin.api.APIFactory;
+import com.blazemeter.bamboo.plugin.api.BlazemeterApi;
 import com.blazemeter.bamboo.plugin.configuration.constants.AdminServletConst;
 import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
 import com.google.common.collect.LinkedHashMultimap;
@@ -24,13 +25,12 @@ import com.opensymphony.xwork.TextProvider;
 
 public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements BuildTaskRequirementSupport{
 
-	private static final List<String> API_VERSION_LIST = ImmutableList.of("autoDetect","v3","v2");
 	private static final List<String> FIELDS_TO_COPY = ImmutableList.of(Constants.SETTINGS_SELECTED_TEST_ID,
 			Constants.SETTINGS_ERROR_THRESHOLD_UNSTABLE, Constants.SETTINGS_ERROR_THRESHOLD_FAIL,
 			Constants.SETTINGS_RESPONSE_TIME_UNSTABLE, Constants.SETTINGS_RESPONSE_TIME_FAIL,
 			Constants.SETTINGS_TEST_DURATION, Constants.SETTINGS_DATA_FOLDER,
 			Constants.SETTINGS_MAIN_JMX);
-
+    private BlazemeterApi api;
 
 	private TextProvider textProvider;
 	
@@ -43,15 +43,18 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 		super.populateContextForCreate(context);
         PluginSettingsFactory pluginSettingsFactory=StaticAccessor.getSettingsFactory();
         PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
-        String serverUrl = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
+		String userKey = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
+		String serverUrl = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
+		String proxyserver = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_SERVER);
+		String proxyport = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_PORT);
+		String proxyuser = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_USER);
+		String proxypass = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_PASS);
 		String apiVersion = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_API_VERSION);
 		context.put(AdminServletConst.URL, serverUrl);
 		context.put(AdminServletConst.API_VERSION, apiVersion);
 		context.put(Constants.SETTINGS_DATA_FOLDER, Constants.DEFAULT_SETTINGS_DATA_FOLDER);
-        BzmServiceManager bzmServiceManager=BzmServiceManager.getBzmServiceManager(context);
-
-        setSessionId(bzmServiceManager);
-		context.put(Constants.TEST_LIST, bzmServiceManager.getTestsAsMap());
+		this.api= APIFactory.getAPI(userKey,serverUrl,proxyserver,proxyport,proxyuser,proxypass,apiVersion);
+		context.put(Constants.TEST_LIST, BzmServiceManager.getTestsAsMap(api));
 	}
 
 	@Override
@@ -60,14 +63,17 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
         taskConfiguratorHelper.populateContextWithConfiguration(context, taskDefinition, FIELDS_TO_COPY);
         PluginSettingsFactory pluginSettingsFactory=StaticAccessor.getSettingsFactory();
         PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
-        String serverUrl = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
-        String apiVersion = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_API_VERSION);
-        context.put(AdminServletConst.URL, serverUrl);
+		String userKey = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
+		String serverUrl = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
+		String proxyserver = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_SERVER);
+		String proxyport = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_PORT);
+		String proxyuser = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_USER);
+		String proxypass = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_PASS);
+		String apiVersion = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_API_VERSION);
+		context.put(AdminServletConst.URL, serverUrl);
         context.put(AdminServletConst.API_VERSION, apiVersion);
-
-        BzmServiceManager bzmServiceManager=BzmServiceManager.getBzmServiceManager(context);
-		setSessionId(bzmServiceManager);
-		context.put(Constants.TEST_LIST, bzmServiceManager.getTestsAsMap());
+		this.api= APIFactory.getAPI(userKey,serverUrl,proxyserver,proxyport,proxyuser,proxypass,apiVersion);
+        context.put(Constants.TEST_LIST, BzmServiceManager.getTestsAsMap(this.api));
 
 		context.put(Constants.SETTINGS_DATA_FOLDER, taskDefinition.getConfiguration().get(Constants.SETTINGS_DATA_FOLDER));
 	}
@@ -94,36 +100,19 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 //		final String mainJMX = params.getString(BlazeMeterConstants.SETTINGS_MAIN_JMX);
 
 
-        PluginSettingsFactory pluginSettingsFactory=StaticAccessor.getSettingsFactory();
-        PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
-        String userKey = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
-        String serverUrl = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
-        String proxyserver = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_SERVER);
-        String proxyport = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_PORT);
-        String proxyuser = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_USER);
-        String proxypass = (String) pluginSettings.get(Config.class.getName() + Constants.TEST_LIST);
-        String apiVersion = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_API_VERSION);
 
-        BzmServiceManager bzmServiceManager= BzmServiceManager.getBzmServiceManager(serverUrl,
-                proxyserver,
-                proxyport,
-                proxyuser,
-                proxypass,
-                apiVersion);
-
-
-        if (StringUtils.isEmpty(bzmServiceManager.getUserKey())) {
+        if (StringUtils.isEmpty(this.api.getUserKey())) {
 			errorCollection.addErrorMessage("Cannot load tests from BlazeMeter server. Invalid user key!");
 		}
 
 		if (StringUtils.isEmpty(selectedTest)) {
 			errorCollection.addErrorMessage(textProvider.getText(Constants.BLAZEMETER_ERROR + Constants.SETTINGS_SELECTED_TEST_ID));
 		} else {
-			if (!bzmServiceManager.verifyUserKey(bzmServiceManager.getUserKey())){
+			if (!this.api.verifyUserKey()){
 				errorCollection.addErrorMessage("Cannot load tests from BlazeMeter server. Invalid user key!");
 			} else {
 				//verify if the test still exists on BlazeMeter server
-                LinkedHashMultimap<String, String> tests = bzmServiceManager.getTests();
+                LinkedHashMultimap<String, String> tests = BzmServiceManager.getTests(this.api);
 				if (tests != null){
 					if (!tests.keySet().contains(selectedTest)) {
 						errorCollection.addErrorMessage("Test '"+selectedTest+"' doesn't exits on BlazeMeter server.");
@@ -184,14 +173,4 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 	public void setTextProvider(final TextProvider textProvider) {
 		this.textProvider = textProvider;
 	}
-
-	public void setSessionId(BzmServiceManager bzmServiceManager){
-		final PluginSettingsFactory pluginSettingsFactory = StaticAccessor.getSettingsFactory();
-		PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();	
-		String config = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
-        if (config != null){
-			bzmServiceManager.setUserKey(config);
-		}
-	}
-
 }

@@ -13,6 +13,8 @@ import com.atlassian.bamboo.task.TaskResultBuilder;
 import com.atlassian.bamboo.task.TaskType;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
+import com.blazemeter.bamboo.plugin.api.APIFactory;
+import com.blazemeter.bamboo.plugin.api.BlazemeterApi;
 import com.blazemeter.bamboo.plugin.api.BzmServiceManager;
 import com.blazemeter.bamboo.plugin.api.TestInfo;
 import com.blazemeter.bamboo.plugin.configuration.constants.AdminServletConst;
@@ -25,6 +27,9 @@ public class BlazeMeterTaskType implements TaskType{
     private static final int INIT_TEST_TIMEOUT = 600000;
 
     private int testDuration;
+    String testId;
+    String session;
+    BlazemeterApi api;
 	int errorUnstableThreshold;
 	int errorFailedThreshold;
 	int responseTimeUnstableThreshold;
@@ -57,39 +62,30 @@ public class BlazeMeterTaskType implements TaskType{
         String proxyuser = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_USER);
         String proxypass = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_PASS);
         String apiVersion = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_API_VERSION);
-        String testId = configMap.get(Constants.SETTINGS_SELECTED_TEST_ID);
+        this.testId = configMap.get(Constants.SETTINGS_SELECTED_TEST_ID);
 
             if (StringUtils.isBlank(userKey)) {
                 logger.addErrorLogEntry("BlazeMeter user key not defined!");
                 return resultBuilder.failed().build();
             }
-        BzmServiceManager bzmServiceManager= BzmServiceManager.getBzmServiceManager(serverUrl,
+        this.api= APIFactory.getAPI(userKey,serverUrl,
                 proxyserver,
                 proxyport,
                 proxyuser,
                 proxypass,
                 apiVersion);
-        if(!bzmServiceManager.verifyUserKey(userKey)){
-            logger.addBuildLogEntry("Failed to verify userKey: userKey is invalid.");
-            return resultBuilder.failedWithError().build();
-        }
-        bzmServiceManager.setTestId(testId);
-        bzmServiceManager.setUserKey(userKey);
 
         rootDirectory = context.getRootDirectory();
 
         logger.addBuildLogEntry("Attempting to start test with id:" + testId);
-        boolean started = bzmServiceManager.startTest(testId, logger);
+        this.session = BzmServiceManager.startTest(api,testId, logger);
         long testInitStart=System.currentTimeMillis();
 
-        if (!started) {
-                return resultBuilder.failed().build();
+        if (session.length()==0) {
+            logger.addErrorLogEntry("Failed to retrieve test session id! Check, that test was started correctly on server.");
+            return resultBuilder.failed().build();
             } else {
-                if (bzmServiceManager.getSession() != null) {//save the session id to the build custom data map
-                    context.getBuildContext().getBuildResult().getCustomBuildData().put("session_id", bzmServiceManager.getSession().toString());
-                } else {
-                    logger.addErrorLogEntry("Failed to retrieve test session id! Check, that test was started correctly on server.");
-                }
+                    context.getBuildContext().getBuildResult().getCustomBuildData().put("session_id", session.toString());
             }
 
             long totalWaitTime = (testDuration + 2) * 60 * 1000;//the duration is in minutes so we multiply to get the value in ms
@@ -101,7 +97,7 @@ public class BlazeMeterTaskType implements TaskType{
 
         do{
             Utils.sleep(CHECK_INTERVAL);
-            testInfo = bzmServiceManager.getTestStatus();
+            testInfo = BzmServiceManager.getTestStatus(this.api,this.testId,this.session);
             logger.addBuildLogEntry("Check if the test is initialized...");
             initTimeOutPassed=System.currentTimeMillis()>testInitStart+INIT_TEST_TIMEOUT;
         }while (!(initTimeOutPassed|testInfo.getStatus().equals(TestStatus.Running.toString())));
@@ -111,7 +107,7 @@ public class BlazeMeterTaskType implements TaskType{
             return resultBuilder.failedWithError().build();
         }
         logger.addBuildLogEntry("Test was initialized on server, testId="+testId);
-        logger.addBuildLogEntry("Test report is available via link: "+"https://a.blazemeter.com/app/#reports/"+bzmServiceManager.getSession().toString()+"/summary");
+        logger.addBuildLogEntry("Test report is available via link: "+"https://a.blazemeter.com/app/#reports/"+this.session+"/summary");
 
         while (currentCheck++ < nrOfCheckInterval) {
                 try {
@@ -122,7 +118,7 @@ public class BlazeMeterTaskType implements TaskType{
                 }
 
                 logger.addBuildLogEntry("Check if the test is still running. Time passed since start:" + ((currentCheck * CHECK_INTERVAL) / 1000 / 60) + " minutes.");
-                testInfo = bzmServiceManager.getTestStatus();
+                testInfo = BzmServiceManager.getTestStatus(this.api,this.testId,this.session);
                 if (testInfo.getStatus().equals(TestStatus.NotRunning.toString())) {
                     logger.addBuildLogEntry("Test is finished earlier then estimated! Time passed since start:" + ((currentCheck * CHECK_INTERVAL) / 1000 / 60) + " minutes.");
                     break;
@@ -134,11 +130,11 @@ public class BlazeMeterTaskType implements TaskType{
 
             //BlazeMeter test stopped due to user test duration setup reached
             logger.addBuildLogEntry("Stopping test...");
-            bzmServiceManager.stopTest(testId, logger);
+            BzmServiceManager.stopTest(this.api,this.testId,this.session, logger);
 
             logger.addBuildLogEntry("Test finished. Checking for test report...");
-            bzmServiceManager.getReport(logger);
-        boolean isServerTresholdsPassed=bzmServiceManager.validateServerTresholds(logger);
+            BzmServiceManager.getReport(this.api,this.session,logger);
+        boolean isServerTresholdsPassed=BzmServiceManager.validateServerTresholds(this.api,this.session,logger);
         return isServerTresholdsPassed?resultBuilder.success().build():resultBuilder.failed().build();
         }
 

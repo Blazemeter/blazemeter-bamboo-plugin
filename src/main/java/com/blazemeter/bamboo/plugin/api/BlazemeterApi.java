@@ -5,7 +5,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.HashMap;
 
 
 /**
@@ -15,23 +14,27 @@ import java.util.HashMap;
  */
 public interface BlazemeterApi {
 
-    public boolean uploadJmx(String userKey, String testId, String fileName, String pathName);
+    public boolean uploadJmx(String testId, String fileName, String pathName);
 
-    public JSONObject uploadFile(String userKey, String testId, String fileName, String pathName);
+    public JSONObject uploadFile(String testId, String fileName, String pathName);
 
-    public TestInfo getTestRunStatus(String userKey, String testId);
+    public TestInfo getTestRunStatus(String testId);
 
-    public String startTest(String userKey, String testId) throws JSONException;
+    public String startTest(String testId) throws JSONException;
 
-    public int getTestCount(String userKey) throws JSONException, IOException;
+    public int getTestCount() throws JSONException, IOException;
 
-    public boolean stopTest(String userKey, String testId) throws JSONException;
+    public boolean stopTest(String testId) throws JSONException;
 
-    public JSONObject testReport(String userKey, String reportId);
+    public JSONObject testReport(String reportId);
 
-    public LinkedHashMultimap<String, String> getTestList(String userKey) throws IOException;
+    public LinkedHashMultimap<String, String> getTestList() throws IOException;
 
-    public boolean verifyUserKey(String userKey);
+    public boolean verifyUserKey();
 
-    public JSONObject getTresholds(String sessionId,String userKey);
+    public JSONObject getTresholds(String sessionId);
+
+    public String getUserKey();
+
+    public void  setUserKey(String userKey);
 }
