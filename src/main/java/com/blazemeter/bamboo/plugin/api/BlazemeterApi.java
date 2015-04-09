@@ -13,6 +13,8 @@ import java.io.IOException;
  *
  */
 public interface BlazemeterApi {
+    public static final String APP_KEY = "bmboo0x98a8w9s4s7c4";
+
 
     public boolean uploadJmx(String testId, String fileName, String pathName);
 

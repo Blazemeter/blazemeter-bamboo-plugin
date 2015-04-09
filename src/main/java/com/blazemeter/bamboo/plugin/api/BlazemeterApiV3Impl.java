@@ -167,7 +167,8 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
         if (StringUtils.isBlank(userKey)&StringUtils.isBlank(testId)) return false;
         String url = this.urlManager.testStop(APP_KEY, userKey, testId);
         JSONArray stopArray=this.bzmHttpClient.getResponseAsJson(url, null,Method.GET).getJSONArray(JsonNodes.RESULT);
-        return stopArray.length()==0;
+        String command=((JSONObject)stopArray.get(0)).getString(JsonNodes.RESULT);
+        return command.equals("shutdown command sent\n");
     }
 
     /**

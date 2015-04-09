@@ -23,7 +23,6 @@ import org.json.JSONObject;
 public class BlazemeterApiV2Impl implements BlazemeterApi{
     PrintStream logger = new PrintStream(System.out);
 
-    public static final String APP_KEY = "bmboo0x98a8w9s4s7c4";
     BzmHttpClient bzmHttpClient;
     BmUrlManagerV2Impl urlManager;
     private final JSONObject not_implemented;
@@ -190,8 +189,12 @@ public class BlazemeterApiV2Impl implements BlazemeterApi{
         if (StringUtils.isBlank(userKey)&StringUtils.isBlank(reportId)) return null;
 
         String url = this.urlManager.testReport(APP_KEY, userKey, reportId);
-        return this.bzmHttpClient.getResponseAsJson(url, null, Method.GET);
+        JSONObject summary = (JSONObject) this.bzmHttpClient.getResponseAsJson(url, null, Method.GET).getJSONObject(JsonNodes.RESULT)
+                .getJSONArray("summary")
+                .get(0);
+        return summary;
     }
+
 
     @Override
     public LinkedHashMultimap<String, String> getTestList() throws IOException {

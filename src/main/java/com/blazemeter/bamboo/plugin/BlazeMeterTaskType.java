@@ -13,10 +13,7 @@ import com.atlassian.bamboo.task.TaskResultBuilder;
 import com.atlassian.bamboo.task.TaskType;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
-import com.blazemeter.bamboo.plugin.api.APIFactory;
-import com.blazemeter.bamboo.plugin.api.BlazemeterApi;
-import com.blazemeter.bamboo.plugin.api.BzmServiceManager;
-import com.blazemeter.bamboo.plugin.api.TestInfo;
+import com.blazemeter.bamboo.plugin.api.*;
 import com.blazemeter.bamboo.plugin.configuration.constants.AdminServletConst;
 import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
 import com.blazemeter.bamboo.plugin.servlet.AdminServlet.Config;
@@ -134,7 +131,10 @@ public class BlazeMeterTaskType implements TaskType{
 
             logger.addBuildLogEntry("Test finished. Checking for test report...");
             BzmServiceManager.getReport(this.api,this.session,logger);
-        boolean isServerTresholdsPassed=BzmServiceManager.validateServerTresholds(this.api,this.session,logger);
+        boolean isServerTresholdsPassed=true;
+        if(this.api instanceof BlazemeterApiV3Impl){
+            isServerTresholdsPassed=BzmServiceManager.validateServerTresholds(this.api,this.session,logger);
+        }
         return isServerTresholdsPassed?resultBuilder.success().build():resultBuilder.failed().build();
         }
 

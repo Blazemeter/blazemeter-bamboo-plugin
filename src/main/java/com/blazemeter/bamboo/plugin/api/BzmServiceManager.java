@@ -7,14 +7,9 @@ import java.util.Map;
 
 import com.atlassian.bamboo.build.logger.BuildLogger;
 import com.atlassian.util.concurrent.NotNull;
-import com.blazemeter.bamboo.plugin.ApiVersion;
-import com.blazemeter.bamboo.plugin.configuration.constants.AdminServletConst;
-import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
 import com.blazemeter.bamboo.plugin.configuration.constants.JsonNodes;
 import com.blazemeter.bamboo.plugin.testresult.TestResult;
-import com.blazemeter.bamboo.plugin.testresult.TestResultFactory;
 import com.google.common.collect.LinkedHashMultimap;
-import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -84,7 +79,7 @@ private BzmServiceManager(){
         try {
             logger.addBuildLogEntry("Trying to request aggregate report. UserKey="+api.getUserKey()+" session="+session);
             JSONObject aggregate=api.testReport(session);
-            testResult = TestResultFactory.getTestResult(aggregate,(api instanceof BlazemeterApiV2Impl?ApiVersion.v2:ApiVersion.v3));
+            testResult = new TestResult(aggregate);
             logger.addBuildLogEntry(testResult.toString());
         } catch (JSONException e) {
             logger.addErrorLogEntry("Problems with getting aggregate test report...",e);
@@ -113,20 +108,10 @@ private BzmServiceManager(){
     } 	
 
     public static void stopTest(BlazemeterApi api,String testId, String session, BuildLogger logger){
-         boolean stopTest=true;
-    	int countStartRequests = 0;
+        boolean stopTest=true;
         logger.addBuildLogEntry("Trying to stop test with testId="+testId+" for session="+session+" for userKey="+api.getUserKey());
+        stopTest = api.stopTest(testId);
         try {
-            do {
-        	stopTest = api.stopTest(testId);
-            countStartRequests++;
-            if (countStartRequests > 5) {
-                logger.addErrorLogEntry("Could not stop BlazeMeter test with testId=" + testId + " userKey="+api.getUserKey());
-            	return;
-            }
-        } while (stopTest == false);
-
-
 			if (stopTest==true) {
 				logger.addBuildLogEntry("Test stopped succesfully. testId="+testId+" userKey="+api.getUserKey()+" session="+session);
 			} else {
