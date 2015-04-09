@@ -134,25 +134,25 @@ private BzmServiceManager(){
     }
 
 
-    public static boolean validateServerTresholds(BlazemeterApi api,String session,BuildLogger logger) {
+    public static TaskState validateServerTresholds(BlazemeterApi api,String session,BuildLogger logger) {
         JSONObject jo = null;
-        boolean tresholdsValid=true;
+        TaskState serverTresholdsResult=TaskState.SUCCESS;
         JSONObject result=null;
         logger.addBuildLogEntry("Going to validate server tresholds...");
         try {
             jo=api.getTresholds(session);
             result=jo.getJSONObject(JsonNodes.RESULT);
-            tresholdsValid=result.getJSONObject(JsonNodes.DATA).getBoolean("success");
+            serverTresholdsResult=result.getJSONObject(JsonNodes.DATA).getBoolean("success")?TaskState.SUCCESS:TaskState.FAILED;
         } catch (NullPointerException e){
-            logger.addErrorLogEntry("Server tresholds validation was not executed");
-            logger.addErrorLogEntry(e.getMessage());
+            logger.addBuildLogEntry("Server tresholds validation was not executed");
+            logger.addBuildLogEntry(e.getMessage());
         }catch (JSONException je) {
-            logger.addErrorLogEntry("Server tresholds validation was not executed");
-            logger.addErrorLogEntry("Failed to get tresholds for  session=" + session);
+            logger.addBuildLogEntry("Server tresholds validation was not executed");
+            logger.addBuildLogEntry("Failed to get tresholds for  session=" + session);
         }finally {
             logger.addBuildLogEntry("Server tresholds validation " +
-                    (tresholdsValid ? "passed. Marking build as PASSED" : "failed. Marking build as FAILED"));
-            return tresholdsValid;
+                    (serverTresholdsResult.equals(TaskState.SUCCESS) ? "passed. Marking build as PASSED" : "failed. Marking build as FAILED"));
+            return serverTresholdsResult;
         }
     }
 

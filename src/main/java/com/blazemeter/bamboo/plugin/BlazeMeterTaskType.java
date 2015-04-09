@@ -1,7 +1,6 @@
 package com.blazemeter.bamboo.plugin;
 
 import java.io.File;
-import java.util.Map;
 
 import com.atlassian.bamboo.build.logger.BuildLogger;
 import com.atlassian.bamboo.configuration.ConfigurationMap;
@@ -26,13 +25,13 @@ public class BlazeMeterTaskType implements TaskType{
     BlazemeterApi api;
 	String dataFolder;
 	String mainJMX;
-	
+
 	boolean needTestUpload;
 	File rootDirectory;
 
 	ProcessService processService;
 	private final PluginSettingsFactory pluginSettingsFactory;
-	
+
 	public BlazeMeterTaskType(final ProcessService processService, PluginSettingsFactory pluginSettingsFactory){
 		this.processService = processService;
 		this.pluginSettingsFactory = pluginSettingsFactory;
@@ -124,23 +123,31 @@ public class BlazeMeterTaskType implements TaskType{
 
             logger.addBuildLogEntry("Test finished. Checking for test report...");
             TestResult result=BzmServiceManager.getReport(this.api, this.session, logger);
-        boolean isServerTresholdsPassed=true;
+        TaskState serverTresholdsResult=TaskState.SUCCESS;
         if(this.api instanceof BlazemeterApiV3Impl){
-            isServerTresholdsPassed=BzmServiceManager.validateServerTresholds(this.api,this.session,logger);
+            serverTresholdsResult=BzmServiceManager.validateServerTresholds(this.api,this.session,logger);
         }
         TaskState localTresholdsResult=BzmServiceManager.validateLocalTresholds(result,configMap,logger);
-        if(localTresholdsResult!=null){
-            switch (localTresholdsResult){
-                case SUCCESS:
-                    return resultBuilder.success().build();
-                case ERROR:
-                    return resultBuilder.failedWithError().build();
-                case FAILED:
-                    return resultBuilder.failed().build();
+
+        if(serverTresholdsResult.equals(TaskState.FAILED)|serverTresholdsResult.equals(TaskState.ERROR)){
+            return resultBuilder.failed().build();
+        }
+        TaskResult taskResult = null;
+            if (serverTresholdsResult.equals(TaskState.SUCCESS)&localTresholdsResult != null) {
+                switch (localTresholdsResult) {
+                    case SUCCESS:
+                        taskResult = resultBuilder.success().build();
+                        break;
+                    case ERROR:
+                        taskResult = resultBuilder.failedWithError().build();
+                        break;
+                    case FAILED:
+                        taskResult = resultBuilder.failed().build();
+                        break;
+                }
+            } else {
+                taskResult = resultBuilder.success().build();
             }
-        }
-        return isServerTresholdsPassed?resultBuilder.success().build():resultBuilder.failed().build();
-        }
-
-
+        return taskResult;
+    }
 }
