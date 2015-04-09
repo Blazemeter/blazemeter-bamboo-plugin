@@ -6,7 +6,9 @@ import java.util.Collection;
 import java.util.Map;
 
 import com.atlassian.bamboo.build.logger.BuildLogger;
+import com.atlassian.bamboo.task.TaskState;
 import com.atlassian.util.concurrent.NotNull;
+import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
 import com.blazemeter.bamboo.plugin.configuration.constants.JsonNodes;
 import com.blazemeter.bamboo.plugin.testresult.TestResult;
 import com.google.common.collect.LinkedHashMultimap;
@@ -115,10 +117,11 @@ private BzmServiceManager(){
 			if (stopTest==true) {
 				logger.addBuildLogEntry("Test stopped succesfully. testId="+testId+" userKey="+api.getUserKey()+" session="+session);
 			} else {
-                logger.addErrorLogEntry("Error while stopping test with testId=" + testId + " userKey=" + api.getUserKey() + " session=" + session);
+                logger.addBuildLogEntry("Error while stopping test with testId=" + testId + " userKey=" + api.getUserKey() + " session=" + session);
 			}
 		} catch (JSONException e) {
-            logger.addErrorLogEntry("Error: Exception while stopping BlazeMeter Test [" + e.getMessage() + "]");
+            logger.addBuildLogEntry("Error while stopping test with testId=" + testId +
+                    " userKey=" + api.getUserKey() + " session=" + session+" [" + e.getMessage() + "]");
 		}
     }
     
@@ -152,4 +155,74 @@ private BzmServiceManager(){
             return tresholdsValid;
         }
     }
+
+    public static TaskState validateLocalTresholds(TestResult testResult, Map<String, String> params, BuildLogger logger) {
+
+        TaskState taskState=null;
+        String errorUnstable = params.get(Constants.SETTINGS_ERROR_THRESHOLD_UNSTABLE);
+        String errorFail = params.get(Constants.SETTINGS_ERROR_THRESHOLD_FAIL);
+        String timeUnstable = params.get(Constants.SETTINGS_RESPONSE_TIME_UNSTABLE);
+        String timeFail = params.get(Constants.SETTINGS_RESPONSE_TIME_FAIL);
+
+        try{
+            int errorUnstableInt  = errorUnstable.isEmpty()?-1:Integer.valueOf(errorUnstable);
+            logger.addBuildLogEntry("ErrorUnstable percentage value="+errorUnstable+
+                    ". It will be compared with errorPercentage="+testResult.getErrorPercentage());
+            if (errorUnstableInt >= 0 & testResult.getErrorPercentage() > errorUnstableInt) {
+                logger.addBuildLogEntry("Validating errorPercentageUnstable...\n");
+                logger.addBuildLogEntry("Actual error_percentage=" + testResult.getErrorPercentage() + " is higher than ERROR_PERCENTAGE_UNSTABLE_treshold=" + errorUnstable + "\n");
+                logger.addBuildLogEntry("Build is unstable");
+                taskState = TaskState.ERROR;
+            }
+        } catch (NumberFormatException nfe){
+            logger.addBuildLogEntry("Error threshold_unstable="+errorUnstable+" is not a number. It will be skipped.");
+        }
+
+        try{
+            int timeUnstableInt = timeUnstable.isEmpty()?-1:Integer.valueOf(timeUnstable);
+            logger.addBuildLogEntry("ResponseTimeUnstable value="+timeUnstableInt+". It will be compared with averageResponseTime="+testResult.getAverage());
+            if (timeUnstableInt >= 0 & testResult.getAverage() > timeUnstableInt) {
+                logger.addBuildLogEntry("Validating responseTimeUnstable...\n");
+                logger.addBuildLogEntry("Actual average_response_time=" + testResult.getAverage() + " is higher than RESPONSE_TIME_UNSTABLE_treshold=" + timeUnstableInt + "\n");
+                logger.addBuildLogEntry("Build is unstable");
+                taskState = TaskState.ERROR;
+            }
+        } catch (NumberFormatException nfe) {
+            logger.addBuildLogEntry("Response time unstable="+timeUnstable+" is not a number. It will be skipped.");
+        }
+
+
+        try{
+            int errorFailInt = errorFail.isEmpty()?-1:Integer.valueOf(errorFail);
+            logger.addBuildLogEntry("ErrorFailed percentage value="+errorFailInt+
+                    ". It will be compared with errorPercentage="+testResult.getErrorPercentage());
+            if (errorFailInt >= 0 & testResult.getErrorPercentage() >= errorFailInt) {
+                logger.addBuildLogEntry("Validating errorPercentageFailed...\n");
+                logger.addBuildLogEntry("Actual error_percentage=" + testResult.getErrorPercentage() + " is higher than ERROR_PERCENTAGE_FAILED treshold=" + errorFailInt + "\n");
+                logger.addBuildLogEntry("Marking build as failed");
+                taskState = TaskState.FAILED;
+                return taskState;
+            }
+        } catch (NumberFormatException nfe){
+            logger.addBuildLogEntry("Error threshold_failed="+errorFail+" is not a number. It will be skipped.");
+        }
+
+        try{
+            int timeFailInt = timeFail.isEmpty()?-1:Integer.valueOf(timeFail);
+            logger.addBuildLogEntry("ResponseTimeFailed value="+timeFailInt+". It will be compared with averageResponseTime="+testResult.getAverage());
+            if (timeFailInt >= 0 & testResult.getAverage() >= timeFailInt) {
+                logger.addBuildLogEntry("Validating responseTimeFailed...\n");
+                logger.addBuildLogEntry("Actual average_response_time=" + testResult.getAverage() + " is higher than RESPONSE_TIME_FAILED treshold=" + timeFailInt + "\n");
+                logger.addBuildLogEntry("Marking build as failed");
+                taskState = TaskState.FAILED;
+                return taskState;
+            }
+
+        } catch (NumberFormatException nfe){
+            logger.addBuildLogEntry("Response time_failed="+timeFail+" is not a number. It will be skipped.");
+        }
+        return taskState;
+    }
+
+
 }

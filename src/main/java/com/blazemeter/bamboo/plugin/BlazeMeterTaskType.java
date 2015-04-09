@@ -6,17 +6,14 @@ import java.util.Map;
 import com.atlassian.bamboo.build.logger.BuildLogger;
 import com.atlassian.bamboo.configuration.ConfigurationMap;
 import com.atlassian.bamboo.process.ProcessService;
-import com.atlassian.bamboo.task.TaskContext;
-import com.atlassian.bamboo.task.TaskException;
-import com.atlassian.bamboo.task.TaskResult;
-import com.atlassian.bamboo.task.TaskResultBuilder;
-import com.atlassian.bamboo.task.TaskType;
+import com.atlassian.bamboo.task.*;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import com.blazemeter.bamboo.plugin.api.*;
 import com.blazemeter.bamboo.plugin.configuration.constants.AdminServletConst;
 import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
 import com.blazemeter.bamboo.plugin.servlet.AdminServlet.Config;
+import com.blazemeter.bamboo.plugin.testresult.TestResult;
 import org.apache.commons.lang3.StringUtils;
 
 public class BlazeMeterTaskType implements TaskType{
@@ -27,10 +24,6 @@ public class BlazeMeterTaskType implements TaskType{
     String testId;
     String session;
     BlazemeterApi api;
-	int errorUnstableThreshold;
-	int errorFailedThreshold;
-	int responseTimeUnstableThreshold;
-	int responseTimeFailedThreshold;
 	String dataFolder;
 	String mainJMX;
 	
@@ -127,47 +120,27 @@ public class BlazeMeterTaskType implements TaskType{
 
             //BlazeMeter test stopped due to user test duration setup reached
             logger.addBuildLogEntry("Stopping test...");
-            BzmServiceManager.stopTest(this.api,this.testId,this.session, logger);
+            BzmServiceManager.stopTest(this.api, this.testId, this.session, logger);
 
             logger.addBuildLogEntry("Test finished. Checking for test report...");
-            BzmServiceManager.getReport(this.api,this.session,logger);
+            TestResult result=BzmServiceManager.getReport(this.api, this.session, logger);
         boolean isServerTresholdsPassed=true;
         if(this.api instanceof BlazemeterApiV3Impl){
             isServerTresholdsPassed=BzmServiceManager.validateServerTresholds(this.api,this.session,logger);
         }
+        TaskState localTresholdsResult=BzmServiceManager.validateLocalTresholds(result,configMap,logger);
+        if(localTresholdsResult!=null){
+            switch (localTresholdsResult){
+                case SUCCESS:
+                    return resultBuilder.success().build();
+                case ERROR:
+                    return resultBuilder.failedWithError().build();
+                case FAILED:
+                    return resultBuilder.failed().build();
+            }
+        }
         return isServerTresholdsPassed?resultBuilder.success().build():resultBuilder.failed().build();
         }
 
-	private String validateLocalTresholds(Map<String, String> params, BuildLogger logger) {
-
-		String errorUnstable = params.get(Constants.SETTINGS_ERROR_THRESHOLD_UNSTABLE);
-		String errorFail = params.get(Constants.SETTINGS_ERROR_THRESHOLD_FAIL);
-		String timeUnstable = params.get(Constants.SETTINGS_RESPONSE_TIME_UNSTABLE);
-		String timeFail = params.get(Constants.SETTINGS_RESPONSE_TIME_FAIL);
-
-		try{
-			errorFailedThreshold = errorFail.isEmpty()?-1:Integer.valueOf(errorFail);
-		} catch (NumberFormatException nfe){
-			return "Error threshold failed is not a number.";
-		}
-		try{
-			errorUnstableThreshold = errorUnstable.isEmpty()?-1:Integer.valueOf(errorUnstable);
-		} catch (NumberFormatException nfe){
-			return "Error threshold unstable is not a number.";
-		}
-		try{
-			responseTimeFailedThreshold = timeFail.isEmpty()?-1:Integer.valueOf(timeFail);
-		} catch (NumberFormatException nfe){
-			return "Response time failed is not a number.";
-		}
-		try{
-			responseTimeUnstableThreshold = timeUnstable.isEmpty()?-1:Integer.valueOf(timeUnstable);
-        } catch (NumberFormatException nfe) {
-            return "Response time unstable is not a number.";
-        }
-
-
-        return null;
-    }
 
 }
