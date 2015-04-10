@@ -3,6 +3,7 @@ package com.blazemeter.bamboo.plugin.api;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import com.atlassian.bamboo.build.logger.BuildLogger;
@@ -107,7 +108,7 @@ private BzmServiceManager(){
         } catch (JSONException e) {
             logger.addErrorLogEntry("Could not upload file " + e.getMessage());
         }
-    } 	
+    }
 
     public static void stopTest(BlazemeterApi api,String testId, String session, BuildLogger logger){
         boolean stopTest=true;
@@ -121,7 +122,7 @@ private BzmServiceManager(){
 			}
 		} catch (JSONException e) {
             logger.addBuildLogEntry("Error while stopping test with testId=" + testId +
-                    " userKey=" + api.getUserKey() + " session=" + session+" [" + e.getMessage() + "]");
+                    " userKey=" + api.getUserKey() + " session=" + session + " [" + e.getMessage() + "]");
 		}
     }
     
@@ -225,4 +226,24 @@ private BzmServiceManager(){
     }
 
 
+
+    public static List<Exception> prepareTest(BlazemeterApi api,
+                                              String testDuration,
+                                              BuildLogger logger){
+        /*
+        TODO
+        1. Create test if needed;
+        2. Update jsonConfig
+        3. Update testDuration;
+        rootDirectory = context.getRootDirectory();
+
+        Parameters:
+
+        rootDirectory;
+        jsonConfig path;
+        testDuration
+
+         */
+        return null;
+    }
 }

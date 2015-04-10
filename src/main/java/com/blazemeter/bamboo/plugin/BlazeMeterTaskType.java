@@ -19,7 +19,7 @@ public class BlazeMeterTaskType implements TaskType{
 	private static final int CHECK_INTERVAL = 60000;
     private static final int INIT_TEST_TIMEOUT = 600000;
 
-    private int testDuration;
+    private String testDuration;
     String testId;
     String session;
     BlazemeterApi api;
@@ -52,6 +52,7 @@ public class BlazeMeterTaskType implements TaskType{
         String proxypass = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_PASS);
         String apiVersion = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_API_VERSION);
         this.testId = configMap.get(Constants.SETTINGS_SELECTED_TEST_ID);
+        this.testDuration = configMap.get(Constants.SETTINGS_TEST_DURATION);
 
             if (StringUtils.isBlank(userKey)) {
                 logger.addErrorLogEntry("BlazeMeter user key not defined!");
@@ -65,7 +66,8 @@ public class BlazeMeterTaskType implements TaskType{
                 apiVersion);
 
         rootDirectory = context.getRootDirectory();
-
+        logger.addBuildLogEntry("Preparing for run test with id:" + testId);
+        BzmServiceManager.prepareTest(api,testDuration,logger);
         logger.addBuildLogEntry("Attempting to start test with id:" + testId);
         this.session = BzmServiceManager.startTest(api,testId, logger);
         long testInitStart=System.currentTimeMillis();
@@ -77,16 +79,20 @@ public class BlazeMeterTaskType implements TaskType{
                     context.getBuildContext().getBuildResult().getCustomBuildData().put("session_id", session.toString());
             }
 
-            long totalWaitTime = (testDuration + 2) * 60 * 1000;//the duration is in minutes so we multiply to get the value in ms
-            long nrOfCheckInterval = totalWaitTime / CHECK_INTERVAL;//
-            long currentCheck = 0;
 
             TestInfo testInfo;
         boolean initTimeOutPassed=false;
 
         do{
-            Utils.sleep(CHECK_INTERVAL);
             testInfo = BzmServiceManager.getTestStatus(this.api,this.testId,this.session);
+            try {
+                Thread.currentThread().sleep(CHECK_INTERVAL);
+            } catch (InterruptedException e) {
+                logger.addErrorLogEntry("BlazeMeter Interrupted Exception: " + e.getMessage());
+                logger.addBuildLogEntry("Stopping test...");
+                BzmServiceManager.stopTest(this.api, this.testId, this.session, logger);
+                break;
+            }
             logger.addBuildLogEntry("Check if the test is initialized...");
             initTimeOutPassed=System.currentTimeMillis()>testInitStart+INIT_TEST_TIMEOUT;
         }while (!(initTimeOutPassed|testInfo.getStatus().equals(TestStatus.Running.toString())));
@@ -98,18 +104,21 @@ public class BlazeMeterTaskType implements TaskType{
         logger.addBuildLogEntry("Test was initialized on server, testId="+testId);
         logger.addBuildLogEntry("Test report is available via link: "+"https://a.blazemeter.com/app/#reports/"+this.session+"/summary");
 
-        while (currentCheck++ < nrOfCheckInterval) {
+        long timeOfStart=System.currentTimeMillis();
+        while (testInfo.getStatus().equals(TestStatus.Running.toString())) {
                 try {
                     Thread.currentThread().sleep(CHECK_INTERVAL);
                 } catch (InterruptedException e) {
                     logger.addErrorLogEntry("BlazeMeter Interrupted Exception: " + e.getMessage());
+                    logger.addBuildLogEntry("Stopping test...");
+                    BzmServiceManager.stopTest(this.api, this.testId, this.session, logger);
                     break;
                 }
 
-                logger.addBuildLogEntry("Check if the test is still running. Time passed since start:" + ((currentCheck * CHECK_INTERVAL) / 1000 / 60) + " minutes.");
+                logger.addBuildLogEntry("Check if the test is still running. Time passed since start:" + ((System.currentTimeMillis()-timeOfStart) / 1000 / 60) + " minutes.");
                 testInfo = BzmServiceManager.getTestStatus(this.api,this.testId,this.session);
                 if (testInfo.getStatus().equals(TestStatus.NotRunning.toString())) {
-                    logger.addBuildLogEntry("Test is finished earlier then estimated! Time passed since start:" + ((currentCheck * CHECK_INTERVAL) / 1000 / 60) + " minutes.");
+                    logger.addBuildLogEntry("Test is finished earlier then estimated! Time passed since start:" + ((System.currentTimeMillis()-timeOfStart) / 1000 / 60) + " minutes.");
                     break;
                 } else if (testInfo.getStatus().equals(TestStatus.NotFound.toString())) {
                     logger.addErrorLogEntry("BlazeMeter test not found!");
@@ -118,8 +127,6 @@ public class BlazeMeterTaskType implements TaskType{
             }
 
             //BlazeMeter test stopped due to user test duration setup reached
-            logger.addBuildLogEntry("Stopping test...");
-            BzmServiceManager.stopTest(this.api, this.testId, this.session, logger);
 
             logger.addBuildLogEntry("Test finished. Checking for test report...");
             TestResult result=BzmServiceManager.getReport(this.api, this.session, logger);
