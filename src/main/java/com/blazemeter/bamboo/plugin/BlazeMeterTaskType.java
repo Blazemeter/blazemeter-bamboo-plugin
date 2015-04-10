@@ -67,7 +67,7 @@ public class BlazeMeterTaskType implements TaskType{
 
         rootDirectory = context.getRootDirectory();
         logger.addBuildLogEntry("Preparing for run test with id:" + testId);
-        BzmServiceManager.prepareTest(api,testDuration,logger);
+        BzmServiceManager.prepareTest(api,testId,testDuration,logger);
         logger.addBuildLogEntry("Attempting to start test with id:" + testId);
         this.session = BzmServiceManager.startTest(api,testId, logger);
         long testInitStart=System.currentTimeMillis();

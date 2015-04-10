@@ -13,30 +13,33 @@ import java.io.IOException;
  *
  */
 public interface BlazemeterApi {
-    public static final String APP_KEY = "bmboo0x98a8w9s4s7c4";
+    String APP_KEY = "bmboo0x98a8w9s4s7c4";
 
+    boolean uploadJmx(String testId, String fileName, String pathName);
 
-    public boolean uploadJmx(String testId, String fileName, String pathName);
+    JSONObject uploadFile(String testId, String fileName, String pathName);
 
-    public JSONObject uploadFile(String testId, String fileName, String pathName);
+    TestInfo getTestRunStatus(String testId);
 
-    public TestInfo getTestRunStatus(String testId);
+    String startTest(String testId) throws JSONException;
 
-    public String startTest(String testId) throws JSONException;
+    int getTestCount() throws JSONException, IOException;
 
-    public int getTestCount() throws JSONException, IOException;
+    boolean stopTest(String testId) throws JSONException;
 
-    public boolean stopTest(String testId) throws JSONException;
+    JSONObject testReport(String reportId);
 
-    public JSONObject testReport(String reportId);
+    LinkedHashMultimap<String, String> getTestList() throws IOException;
 
-    public LinkedHashMultimap<String, String> getTestList() throws IOException;
+    boolean verifyUserKey();
 
-    public boolean verifyUserKey();
+    JSONObject getTresholds(String sessionId);
 
-    public JSONObject getTresholds(String sessionId);
+    String getUserKey();
 
-    public String getUserKey();
+    void  setUserKey(String userKey);
 
-    public void  setUserKey(String userKey);
+    JSONObject putTestInfo(String testId, JSONObject data);
+
+    JSONObject getTestConfig(String testId);
 }

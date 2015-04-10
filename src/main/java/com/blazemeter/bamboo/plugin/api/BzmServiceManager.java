@@ -2,6 +2,7 @@ package com.blazemeter.bamboo.plugin.api;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -10,7 +11,7 @@ import com.atlassian.bamboo.build.logger.BuildLogger;
 import com.atlassian.bamboo.task.TaskState;
 import com.atlassian.util.concurrent.NotNull;
 import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
-import com.blazemeter.bamboo.plugin.configuration.constants.JsonNodes;
+import com.blazemeter.bamboo.plugin.configuration.constants.JsonConstants;
 import com.blazemeter.bamboo.plugin.testresult.TestResult;
 import com.google.common.collect.LinkedHashMultimap;
 import org.json.JSONException;
@@ -102,7 +103,7 @@ private BzmServiceManager(){
     public void uploadFile(BlazemeterApi api,String testId, String dataFolder, String fileName, BuildLogger logger) {
         JSONObject json = api.uploadFile(testId, fileName, dataFolder + File.separator + fileName);
         try {
-            if (!json.get(JsonNodes.RESPONSE_CODE).equals(new Integer(200))) {
+            if (!json.get(JsonConstants.RESPONSE_CODE).equals(new Integer(200))) {
                 logger.addErrorLogEntry("Could not upload file " + fileName + " " + json.get("error").toString());
             }
         } catch (JSONException e) {
@@ -142,8 +143,8 @@ private BzmServiceManager(){
         logger.addBuildLogEntry("Going to validate server tresholds...");
         try {
             jo=api.getTresholds(session);
-            result=jo.getJSONObject(JsonNodes.RESULT);
-            serverTresholdsResult=result.getJSONObject(JsonNodes.DATA).getBoolean("success")?TaskState.SUCCESS:TaskState.FAILED;
+            result=jo.getJSONObject(JsonConstants.RESULT);
+            serverTresholdsResult=result.getJSONObject(JsonConstants.DATA).getBoolean("success")?TaskState.SUCCESS:TaskState.FAILED;
         } catch (NullPointerException e){
             logger.addBuildLogEntry("Server tresholds validation was not executed");
             logger.addBuildLogEntry(e.getMessage());
@@ -225,16 +226,48 @@ private BzmServiceManager(){
         return taskState;
     }
 
+    public static JSONObject updateTestDuration(BlazemeterApi api,
+                                                String testId,
+                                                String testDuration,
+                                                BuildLogger logger) throws Exception{
+        JSONObject result;
+        JSONObject updateResult=null;
+        try {
+            JSONObject jo = api.getTestConfig(testId);
+            result = jo.getJSONObject(JsonConstants.RESULT);
+            JSONObject configuration = result.getJSONObject(JsonConstants.CONFIGURATION);
+            JSONObject plugins = configuration.getJSONObject(JsonConstants.PLUGINS);
+            String type = configuration.getString(JsonConstants.TYPE);
+            JSONObject options = plugins.getJSONObject(type);
+            JSONObject override = options.getJSONObject(JsonConstants.OVERRIDE);
+            override.put(JsonConstants.DURATION, testDuration);
+            override.put("threads", JSONObject.NULL);
+            configuration.put("serversCount", JSONObject.NULL);
+            updateResult = api.putTestInfo(testId, result);
+        } catch (JSONException je) {
+            logger.addBuildLogEntry("Received JSONException while updating test duration: " + je);
+            throw je;
+        } catch (Exception e) {
+            logger.addBuildLogEntry("Received Exception while updating test duration: " + e);
+            throw e;
+        }
+        return updateResult;
+    }
 
 
     public static List<Exception> prepareTest(BlazemeterApi api,
+                                              String testId,
                                               String testDuration,
                                               BuildLogger logger){
+        List<Exception> exceptions=new ArrayList<>();
+        try {
+            if (!testDuration.isEmpty()) {
+                updateTestDuration(api, testId, testDuration, logger);
+            }
         /*
         TODO
         1. Create test if needed;
         2. Update jsonConfig
-        3. Update testDuration;
         rootDirectory = context.getRootDirectory();
 
         Parameters:
@@ -244,6 +277,10 @@ private BzmServiceManager(){
         testDuration
 
          */
-        return null;
+        }catch (Exception e){
+            exceptions.add(e);
+        }finally {
+            return exceptions;
+        }
     }
 }

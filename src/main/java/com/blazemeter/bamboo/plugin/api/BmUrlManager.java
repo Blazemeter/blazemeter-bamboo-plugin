@@ -29,4 +29,7 @@ public interface BmUrlManager {
     public String getTests(String appKey, String userKey);
 
     public String getTresholds(String appKey, String userKey, String sessionId);
+
+    public String getTestConfig(String appKey, String userKey, String testId);
+
 }

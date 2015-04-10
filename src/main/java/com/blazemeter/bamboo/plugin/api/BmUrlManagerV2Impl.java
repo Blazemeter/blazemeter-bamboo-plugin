@@ -112,4 +112,9 @@ public class BmUrlManagerV2Impl implements BmUrlManager{
     public String getTresholds(String appKey, String userKey, String sessionId) {
         return Constants.NOT_IMPLEMENTED;
     }
+
+    @Override
+    public String getTestConfig(String appKey, String userKey, String testId) {
+        return null;
+    }
 }
