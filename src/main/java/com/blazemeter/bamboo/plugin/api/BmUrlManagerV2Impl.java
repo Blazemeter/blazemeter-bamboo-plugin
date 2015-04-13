@@ -115,6 +115,16 @@ public class BmUrlManagerV2Impl implements BmUrlManager{
 
     @Override
     public String getTestConfig(String appKey, String userKey, String testId) {
-        return null;
+        return Constants.NOT_IMPLEMENTED;
+    }
+
+    @Override
+    public String testTerminate(String appKey, String userKey, String testId) {
+        return Constants.NOT_IMPLEMENTED;
+    }
+
+    @Override
+    public String testSessionStatus(String appKey, String userKey, String testId) {
+        return Constants.NOT_IMPLEMENTED;
     }
 }

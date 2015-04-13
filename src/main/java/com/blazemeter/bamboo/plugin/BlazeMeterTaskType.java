@@ -90,7 +90,7 @@ public class BlazeMeterTaskType implements TaskType{
             } catch (InterruptedException e) {
                 logger.addErrorLogEntry("BlazeMeter Interrupted Exception: " + e.getMessage());
                 logger.addBuildLogEntry("Stopping test...");
-                BzmServiceManager.stopTest(this.api, this.testId, this.session, logger);
+                BzmServiceManager.stopTestSession(this.api, this.testId, this.session, logger);
                 break;
             }
             logger.addBuildLogEntry("Check if the test is initialized...");
@@ -111,7 +111,7 @@ public class BlazeMeterTaskType implements TaskType{
                 } catch (InterruptedException e) {
                     logger.addErrorLogEntry("BlazeMeter Interrupted Exception: " + e.getMessage());
                     logger.addBuildLogEntry("Stopping test...");
-                    BzmServiceManager.stopTest(this.api, this.testId, this.session, logger);
+                    BzmServiceManager.stopTestSession(this.api, this.testId, this.session, logger);
                     break;
                 }
 

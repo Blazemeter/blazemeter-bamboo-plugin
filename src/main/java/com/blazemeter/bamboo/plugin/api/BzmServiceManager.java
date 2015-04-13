@@ -111,27 +111,11 @@ private BzmServiceManager(){
         }
     }
 
-    public static void stopTest(BlazemeterApi api,String testId, String session, BuildLogger logger){
-        boolean stopTest=true;
-        logger.addBuildLogEntry("Trying to stop test with testId="+testId+" for session="+session+" for userKey="+api.getUserKey());
-        stopTest = api.stopTest(testId);
-        try {
-			if (stopTest==true) {
-				logger.addBuildLogEntry("Test stopped succesfully. testId="+testId+" userKey="+api.getUserKey()+" session="+session);
-			} else {
-                logger.addBuildLogEntry("Error while stopping test with testId=" + testId + " userKey=" + api.getUserKey() + " session=" + session);
-			}
-		} catch (JSONException e) {
-            logger.addBuildLogEntry("Error while stopping test with testId=" + testId +
-                    " userKey=" + api.getUserKey() + " session=" + session + " [" + e.getMessage() + "]");
-		}
-    }
-    
     public static TestInfo getTestStatus(BlazemeterApi api,String testId,String session){
         if(api instanceof BlazemeterApiV2Impl){
-            return api.getTestRunStatus(testId);
+            return api.getTestInfo(testId);
         }else{
-            return api.getTestRunStatus(session);
+            return api.getTestInfo(session);
         }
     }
 
@@ -252,6 +236,26 @@ private BzmServiceManager(){
             throw e;
         }
         return updateResult;
+    }
+
+    public static boolean stopTestSession(BlazemeterApi api, String testId, String sessionId, BuildLogger logger) {
+        boolean terminate=false;
+        try {
+
+            int statusCode = api.getTestSessionStatusCode(sessionId);
+            if (statusCode < 100) {
+                api.terminateTest(testId);
+                terminate=true;
+            }
+            if (statusCode >= 100|statusCode ==-1) {
+                api.stopTest(testId);
+                terminate=false;
+            }
+        } catch (Exception e) {
+            logger.addBuildLogEntry("Error while trying to stop test with testId=" + testId + ", " + e.getMessage());
+        }finally {
+            return terminate;
+        }
     }
 
 

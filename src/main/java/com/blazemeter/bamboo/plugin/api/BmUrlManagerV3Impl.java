@@ -133,4 +133,35 @@ public class BmUrlManagerV3Impl implements BmUrlManager{
 
         return getTestInfo;
     }
+
+    @Override
+    public String testTerminate(String appKey, String userKey, String testId) {
+        String testTerminate=null;
+        try {
+            appKey = URLEncoder.encode(appKey, "UTF-8");
+            userKey = URLEncoder.encode(userKey, "UTF-8");
+            testId = URLEncoder.encode(testId, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        testTerminate=SERVER_URL+"/api/latest/tests/"
+                +testId+"/terminate?api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
+
+        return testTerminate;
+
+    }
+
+    @Override
+    public String testSessionStatus(String appKey, String userKey, String sessionId) {
+        String testStatus=null;
+        try {
+            appKey = URLEncoder.encode(appKey, "UTF-8");
+            userKey = URLEncoder.encode(userKey, "UTF-8");
+            sessionId = URLEncoder.encode(sessionId, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        testStatus=SERVER_URL+"/api/latest/sessions/"+sessionId+"?api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
+        return testStatus;
+    }
 }

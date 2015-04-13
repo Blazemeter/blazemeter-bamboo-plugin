@@ -106,7 +106,7 @@ public class BlazemeterApiV2Impl implements BlazemeterApi{
 
 
     @Override
-    public TestInfo getTestRunStatus(String testId) {
+    public TestInfo getTestInfo(String testId) {
         TestInfo ti = new TestInfo();
 
         if (StringUtils.isBlank(userKey)&StringUtils.isBlank(testId))
@@ -321,6 +321,16 @@ public class BlazemeterApiV2Impl implements BlazemeterApi{
 
     @Override
     public JSONObject getTestConfig(String testId) {
+        return not_implemented;
+    }
+
+    @Override
+    public int getTestSessionStatusCode(String id) {
+        return 0;
+    }
+
+    @Override
+    public JSONObject terminateTest(String testId) {
         return not_implemented;
     }
 }

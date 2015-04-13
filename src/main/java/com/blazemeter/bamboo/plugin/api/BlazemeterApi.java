@@ -19,9 +19,11 @@ public interface BlazemeterApi {
 
     JSONObject uploadFile(String testId, String fileName, String pathName);
 
-    TestInfo getTestRunStatus(String testId);
+    TestInfo getTestInfo(String testId);
 
     String startTest(String testId) throws JSONException;
+
+    int getTestSessionStatusCode(String id);
 
     int getTestCount() throws JSONException, IOException;
 
@@ -42,4 +44,7 @@ public interface BlazemeterApi {
     JSONObject putTestInfo(String testId, JSONObject data);
 
     JSONObject getTestConfig(String testId);
+
+    JSONObject terminateTest(String testId);
+
 }
