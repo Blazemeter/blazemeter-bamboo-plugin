@@ -19,24 +19,6 @@
             <br />
             <span class="errorText">${url_error}</span>
         </div>
-      <div class="field-group">
-        <label for="name">${i18n.getText("blazemeter.admin.proxyserver")}</label>
-        <input type="text" id="proxyserver" name="proxyserver" class="text" value="${proxyserver}"><span class="errorText">${proxyserver_error}</span>
-        <br />
-        
-        <label for="name">${i18n.getText("blazemeter.admin.proxyport")}</label>
-        <input type="text" id="proxyport" name="proxyport" class="text" value="${proxyport}"><span class="errorText">${proxyport_error}</span>
-        <br />
-        
-        <label for="name">${i18n.getText("blazemeter.admin.proxyuser")}</label>
-        <input type="text" id="proxyuser" name="proxyuser" class="text" value="${proxyuser}"><span class="errorText">${proxyuser_error}</span>
-        <br />
-        
-        <label for="name">${i18n.getText("blazemeter.admin.proxypass")}</label>
-        <input type="text" id="proxypass" name="proxypass" class="text" value="${proxypass}"><span class="errorText">${proxypass_error}</span>
-        <br />
-        
-      </div>
 
       <div class="field-group">
       <label for="name">${i18n.getText("blazemeter.apiVersion")}</label>

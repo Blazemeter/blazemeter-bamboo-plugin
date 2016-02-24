@@ -46,11 +46,7 @@ public class AdminServlet extends HttpServlet {
 		PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
 		String config = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
 		String url = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
-		String proxyserver = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_SERVER);
-		String proxyport = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_PORT);
-		String proxyuser = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_USER);
 		String apiVersion = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_API_VERSION);
-		String proxypass = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_PASS);
 		if (config != null){
 			context.put(AdminServletConst.USER_KEY, config.trim());
 			context.put(AdminServletConst.USER_KEY_ERROR, "");
@@ -67,37 +63,6 @@ public class AdminServlet extends HttpServlet {
             context.put(AdminServletConst.URL_ERROR, "Please set the BlazeMeter server url!");
         }
 
-		if (proxyserver != null){
-			context.put(AdminServletConst.PROXY_SERVER, proxyserver.trim());
-			context.put(AdminServletConst.PROXY_SERVER_ERROR, "");
-		} else {
-			context.put(AdminServletConst.PROXY_SERVER, "");
-			context.put(AdminServletConst.PROXY_SERVER_ERROR, "");
-		}
-		
-		if (proxyport != null){
-			context.put(AdminServletConst.PROXY_PORT, proxyport.trim());
-			context.put(AdminServletConst.PROXY_PORT_ERROR, "");
-		} else {
-			context.put(AdminServletConst.PROXY_PORT, "");
-			context.put(AdminServletConst.PROXY_PORT_ERROR, "");
-		}
-		
-		if (proxyuser != null){
-			context.put(AdminServletConst.PROXY_USER, proxyuser.trim());
-			context.put(AdminServletConst.PROXY_USER_ERROR, "");
-		} else {
-			context.put(AdminServletConst.PROXY_USER, "");
-			context.put(AdminServletConst.PROXY_USER_ERROR, "");
-		}
-		
-		if (proxypass != null){
-			context.put(AdminServletConst.PROXY_PASS, proxypass.trim());
-			context.put(AdminServletConst.PROXY_PASS_ERROR, "");
-		} else {
-			context.put(AdminServletConst.PROXY_PASS, "");
-			context.put(AdminServletConst.PROXY_PASS_ERROR, "");
-		}
 		context.put(AdminServletConst.API_VERSION, apiVersion!=null?apiVersion.trim():ApiVersion.v3.name());
 		renderer.render(AdminServletConst.BLAZEMETER_ADMIN_VM, context, resp.getWriter());
 	}
@@ -109,54 +74,25 @@ public class AdminServlet extends HttpServlet {
 		
 		String userKey = req.getParameter(AdminServletConst.USER_KEY).trim();
 		String url = req.getParameter(AdminServletConst.URL).trim();
-		String proxyserver = req.getParameter(AdminServletConst.PROXY_SERVER).trim();
-		String proxyport = req.getParameter(AdminServletConst.PROXY_PORT).trim();
-		String proxyuser = req.getParameter(AdminServletConst.PROXY_USER).trim();
-		String proxypass = req.getParameter(AdminServletConst.PROXY_PASS).trim();
 		String apiVersion = req.getParameter(AdminServletConst.API_VERSION).trim();
-		try{
-			if ((proxyport == null) || (proxyport == "")){
-				proxyport = "-1";
-				context.put(AdminServletConst.PROXY_PORT_ERROR, "");
-			} else {
-				Integer.parseInt(proxyport);
-				context.put(AdminServletConst.PROXY_PORT_ERROR, "");
-			}
-		} catch (Exception e){
-			context.put(AdminServletConst.PROXY_PORT_ERROR, "Invalid port value!");
-			proxyport = "-1";
-		}
-		
+
 		context.put(AdminServletConst.USER_KEY, userKey);
 		context.put(AdminServletConst.URL, url);
-		context.put(AdminServletConst.PROXY_SERVER, proxyserver);
-		context.put(AdminServletConst.PROXY_PORT, proxyport == "-1" ? "" : proxyport);
-		context.put(AdminServletConst.PROXY_USER, proxyuser);
-		context.put(AdminServletConst.PROXY_PASS, proxypass);
 		context.put(AdminServletConst.API_VERSION, apiVersion);
 
-		context.put(AdminServletConst.PROXY_SERVER_ERROR, "");
-		context.put(AdminServletConst.PROXY_USER_ERROR, "");
-		context.put(AdminServletConst.PROXY_PASS_ERROR, "");
-		
-
-        /*
+	    /*
         TODO
         Add here auto-detect version
          */
-		BlazemeterApi api= APIFactory.getAPI(userKey, url, proxyserver, proxyport, proxyuser, proxypass, ApiVersion.v3.name());
+		BlazemeterApi api= APIFactory.getAPI(userKey, url, ApiVersion.v3.name());
 		if (api.verifyUserKey()){
 			transactionTemplate.execute(new TransactionCallback() {
 				public Object doInTransaction() {
 					PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();		
 					pluginSettings.put(Config.class.getName() + AdminServletConst.DOT_USER_KEY, req.getParameter(AdminServletConst.USER_KEY).trim());
 					pluginSettings.put(Config.class.getName() + AdminServletConst.DOT_SERVER_URL, req.getParameter(AdminServletConst.URL).trim());
-					pluginSettings.put(Config.class.getName() + AdminServletConst.DOT_PROXY_SERVER, req.getParameter(AdminServletConst.PROXY_SERVER).trim());
-					pluginSettings.put(Config.class.getName() + AdminServletConst.DOT_PROXY_PORT, req.getParameter(AdminServletConst.PROXY_PORT).trim());
-					pluginSettings.put(Config.class.getName() + AdminServletConst.DOT_PROXY_USER, req.getParameter(AdminServletConst.PROXY_USER).trim());
 					pluginSettings.put(Config.class.getName() + AdminServletConst.DOT_API_VERSION, req.getParameter(AdminServletConst.API_VERSION).trim());
-					pluginSettings.put(Config.class.getName() + AdminServletConst.DOT_PROXY_PASS, req.getParameter(AdminServletConst.PROXY_PASS).trim());
-                    return null;
+					return null;
 				}
 			});
 			

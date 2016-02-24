@@ -27,32 +27,11 @@ import java.net.UnknownHostException;
 public class BzmHttpClient {
 
     DefaultHttpClient httpClient;
-    String serverName;
-    String userName;
-    String password;
-    int serverPort;
 
 
-  public BzmHttpClient(String serverName, String userName, String password, int serverPort){
-      this.serverName=serverName;
-      this.userName=userName;
-      this.password=password;
-      this.serverPort=serverPort;
+  public BzmHttpClient(){
       this.httpClient=new DefaultHttpClient();
   }
-
-
-    public void configureProxy(){
-        // Configure the proxy if necessary
-        if (this.serverName != null && !this.serverName.isEmpty() && this.serverPort > 0) {
-            if (this.userName != null && !this.userName.isEmpty()){
-                Credentials cred = new UsernamePasswordCredentials(this.userName, password);
-                httpClient.getCredentialsProvider().setCredentials(new AuthScope(serverName, serverPort), cred);
-            }
-            HttpHost proxyHost = new HttpHost(serverName, serverPort);
-            httpClient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxyHost);
-        }
-    }
 
     public HttpResponse getHttpResponse(String url, JSONObject data, Method method) throws Exception {
         HttpResponse response = null;
@@ -105,11 +84,7 @@ public class BzmHttpClient {
             if ((statusCode >= 300) || (statusCode < 200)) {
                 throw new RuntimeException(String.format("Failed : %d %s", statusCode, error));
             }
-        }
-        catch (UnknownHostException uhe) {
-            System.err.format("Unknown host '" + this.serverName + "', check proxy settings! \n");
-        }
-        catch (Exception e) {
+        }catch (Exception e) {
             System.err.format("Wrong response: %s\n", e);
         }
 

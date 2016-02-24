@@ -25,21 +25,12 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
     BzmHttpClient bzmHttpClient;
     BmUrlManagerV3Impl urlManager;
     private String userKey;
-	private String serverName;
-	private int serverPort;
-	private String username;
-	private String password;
 
-	public BlazemeterApiV3Impl(String userKey, String serverUrl, String serverName, int serverPort, String username, String password) {
+	public BlazemeterApiV3Impl(String userKey, String serverUrl) {
     	this.userKey=userKey;
-        this.serverName = serverName;
-    	this.serverPort = serverPort;
-    	this.username = username;
-    	this.password = password;		
         urlManager = new BmUrlManagerV3Impl(serverUrl);
         try {
-            bzmHttpClient = new BzmHttpClient(serverName, username, password, serverPort);
-            bzmHttpClient.configureProxy();
+            bzmHttpClient = new BzmHttpClient();
         } catch (Exception ex) {
             logger.format("error Instantiating HTTPClient. Exception received: %s", ex);
         }
@@ -261,38 +252,6 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
         JSONObject jo = this.bzmHttpClient.getResponseAsJson(url, null, Method.GET);
         return jo;
     }
-
-    public String getServerName() {
-		return serverName;
-	}
-
-	public void setServerName(String serverName) {
-		this.serverName = serverName;
-	}
-
-	public int getServerPort() {
-		return serverPort;
-	}
-
-	public void setServerPort(int serverPort) {
-		this.serverPort = serverPort;
-	}
-
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
 
 
 

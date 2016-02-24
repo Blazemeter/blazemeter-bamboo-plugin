@@ -46,10 +46,6 @@ public class BlazeMeterTaskType implements TaskType{
         PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
         String userKey = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
         String serverUrl = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
-        String proxyserver = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_SERVER);
-        String proxyport = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_PORT);
-        String proxyuser = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_USER);
-        String proxypass = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_PASS);
         String apiVersion = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_API_VERSION);
         this.testId = configMap.get(Constants.SETTINGS_SELECTED_TEST_ID);
         this.testDuration = configMap.get(Constants.SETTINGS_TEST_DURATION);
@@ -59,10 +55,6 @@ public class BlazeMeterTaskType implements TaskType{
                 return resultBuilder.failed().build();
             }
         this.api= APIFactory.getAPI(userKey,serverUrl,
-                proxyserver,
-                proxyport,
-                proxyuser,
-                proxypass,
                 apiVersion);
 
         rootDirectory = context.getRootDirectory();

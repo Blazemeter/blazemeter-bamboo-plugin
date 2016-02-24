@@ -45,15 +45,11 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
         PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
 		String userKey = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
 		String serverUrl = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
-		String proxyserver = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_SERVER);
-		String proxyport = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_PORT);
-		String proxyuser = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_USER);
-		String proxypass = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_PASS);
 		String apiVersion = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_API_VERSION);
 		context.put(AdminServletConst.URL, serverUrl);
 		context.put(AdminServletConst.API_VERSION, apiVersion);
 		context.put(Constants.SETTINGS_DATA_FOLDER, Constants.DEFAULT_SETTINGS_DATA_FOLDER);
-		this.api= APIFactory.getAPI(userKey,serverUrl,proxyserver,proxyport,proxyuser,proxypass,apiVersion);
+		this.api= APIFactory.getAPI(userKey,serverUrl,apiVersion);
 		context.put(Constants.TEST_LIST, BzmServiceManager.getTestsAsMap(api));
 	}
 
@@ -65,14 +61,10 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
         PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
 		String userKey = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
 		String serverUrl = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
-		String proxyserver = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_SERVER);
-		String proxyport = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_PORT);
-		String proxyuser = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_USER);
-		String proxypass = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_PROXY_PASS);
 		String apiVersion = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_API_VERSION);
 		context.put(AdminServletConst.URL, serverUrl);
         context.put(AdminServletConst.API_VERSION, apiVersion);
-		this.api= APIFactory.getAPI(userKey,serverUrl,proxyserver,proxyport,proxyuser,proxypass,apiVersion);
+		this.api= APIFactory.getAPI(userKey,serverUrl,apiVersion);
         context.put(Constants.TEST_LIST, BzmServiceManager.getTestsAsMap(this.api));
 
 		context.put(Constants.SETTINGS_DATA_FOLDER, taskDefinition.getConfiguration().get(Constants.SETTINGS_DATA_FOLDER));
