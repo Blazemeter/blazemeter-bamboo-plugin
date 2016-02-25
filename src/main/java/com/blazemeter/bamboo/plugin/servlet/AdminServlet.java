@@ -18,9 +18,8 @@ import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import com.atlassian.templaterenderer.TemplateRenderer;
 import com.atlassian.sal.api.transaction.TransactionTemplate;
 import com.atlassian.sal.api.transaction.TransactionCallback;
-import com.blazemeter.bamboo.plugin.ApiVersion;
-import com.blazemeter.bamboo.plugin.api.APIFactory;
 import com.blazemeter.bamboo.plugin.api.BlazemeterApi;
+import com.blazemeter.bamboo.plugin.api.BlazemeterApiV3Impl;
 import com.blazemeter.bamboo.plugin.configuration.constants.AdminServletConst;
 
 public class AdminServlet extends HttpServlet {
@@ -46,7 +45,6 @@ public class AdminServlet extends HttpServlet {
 		PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
 		String config = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
 		String url = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
-		String apiVersion = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_API_VERSION);
 		if (config != null){
 			context.put(AdminServletConst.USER_KEY, config.trim());
 			context.put(AdminServletConst.USER_KEY_ERROR, "");
@@ -63,7 +61,6 @@ public class AdminServlet extends HttpServlet {
             context.put(AdminServletConst.URL_ERROR, "Please set the BlazeMeter server url!");
         }
 
-		context.put(AdminServletConst.API_VERSION, apiVersion!=null?apiVersion.trim():ApiVersion.v3.name());
 		renderer.render(AdminServletConst.BLAZEMETER_ADMIN_VM, context, resp.getWriter());
 	}
 
@@ -74,20 +71,17 @@ public class AdminServlet extends HttpServlet {
 		
 		String userKey = req.getParameter(AdminServletConst.USER_KEY).trim();
 		String url = req.getParameter(AdminServletConst.URL).trim();
-		String apiVersion = req.getParameter(AdminServletConst.API_VERSION).trim();
 
 		context.put(AdminServletConst.USER_KEY, userKey);
 		context.put(AdminServletConst.URL, url);
-		context.put(AdminServletConst.API_VERSION, apiVersion);
 
-	   BlazemeterApi api= APIFactory.getAPI(userKey, url, ApiVersion.v3.name());
+	   BlazemeterApi api= new BlazemeterApiV3Impl(userKey, url);
 		if (api.verifyUserKey()){
 			transactionTemplate.execute(new TransactionCallback() {
 				public Object doInTransaction() {
 					PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();		
 					pluginSettings.put(Config.class.getName() + AdminServletConst.DOT_USER_KEY, req.getParameter(AdminServletConst.USER_KEY).trim());
 					pluginSettings.put(Config.class.getName() + AdminServletConst.DOT_SERVER_URL, req.getParameter(AdminServletConst.URL).trim());
-					pluginSettings.put(Config.class.getName() + AdminServletConst.DOT_API_VERSION, req.getParameter(AdminServletConst.API_VERSION).trim());
 					return null;
 				}
 			});

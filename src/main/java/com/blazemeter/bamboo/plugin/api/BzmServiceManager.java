@@ -10,7 +10,6 @@ import java.util.Map;
 import com.atlassian.bamboo.build.logger.BuildLogger;
 import com.atlassian.bamboo.task.TaskState;
 import com.atlassian.util.concurrent.NotNull;
-import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
 import com.blazemeter.bamboo.plugin.configuration.constants.JsonConstants;
 import com.blazemeter.bamboo.plugin.testresult.TestResult;
 import com.google.common.collect.LinkedHashMultimap;
@@ -110,15 +109,6 @@ private BzmServiceManager(){
             logger.addErrorLogEntry("Could not upload file " + e.getMessage());
         }
     }
-
-    public static TestInfo getTestStatus(BlazemeterApi api,String testId,String session){
-        if(api instanceof BlazemeterApiV2Impl){
-            return api.getTestInfo(testId);
-        }else{
-            return api.getTestInfo(session);
-        }
-    }
-
 
     public static TaskState validateServerTresholds(BlazemeterApi api,String session,BuildLogger logger) {
         JSONObject jo = null;

@@ -8,11 +8,8 @@ public interface AdminServletConst {
     String USER_KEY ="userkey";
     String USER_KEY_ERROR ="userkey_error";
 
-    String API_VERSION ="api_version";
-
     String DOT_USER_KEY =".userkey";
     String DOT_SERVER_URL =".url";
-    String DOT_API_VERSION =".api_version";
 
     String URL ="url";
     String URL_ERROR ="url_error";

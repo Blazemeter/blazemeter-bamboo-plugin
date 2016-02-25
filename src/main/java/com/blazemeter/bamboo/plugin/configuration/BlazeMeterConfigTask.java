@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.blazemeter.bamboo.plugin.Utils;
-import com.blazemeter.bamboo.plugin.api.APIFactory;
 import com.blazemeter.bamboo.plugin.api.BlazemeterApi;
+import com.blazemeter.bamboo.plugin.api.BlazemeterApiV3Impl;
 import com.blazemeter.bamboo.plugin.configuration.constants.AdminServletConst;
 import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
 import com.google.common.collect.LinkedHashMultimap;
@@ -43,11 +43,9 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
         PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
 		String userKey = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
 		String serverUrl = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
-		String apiVersion = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_API_VERSION);
 		context.put(AdminServletConst.URL, serverUrl);
-		context.put(AdminServletConst.API_VERSION, apiVersion);
 		context.put(Constants.SETTINGS_DATA_FOLDER, Constants.DEFAULT_SETTINGS_DATA_FOLDER);
-		this.api= APIFactory.getAPI(userKey,serverUrl,apiVersion);
+		this.api= new BlazemeterApiV3Impl(userKey,serverUrl);
 		context.put(Constants.TEST_LIST, BzmServiceManager.getTestsAsMap(api));
 	}
 
@@ -59,10 +57,8 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
         PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
 		String userKey = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
 		String serverUrl = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
-		String apiVersion = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_API_VERSION);
 		context.put(AdminServletConst.URL, serverUrl);
-        context.put(AdminServletConst.API_VERSION, apiVersion);
-		this.api= APIFactory.getAPI(userKey,serverUrl,apiVersion);
+		this.api= new BlazemeterApiV3Impl(userKey,serverUrl);
         context.put(Constants.TEST_LIST, BzmServiceManager.getTestsAsMap(this.api));
 
 		context.put(Constants.SETTINGS_DATA_FOLDER, taskDefinition.getConfiguration().get(Constants.SETTINGS_DATA_FOLDER));
@@ -80,12 +76,6 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 
 		final String selectedTest = params.getString(Constants.SETTINGS_SELECTED_TEST_ID);
 		final String testDuration = params.getString(Constants.SETTINGS_TEST_DURATION);
-
-
-//		final String dataFolder = params.getString(BlazeMeterConstants.SETTINGS_DATA_FOLDER);
-//		final String mainJMX = params.getString(BlazeMeterConstants.SETTINGS_MAIN_JMX);
-
-
 
         if (StringUtils.isEmpty(this.api.getUserKey())) {
 			errorCollection.addErrorMessage("Cannot load tests from BlazeMeter server. Invalid user key!");

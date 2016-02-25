@@ -46,7 +46,6 @@ public class BlazeMeterTaskType implements TaskType{
         PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
         String userKey = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
         String serverUrl = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
-        String apiVersion = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_API_VERSION);
         this.testId = configMap.get(Constants.SETTINGS_SELECTED_TEST_ID);
         this.testDuration = configMap.get(Constants.SETTINGS_TEST_DURATION);
 
@@ -54,8 +53,7 @@ public class BlazeMeterTaskType implements TaskType{
                 logger.addErrorLogEntry("BlazeMeter user key not defined!");
                 return resultBuilder.failed().build();
             }
-        this.api= APIFactory.getAPI(userKey,serverUrl,
-                apiVersion);
+        this.api= new BlazemeterApiV3Impl(userKey,serverUrl);
 
         rootDirectory = context.getRootDirectory();
         logger.addBuildLogEntry("Preparing for run test with id:" + testId);
@@ -76,7 +74,7 @@ public class BlazeMeterTaskType implements TaskType{
         boolean initTimeOutPassed=false;
 
         do{
-            testInfo = BzmServiceManager.getTestStatus(this.api,this.testId,this.session);
+            testInfo = this.api.getTestInfo(session);
             try {
                 Thread.currentThread().sleep(CHECK_INTERVAL);
             } catch (InterruptedException e) {
@@ -108,7 +106,7 @@ public class BlazeMeterTaskType implements TaskType{
                 }
 
                 logger.addBuildLogEntry("Check if the test is still running. Time passed since start:" + ((System.currentTimeMillis()-timeOfStart) / 1000 / 60) + " minutes.");
-                testInfo = BzmServiceManager.getTestStatus(this.api,this.testId,this.session);
+                testInfo = this.api.getTestInfo(session);
                 if (testInfo.getStatus().equals(TestStatus.NotRunning.toString())) {
                     logger.addBuildLogEntry("Test is finished earlier then estimated! Time passed since start:" + ((System.currentTimeMillis()-timeOfStart) / 1000 / 60) + " minutes.");
                     break;
