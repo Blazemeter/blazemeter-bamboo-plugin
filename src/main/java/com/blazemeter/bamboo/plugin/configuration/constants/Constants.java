@@ -8,12 +8,6 @@ public interface Constants {
 
     //settings properties
      String SETTINGS_SELECTED_TEST_ID = "selectedtest";
-     String SETTINGS_TEST_DURATION = "test_duration";
-     String SETTINGS_DATA_FOLDER = "data_folder";
-     String SETTINGS_MAIN_JMX = "main_jmx";
-
-    //Default properties
-     String DEFAULT_SETTINGS_DATA_FOLDER = "DataFolder";
 
     //Report properties
      String REPORT_ERROR_THRESHOLD = "report_thr";

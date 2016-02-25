@@ -3,7 +3,6 @@ package com.blazemeter.bamboo.plugin.configuration;
 import java.util.List;
 import java.util.Map;
 
-import com.blazemeter.bamboo.plugin.Utils;
 import com.blazemeter.bamboo.plugin.api.BlazemeterApi;
 import com.blazemeter.bamboo.plugin.api.BlazemeterApiV3Impl;
 import com.blazemeter.bamboo.plugin.configuration.constants.AdminServletConst;
@@ -25,9 +24,7 @@ import com.opensymphony.xwork.TextProvider;
 
 public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements BuildTaskRequirementSupport{
 
-	private static final List<String> FIELDS_TO_COPY = ImmutableList.of(Constants.SETTINGS_SELECTED_TEST_ID,
-			Constants.SETTINGS_TEST_DURATION, Constants.SETTINGS_DATA_FOLDER,
-			Constants.SETTINGS_MAIN_JMX);
+	private static final List<String> FIELDS_TO_COPY = ImmutableList.of(Constants.SETTINGS_SELECTED_TEST_ID);
     private BlazemeterApi api;
 
 	private TextProvider textProvider;
@@ -44,7 +41,6 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 		String userKey = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
 		String serverUrl = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
 		context.put(AdminServletConst.URL, serverUrl);
-		context.put(Constants.SETTINGS_DATA_FOLDER, Constants.DEFAULT_SETTINGS_DATA_FOLDER);
 		this.api= new BlazemeterApiV3Impl(userKey,serverUrl);
 		context.put(Constants.TEST_LIST, BzmServiceManager.getTestsAsMap(api));
 	}
@@ -60,8 +56,6 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 		context.put(AdminServletConst.URL, serverUrl);
 		this.api= new BlazemeterApiV3Impl(userKey,serverUrl);
         context.put(Constants.TEST_LIST, BzmServiceManager.getTestsAsMap(this.api));
-
-		context.put(Constants.SETTINGS_DATA_FOLDER, taskDefinition.getConfiguration().get(Constants.SETTINGS_DATA_FOLDER));
 	}
 
 	@Override
@@ -75,7 +69,6 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 		super.validate(params, errorCollection);
 
 		final String selectedTest = params.getString(Constants.SETTINGS_SELECTED_TEST_ID);
-		final String testDuration = params.getString(Constants.SETTINGS_TEST_DURATION);
 
         if (StringUtils.isEmpty(this.api.getUserKey())) {
 			errorCollection.addErrorMessage("Cannot load tests from BlazeMeter server. Invalid user key!");
@@ -98,12 +91,7 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 				}
 			}
 		}
-
-		if (!StringUtils.isEmpty(testDuration)&&!Utils.checkNumber(testDuration, false)) {
-			errorCollection.addError(Constants.SETTINGS_TEST_DURATION,
-					textProvider.getText(Constants.BLAZEMETER_ERROR + Constants.SETTINGS_TEST_DURATION));
-		}
-	}
+}
 
 
 	
@@ -112,10 +100,6 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 		final Map<String, String> config = super.generateTaskConfigMap(params, previousTaskDefinition);
 
 		config.put(Constants.SETTINGS_SELECTED_TEST_ID, params.getString(Constants.SETTINGS_SELECTED_TEST_ID).trim());
-		config.put(Constants.SETTINGS_TEST_DURATION, params.getString(Constants.SETTINGS_TEST_DURATION).trim());
-		config.put(Constants.SETTINGS_DATA_FOLDER, params.getString(Constants.SETTINGS_DATA_FOLDER).trim());
-		config.put(Constants.SETTINGS_MAIN_JMX, params.getString(Constants.SETTINGS_MAIN_JMX).trim());
-
 		return config;
 	}
 

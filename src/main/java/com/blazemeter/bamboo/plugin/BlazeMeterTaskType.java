@@ -47,7 +47,6 @@ public class BlazeMeterTaskType implements TaskType{
         String userKey = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
         String serverUrl = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
         this.testId = configMap.get(Constants.SETTINGS_SELECTED_TEST_ID);
-        this.testDuration = configMap.get(Constants.SETTINGS_TEST_DURATION);
 
             if (StringUtils.isBlank(userKey)) {
                 logger.addErrorLogEntry("BlazeMeter user key not defined!");
