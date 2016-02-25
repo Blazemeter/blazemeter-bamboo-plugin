@@ -88,7 +88,6 @@ public class ViewBlazeMeterStatistics extends ViewBuild {
      */
     private void createChart(XYSeriesCollection dataset)
     {
-    	//TODO - remove first series from the first axis 
         chart = new HashMap<String, Object>();
         ChartRenderingInfo chartRenderingInfo = new ChartRenderingInfo();
         XYSeriesCollection dataset1 = new XYSeriesCollection(dataset.getSeries(1));

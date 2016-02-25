@@ -8,10 +8,6 @@ public interface Constants {
 
     //settings properties
      String SETTINGS_SELECTED_TEST_ID = "selectedtest";
-     String SETTINGS_ERROR_THRESHOLD_UNSTABLE = "thr_unstable";
-     String SETTINGS_ERROR_THRESHOLD_FAIL = "thr_fail";
-     String SETTINGS_RESPONSE_TIME_UNSTABLE = "resp_unstable";
-     String SETTINGS_RESPONSE_TIME_FAIL = "resp_fail";
      String SETTINGS_TEST_DURATION = "test_duration";
      String SETTINGS_DATA_FOLDER = "data_folder";
      String SETTINGS_MAIN_JMX = "main_jmx";

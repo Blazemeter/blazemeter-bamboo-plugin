@@ -26,8 +26,6 @@ import com.opensymphony.xwork.TextProvider;
 public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements BuildTaskRequirementSupport{
 
 	private static final List<String> FIELDS_TO_COPY = ImmutableList.of(Constants.SETTINGS_SELECTED_TEST_ID,
-			Constants.SETTINGS_ERROR_THRESHOLD_UNSTABLE, Constants.SETTINGS_ERROR_THRESHOLD_FAIL,
-			Constants.SETTINGS_RESPONSE_TIME_UNSTABLE, Constants.SETTINGS_RESPONSE_TIME_FAIL,
 			Constants.SETTINGS_TEST_DURATION, Constants.SETTINGS_DATA_FOLDER,
 			Constants.SETTINGS_MAIN_JMX);
     private BlazemeterApi api;
@@ -81,10 +79,6 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 		super.validate(params, errorCollection);
 
 		final String selectedTest = params.getString(Constants.SETTINGS_SELECTED_TEST_ID);
-		final String errorUnstable = params.getString(Constants.SETTINGS_ERROR_THRESHOLD_UNSTABLE);
-		final String errorFail = params.getString(Constants.SETTINGS_ERROR_THRESHOLD_FAIL);
-		final String respUnstable = params.getString(Constants.SETTINGS_RESPONSE_TIME_UNSTABLE);
-		final String respFail = params.getString(Constants.SETTINGS_RESPONSE_TIME_FAIL);
 		final String testDuration = params.getString(Constants.SETTINGS_TEST_DURATION);
 
 
@@ -114,29 +108,6 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 				}
 			}
 		}
-		
-		if (!StringUtils.isEmpty(errorUnstable)&&!Utils.checkNumber(errorUnstable, true)) {
-            errorCollection.addError(Constants.SETTINGS_ERROR_THRESHOLD_UNSTABLE,
-                    textProvider.getText(Constants.BLAZEMETER_ERROR + Constants.SETTINGS_ERROR_THRESHOLD_UNSTABLE));
-		}
-
-		if (!StringUtils.isEmpty(errorFail)&&!Utils.checkNumber(errorFail, true)) {
-            errorCollection.addError(Constants.SETTINGS_ERROR_THRESHOLD_FAIL,
-                    textProvider.getText(Constants.BLAZEMETER_ERROR + Constants.SETTINGS_ERROR_THRESHOLD_FAIL));
-
-        }
-
-		if (!StringUtils.isEmpty(respUnstable)&&!Utils.checkNumber(respUnstable, false)) {
-			errorCollection.addError(Constants.SETTINGS_RESPONSE_TIME_UNSTABLE,
-						textProvider.getText(Constants.BLAZEMETER_ERROR + Constants.SETTINGS_RESPONSE_TIME_UNSTABLE));
-		}
-		
-
-        if (!StringUtils.isEmpty(respFail)&&!Utils.checkNumber(respFail, false)) {
-				errorCollection.addError(Constants.SETTINGS_RESPONSE_TIME_FAIL,
-						textProvider.getText(Constants.BLAZEMETER_ERROR + Constants.SETTINGS_RESPONSE_TIME_FAIL));
-		}
-
 
 		if (!StringUtils.isEmpty(testDuration)&&!Utils.checkNumber(testDuration, false)) {
 			errorCollection.addError(Constants.SETTINGS_TEST_DURATION,
@@ -151,10 +122,6 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 		final Map<String, String> config = super.generateTaskConfigMap(params, previousTaskDefinition);
 
 		config.put(Constants.SETTINGS_SELECTED_TEST_ID, params.getString(Constants.SETTINGS_SELECTED_TEST_ID).trim());
-		config.put(Constants.SETTINGS_ERROR_THRESHOLD_UNSTABLE, params.getString(Constants.SETTINGS_ERROR_THRESHOLD_UNSTABLE).trim());
-		config.put(Constants.SETTINGS_ERROR_THRESHOLD_FAIL, params.getString(Constants.SETTINGS_ERROR_THRESHOLD_FAIL).trim());
-		config.put(Constants.SETTINGS_RESPONSE_TIME_UNSTABLE, params.getString(Constants.SETTINGS_RESPONSE_TIME_UNSTABLE).trim());
-		config.put(Constants.SETTINGS_RESPONSE_TIME_FAIL, params.getString(Constants.SETTINGS_RESPONSE_TIME_FAIL).trim());
 		config.put(Constants.SETTINGS_TEST_DURATION, params.getString(Constants.SETTINGS_TEST_DURATION).trim());
 		config.put(Constants.SETTINGS_DATA_FOLDER, params.getString(Constants.SETTINGS_DATA_FOLDER).trim());
 		config.put(Constants.SETTINGS_MAIN_JMX, params.getString(Constants.SETTINGS_MAIN_JMX).trim());

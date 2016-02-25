@@ -80,11 +80,7 @@ public class AdminServlet extends HttpServlet {
 		context.put(AdminServletConst.URL, url);
 		context.put(AdminServletConst.API_VERSION, apiVersion);
 
-	    /*
-        TODO
-        Add here auto-detect version
-         */
-		BlazemeterApi api= APIFactory.getAPI(userKey, url, ApiVersion.v3.name());
+	   BlazemeterApi api= APIFactory.getAPI(userKey, url, ApiVersion.v3.name());
 		if (api.verifyUserKey()){
 			transactionTemplate.execute(new TransactionCallback() {
 				public Object doInTransaction() {

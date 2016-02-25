@@ -126,27 +126,11 @@ public class BlazeMeterTaskType implements TaskType{
         if(this.api instanceof BlazemeterApiV3Impl){
             serverTresholdsResult=BzmServiceManager.validateServerTresholds(this.api,this.session,logger);
         }
-        TaskState localTresholdsResult=BzmServiceManager.validateLocalTresholds(result,configMap,logger);
 
         if(serverTresholdsResult.equals(TaskState.FAILED)|serverTresholdsResult.equals(TaskState.ERROR)){
             return resultBuilder.failed().build();
+        }else {
+            return resultBuilder.success().build();
         }
-        TaskResult taskResult = null;
-            if (serverTresholdsResult.equals(TaskState.SUCCESS)&localTresholdsResult != null) {
-                switch (localTresholdsResult) {
-                    case SUCCESS:
-                        taskResult = resultBuilder.success().build();
-                        break;
-                    case ERROR:
-                        taskResult = resultBuilder.failedWithError().build();
-                        break;
-                    case FAILED:
-                        taskResult = resultBuilder.failed().build();
-                        break;
-                }
-            } else {
-                taskResult = resultBuilder.success().build();
-            }
-        return taskResult;
     }
 }
