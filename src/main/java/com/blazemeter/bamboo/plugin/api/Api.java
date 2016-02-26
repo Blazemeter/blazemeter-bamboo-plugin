@@ -16,10 +16,6 @@ import java.io.IOException;
 public interface Api {
     String APP_KEY = "bmboo0x98a8w9s4s7c4";
 
-    boolean uploadJmx(String testId, String fileName, String pathName);
-
-    JSONObject uploadFile(String testId, String fileName, String pathName);
-
     TestStatus testStatus(String testId);
 
     String startTest(String testId) throws JSONException;

@@ -60,13 +60,13 @@
    
 	<!-- Definition for BlazeMeter task plugin -->
 	<taskType key="blazemeter" name="BlazeMeter Test"
-		class="com.blazemeter.bamboo.plugin.BlazeMeterTaskType">
+		class="com.blazemeter.bamboo.plugin.TaskType">
 		<description>Execute the BlazeMeter tests as part of your build
 		</description>
 		<category name="builder" />
 		<category name="test" />
 		<configuration
-			class="com.blazemeter.bamboo.plugin.configuration.BlazeMeterConfigTask" />
+			class="com.blazemeter.bamboo.plugin.configuration.ConfigTask" />
 		<resource type="freemarker" name="edit"
 			location="templates/editConfigTask.ftl" />
 		<resource type="freemarker" name="view"

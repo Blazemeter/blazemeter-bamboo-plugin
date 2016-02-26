@@ -1,7 +1,6 @@
 package com.blazemeter.bamboo.plugin.api;
 
 import com.blazemeter.bamboo.plugin.TestStatus;
-import com.blazemeter.bamboo.plugin.Utils;
 import com.blazemeter.bamboo.plugin.configuration.constants.JsonConstants;
 import com.google.common.collect.LinkedHashMultimap;
 import org.apache.commons.lang3.StringUtils;
@@ -22,7 +21,7 @@ public class ApiV3Impl implements Api {
     PrintStream logger = new PrintStream(System.out);
 
     public static final String APP_KEY = "bmboo0x98a8w9s4s7c4";
-    BzmHttpClient bzmHttpClient;
+    HttpWrapper http;
     UrlManagerV3Impl urlManager;
     private String userKey;
 
@@ -30,65 +29,10 @@ public class ApiV3Impl implements Api {
     	this.userKey=userKey;
         urlManager = new UrlManagerV3Impl(serverUrl);
         try {
-            bzmHttpClient = new BzmHttpClient();
+            http = new HttpWrapper();
         } catch (Exception ex) {
             logger.format("error Instantiating HTTPClient. Exception received: %s", ex);
         }
-    }
-
-
-
-
-    /**
-     * @param testId   - test id
-     * @param fileName - test name
-     * @param pathName - jmx file path
-     *                 //     * @return test id
-     *                 //     * @throws java.io.IOException
-     *                 //     * @throws org.json.JSONException
-     */
-    @Override
-    public synchronized boolean uploadJmx(String testId, String fileName, String pathName) {
-        if (StringUtils.isBlank(userKey)&StringUtils.isBlank(testId)) return false;
-
-        String url = this.urlManager.scriptUpload(APP_KEY, userKey, testId, fileName);
-        JSONObject jmxData = new JSONObject();
-        String fileCon = Utils.getFileContents(pathName);
-
-        try {
-            jmxData.put(JsonConstants.DATA, fileCon);
-        } catch (JSONException e) {
-            System.err.format(e.getMessage());
-            return false;
-        }
-
-        this.bzmHttpClient.getResponseAsJson(url,jmxData,Method.GET);
-        return true;
-    }
-
-    /**
-     * @param testId   - test id
-     * @return test id
-     *         //     * @throws java.io.IOException
-     *         //     * @throws org.json.JSONException
-     */
-
-
-    @Override
-    public synchronized JSONObject uploadFile(String testId, String fileName, String pathName) {
-        if (StringUtils.isBlank(userKey)&StringUtils.isBlank(testId)) return null;
-
-        String url = this.urlManager.fileUpload(APP_KEY, userKey, testId, fileName);
-        JSONObject jmxData = new JSONObject();
-        String fileCon = Utils.getFileContents(pathName);
-
-        try {
-            jmxData.put(JsonConstants.DATA, fileCon);
-        } catch (JSONException e) {
-            System.err.format(e.getMessage());
-        }
-
-        return this.bzmHttpClient.getResponseAsJson(url, jmxData,Method.GET);
     }
 
 
@@ -103,7 +47,7 @@ public class ApiV3Impl implements Api {
 
         try {
             String url = this.urlManager.masterStatus(APP_KEY, userKey, id);
-            JSONObject jo = this.bzmHttpClient.getResponseAsJson(url, null, Method.GET);
+            JSONObject jo = this.http.response(url, null, Method.GET,JSONObject.class);
             JSONObject result = (JSONObject) jo.get(JsonConstants.RESULT);
             if (result.has(JsonConstants.DATA_URL) && result.get(JsonConstants.DATA_URL) == null) {
                 testStatus = TestStatus.NotFound;
@@ -134,7 +78,7 @@ public class ApiV3Impl implements Api {
         if (StringUtils.isBlank(userKey)&StringUtils.isBlank(testId)) return null;
 
         String url = this.urlManager.testStart(APP_KEY, userKey, testId);
-        JSONObject json=this.bzmHttpClient.getResponseAsJson(url, null, Method.GET);
+        JSONObject json=this.http.response(url, null, Method.GET,JSONObject.class);
         masterId = String.valueOf(json.getJSONObject(JsonConstants.RESULT).getInt(JsonConstants.ID));
         return masterId;
     }
@@ -148,7 +92,7 @@ public class ApiV3Impl implements Api {
 
         String url = this.urlManager.tests(APP_KEY, userKey);
 
-        JSONObject jo = this.bzmHttpClient.getResponseAsJson(url, null,Method.GET);
+        JSONObject jo = this.http.response(url, null,Method.GET,JSONObject.class);
         String r = jo.get(JsonConstants.RESPONSE_CODE).toString();
         if (!r.equals("200"))
             return 0;
@@ -166,7 +110,7 @@ public class ApiV3Impl implements Api {
     public boolean stopTest(String testId) throws JSONException{
         if (StringUtils.isBlank(userKey)&StringUtils.isBlank(testId)) return false;
         String url = this.urlManager.testStop(APP_KEY, userKey, testId);
-        JSONArray stopArray=this.bzmHttpClient.getResponseAsJson(url, null,Method.GET).getJSONArray(JsonConstants.RESULT);
+        JSONArray stopArray=this.http.response(url, null,Method.GET,JSONObject.class).getJSONArray(JsonConstants.RESULT);
         String command=((JSONObject)stopArray.get(0)).getString(JsonConstants.RESULT);
         return command.equals("shutdown command sent\n");
     }
@@ -181,7 +125,7 @@ public class ApiV3Impl implements Api {
         if (StringUtils.isBlank(userKey)&StringUtils.isBlank(reportId)) return null;
 
         String url = this.urlManager.testReport(APP_KEY, userKey, reportId);
-        JSONObject summary = (JSONObject) this.bzmHttpClient.getResponseAsJson(url, null, Method.GET).getJSONObject(JsonConstants.RESULT)
+        JSONObject summary = (JSONObject) this.http.response(url, null, Method.GET,JSONObject.class).getJSONObject(JsonConstants.RESULT)
                 .getJSONArray("summary")
                 .get(0);
         return summary;
@@ -197,7 +141,7 @@ public class ApiV3Impl implements Api {
         } else {
             String url = this.urlManager.tests(APP_KEY, userKey);
             logger.println(url);
-            JSONObject jo = this.bzmHttpClient.getResponseAsJson(url, null,Method.GET);
+            JSONObject jo = this.http.response(url, null,Method.GET,JSONObject.class);
             try {
                 JSONArray arr = (JSONArray) jo.get(JsonConstants.RESULT);
                 if (arr.length() > 0) {
@@ -240,7 +184,7 @@ public class ApiV3Impl implements Api {
         } else {
             String url = this.urlManager.tests(APP_KEY, userKey);
             try {
-                JSONObject jo = this.bzmHttpClient.getResponseAsJson(url, null, Method.GET);
+                JSONObject jo = this.http.response(url, null, Method.GET,JSONObject.class);
                 if (((JSONArray) jo.get(JsonConstants.RESULT)).length() > 0) {
                     return true;
                 } else {
@@ -258,7 +202,7 @@ public class ApiV3Impl implements Api {
             return null;
         }
         String url = this.urlManager.ciStatus(APP_KEY, userKey, sessionId);
-        JSONObject jo = this.bzmHttpClient.getResponseAsJson(url, null, Method.GET);
+        JSONObject jo = this.http.response(url, null, Method.GET,JSONObject.class);
         return jo;
     }
 
@@ -279,7 +223,7 @@ public class ApiV3Impl implements Api {
         if(org.apache.commons.lang.StringUtils.isBlank(this.userKey)& org.apache.commons.lang.StringUtils.isBlank(testId)) return null;
 
         String url = this.urlManager.getTestConfig(APP_KEY, this.userKey, testId);
-        JSONObject jo = this.bzmHttpClient.getResponseAsJson(url, data, Method.PUT);
+        JSONObject jo = this.http.response(url, data, Method.PUT,JSONObject.class);
         return jo;
     }
 
@@ -288,7 +232,7 @@ public class ApiV3Impl implements Api {
         if(org.apache.commons.lang.StringUtils.isBlank(this.userKey)& org.apache.commons.lang.StringUtils.isBlank(testId)) return null;
 
         String url = this.urlManager.getTestConfig(APP_KEY, this.userKey, testId);
-        JSONObject jo = this.bzmHttpClient.getResponseAsJson(url, null, Method.GET);
+        JSONObject jo = this.http.response(url, null, Method.GET,JSONObject.class);
         return jo;
     }
 
@@ -297,7 +241,7 @@ public class ApiV3Impl implements Api {
         if(org.apache.commons.lang.StringUtils.isBlank(this.userKey)& org.apache.commons.lang.StringUtils.isBlank(testId)) return null;
 
         String url = this.urlManager.testTerminate(APP_KEY, this.userKey, testId);
-        return this.bzmHttpClient.getResponseAsJson(url, null, Method.GET);
+        return this.http.response(url, null, Method.GET,JSONObject.class);
 
     }
 
@@ -311,7 +255,7 @@ public class ApiV3Impl implements Api {
         }
         try {
             String url = this.urlManager.masterStatus(APP_KEY, this.userKey, id);
-            JSONObject jo = this.bzmHttpClient.getResponseAsJson(url, null, Method.GET);
+            JSONObject jo = this.http.response(url, null, Method.GET,JSONObject.class);
             JSONObject result = (JSONObject) jo.get(JsonConstants.RESULT);
             statusCode=result.getInt("statusCode");
         } catch (Exception e) {

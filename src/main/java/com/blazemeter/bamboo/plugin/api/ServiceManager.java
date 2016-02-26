@@ -19,8 +19,8 @@ import org.json.JSONObject;
  * @author Zmicer Kashlach
  *
  */
-public class BzmServiceManager {
-private BzmServiceManager(){
+public class ServiceManager {
+private ServiceManager(){
 	}
 
     @NotNull
