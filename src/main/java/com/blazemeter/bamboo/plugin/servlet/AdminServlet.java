@@ -18,8 +18,8 @@ import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import com.atlassian.templaterenderer.TemplateRenderer;
 import com.atlassian.sal.api.transaction.TransactionTemplate;
 import com.atlassian.sal.api.transaction.TransactionCallback;
-import com.blazemeter.bamboo.plugin.api.BlazemeterApi;
-import com.blazemeter.bamboo.plugin.api.BlazemeterApiV3Impl;
+import com.blazemeter.bamboo.plugin.api.Api;
+import com.blazemeter.bamboo.plugin.api.ApiV3Impl;
 import com.blazemeter.bamboo.plugin.configuration.constants.AdminServletConst;
 
 public class AdminServlet extends HttpServlet {
@@ -75,7 +75,7 @@ public class AdminServlet extends HttpServlet {
 		context.put(AdminServletConst.USER_KEY, userKey);
 		context.put(AdminServletConst.URL, url);
 
-	   BlazemeterApi api= new BlazemeterApiV3Impl(userKey, url);
+	   Api api= new ApiV3Impl(userKey, url);
 		if (api.verifyUserKey()){
 			transactionTemplate.execute(new TransactionCallback() {
 				public Object doInTransaction() {

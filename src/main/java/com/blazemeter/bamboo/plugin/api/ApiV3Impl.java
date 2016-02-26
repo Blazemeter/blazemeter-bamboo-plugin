@@ -18,17 +18,17 @@ import java.io.PrintStream;
  * @author 
  *
  */
-public class BlazemeterApiV3Impl implements BlazemeterApi{
+public class ApiV3Impl implements Api {
     PrintStream logger = new PrintStream(System.out);
 
     public static final String APP_KEY = "bmboo0x98a8w9s4s7c4";
     BzmHttpClient bzmHttpClient;
-    BmUrlManagerV3Impl urlManager;
+    UrlManagerV3Impl urlManager;
     private String userKey;
 
-	public BlazemeterApiV3Impl(String userKey, String serverUrl) {
+	public ApiV3Impl(String userKey, String serverUrl) {
     	this.userKey=userKey;
-        urlManager = new BmUrlManagerV3Impl(serverUrl);
+        urlManager = new UrlManagerV3Impl(serverUrl);
         try {
             bzmHttpClient = new BzmHttpClient();
         } catch (Exception ex) {
@@ -93,41 +93,50 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
 
 
     @Override
-    public TestInfo getTestInfo(String sessionId) throws JSONException{
-        TestInfo ti = new TestInfo();
-        if (StringUtils.isBlank(userKey)&StringUtils.isBlank(sessionId)) {
-            ti.setStatus(TestStatus.NotFound.toString());
-            return ti;
+    public TestStatus testStatus(String id) throws JSONException{
+        TestStatus testStatus = null;
+
+        if (StringUtils.isBlank(userKey) & StringUtils.isBlank(id)) {
+            testStatus = TestStatus.NotFound;
+            return testStatus;
         }
-        String url = this.urlManager.testStatus(APP_KEY, userKey, sessionId);
-        JSONObject jo = this.bzmHttpClient.getResponseAsJson(url, null, Method.GET);
-        JSONObject result = (JSONObject) jo.get(JsonConstants.RESULT);
-        if (result.get(JsonConstants.DATA_URL) == null) {
-            ti.setStatus(TestStatus.NotFound.toString());
-        } else {
-            ti.setId(String.valueOf(result.getInt("testId")));
-            ti.setName(result.getString(JsonConstants.NAME));
-            if (result.getString(JsonConstants.STATUS).equals("DATA_RECIEVED")) {
-                ti.setStatus(TestStatus.Running.toString());
-            } else if (result.getString(JsonConstants.STATUS).equals("ENDED")) {
-                ti.setStatus(TestStatus.NotRunning.toString());
+
+        try {
+            String url = this.urlManager.masterStatus(APP_KEY, userKey, id);
+            JSONObject jo = this.bzmHttpClient.getResponseAsJson(url, null, Method.GET);
+            JSONObject result = (JSONObject) jo.get(JsonConstants.RESULT);
+            if (result.has(JsonConstants.DATA_URL) && result.get(JsonConstants.DATA_URL) == null) {
+                testStatus = TestStatus.NotFound;
             } else {
-                ti.setStatus(TestStatus.NotRunning.toString());
+                if (result.has("status") && !result.getString("status").equals("ENDED")) {
+                    testStatus = TestStatus.Running;
+                } else {
+                    logger.println("Test is not running on server");
+                    if (result.has("errors") && !result.get("errors").equals(JSONObject.NULL)) {
+                        logger.println("Error received from server: " + result.get("errors").toString());
+                        testStatus = TestStatus.Error;
+                    } else {
+                        testStatus = TestStatus.NotRunning;
+                    }
+                }
             }
+        } catch (Exception e) {
+            logger.format("Error getting status ", e);
+            testStatus = TestStatus.Error;
         }
-        return ti;
+        return testStatus;
     }
 
 
     @Override
     public synchronized String startTest(String testId) {
-        String session=null;
+        String masterId=null;
         if (StringUtils.isBlank(userKey)&StringUtils.isBlank(testId)) return null;
 
         String url = this.urlManager.testStart(APP_KEY, userKey, testId);
         JSONObject json=this.bzmHttpClient.getResponseAsJson(url, null, Method.GET);
-        session = json.getJSONObject(JsonConstants.RESULT).getJSONArray("sessionsId").getString(0);
-        return session;
+        masterId = String.valueOf(json.getJSONObject(JsonConstants.RESULT).getInt(JsonConstants.ID));
+        return masterId;
     }
 
     @Override
@@ -137,7 +146,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
             return 0;
         }
 
-        String url = this.urlManager.getTests(APP_KEY, userKey);
+        String url = this.urlManager.tests(APP_KEY, userKey);
 
         JSONObject jo = this.bzmHttpClient.getResponseAsJson(url, null,Method.GET);
         String r = jo.get(JsonConstants.RESPONSE_CODE).toString();
@@ -186,7 +195,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
         if (userKey == null || userKey.trim().isEmpty()) {
             logger.println("getTests userKey is empty");
         } else {
-            String url = this.urlManager.getTests(APP_KEY, userKey);
+            String url = this.urlManager.tests(APP_KEY, userKey);
             logger.println(url);
             JSONObject jo = this.bzmHttpClient.getResponseAsJson(url, null,Method.GET);
             try {
@@ -229,7 +238,7 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
         if (userKey == null || userKey.trim().isEmpty()) {
             return false;
         } else {
-            String url = this.urlManager.getTests(APP_KEY, userKey);
+            String url = this.urlManager.tests(APP_KEY, userKey);
             try {
                 JSONObject jo = this.bzmHttpClient.getResponseAsJson(url, null, Method.GET);
                 if (((JSONArray) jo.get(JsonConstants.RESULT)).length() > 0) {
@@ -244,11 +253,11 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
     }
 
     @Override
-    public JSONObject getTresholds(String sessionId) {
+    public JSONObject ciStatus(String sessionId) {
         if (userKey == null || userKey.trim().isEmpty()) {
             return null;
         }
-        String url = this.urlManager.getTresholds(APP_KEY, userKey, sessionId);
+        String url = this.urlManager.ciStatus(APP_KEY, userKey, sessionId);
         JSONObject jo = this.bzmHttpClient.getResponseAsJson(url, null, Method.GET);
         return jo;
     }
@@ -294,14 +303,14 @@ public class BlazemeterApiV3Impl implements BlazemeterApi{
 
 
     @Override
-    public int getTestSessionStatusCode(String id) {
+    public int masterStatus(String id) {
         int statusCode=0;
         if(org.apache.commons.lang.StringUtils.isBlank(this.userKey)& org.apache.commons.lang.StringUtils.isBlank(id))
         {
             return statusCode;
         }
         try {
-            String url = this.urlManager.testSessionStatus(APP_KEY, this.userKey, id);
+            String url = this.urlManager.masterStatus(APP_KEY, this.userKey, id);
             JSONObject jo = this.bzmHttpClient.getResponseAsJson(url, null, Method.GET);
             JSONObject result = (JSONObject) jo.get(JsonConstants.RESULT);
             statusCode=result.getInt("statusCode");

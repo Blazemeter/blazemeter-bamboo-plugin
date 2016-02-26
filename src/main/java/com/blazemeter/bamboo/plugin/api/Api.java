@@ -1,5 +1,6 @@
 package com.blazemeter.bamboo.plugin.api;
 
+import com.blazemeter.bamboo.plugin.TestStatus;
 import com.google.common.collect.LinkedHashMultimap;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,18 +13,18 @@ import java.io.IOException;
  * @author 
  *
  */
-public interface BlazemeterApi {
+public interface Api {
     String APP_KEY = "bmboo0x98a8w9s4s7c4";
 
     boolean uploadJmx(String testId, String fileName, String pathName);
 
     JSONObject uploadFile(String testId, String fileName, String pathName);
 
-    TestInfo getTestInfo(String testId);
+    TestStatus testStatus(String testId);
 
     String startTest(String testId) throws JSONException;
 
-    int getTestSessionStatusCode(String id);
+    int masterStatus(String id);
 
     int getTestCount() throws JSONException, IOException;
 
@@ -35,7 +36,7 @@ public interface BlazemeterApi {
 
     boolean verifyUserKey();
 
-    JSONObject getTresholds(String sessionId);
+    JSONObject ciStatus(String sessionId);
 
     String getUserKey();
 

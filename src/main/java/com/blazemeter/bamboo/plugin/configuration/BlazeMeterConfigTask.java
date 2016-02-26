@@ -3,8 +3,8 @@ package com.blazemeter.bamboo.plugin.configuration;
 import java.util.List;
 import java.util.Map;
 
-import com.blazemeter.bamboo.plugin.api.BlazemeterApi;
-import com.blazemeter.bamboo.plugin.api.BlazemeterApiV3Impl;
+import com.blazemeter.bamboo.plugin.api.Api;
+import com.blazemeter.bamboo.plugin.api.ApiV3Impl;
 import com.blazemeter.bamboo.plugin.configuration.constants.AdminServletConst;
 import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
 import com.google.common.collect.LinkedHashMultimap;
@@ -25,7 +25,7 @@ import com.opensymphony.xwork.TextProvider;
 public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements BuildTaskRequirementSupport{
 
 	private static final List<String> FIELDS_TO_COPY = ImmutableList.of(Constants.SETTINGS_SELECTED_TEST_ID);
-    private BlazemeterApi api;
+    private Api api;
 
 	private TextProvider textProvider;
 	
@@ -41,7 +41,7 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 		String userKey = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
 		String serverUrl = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
 		context.put(AdminServletConst.URL, serverUrl);
-		this.api= new BlazemeterApiV3Impl(userKey,serverUrl);
+		this.api= new ApiV3Impl(userKey,serverUrl);
 		context.put(Constants.TEST_LIST, BzmServiceManager.getTestsAsMap(api));
 	}
 
@@ -54,7 +54,7 @@ public class BlazeMeterConfigTask extends AbstractTaskConfigurator implements Bu
 		String userKey = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
 		String serverUrl = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
 		context.put(AdminServletConst.URL, serverUrl);
-		this.api= new BlazemeterApiV3Impl(userKey,serverUrl);
+		this.api= new ApiV3Impl(userKey,serverUrl);
         context.put(Constants.TEST_LIST, BzmServiceManager.getTestsAsMap(this.api));
 	}
 

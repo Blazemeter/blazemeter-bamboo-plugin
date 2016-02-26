@@ -2,9 +2,7 @@ package com.blazemeter.bamboo.plugin.api;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import com.atlassian.bamboo.build.logger.BuildLogger;
@@ -18,7 +16,7 @@ import org.json.JSONObject;
 
 /**
  * 
- * @author Marcel Milea
+ * @author Zmicer Kashlach
  *
  */
 public class BzmServiceManager {
@@ -34,7 +32,7 @@ private BzmServiceManager(){
 	 * returns a hash map with test id as key and test name as value
 	 * @return
 	 */
-	public static LinkedHashMultimap<String, String> getTests(BlazemeterApi api) {
+	public static LinkedHashMultimap<String, String> getTests(Api api) {
         LinkedHashMultimap<String,String> tests= LinkedHashMultimap.create();
         try {
 			tests=api.getTestList();
@@ -47,28 +45,28 @@ private BzmServiceManager(){
         }
     }
 
-    public static Map<String, Collection<String>> getTestsAsMap(BlazemeterApi api) {
+    public static Map<String, Collection<String>> getTestsAsMap(Api api) {
         return getTests(api).asMap();
     }
 
-	public static String startTest(BlazemeterApi api,String testId, BuildLogger logger) {
+	public static String startTest(Api api, String testId, BuildLogger logger) {
         int countStartRequests = 0;
-        String session=null;
+        String masterId=null;
         try {
             logger.addBuildLogEntry("Trying to start test with testId="+testId+" for userKey="+api.getUserKey());
             do {
-                session=api.startTest(testId);
+                masterId=api.startTest(testId);
                 countStartRequests++;
                 if (countStartRequests > 5) {
                     logger.addErrorLogEntry("Could not start BlazeMeter Test with userKey=" + api.getUserKey() + " testId=" + testId);
-                    return session;
+                    return masterId;
                 }
-            } while (session.length()==0);
-            logger.addBuildLogEntry("Test with testId="+testId+" was started with session="+session.toString());
+            } while (masterId.length()==0);
+            logger.addBuildLogEntry("Test with testId="+testId+" was started with masterId="+masterId.toString());
         } catch (JSONException e) {
             logger.addErrorLogEntry("Error: Exception while starting BlazeMeter Test [" + e.getMessage() + "]");
         }
-        return session;
+        return masterId;
     }
 
 
@@ -77,11 +75,11 @@ private BzmServiceManager(){
 	 * @param logger 
 	 * @return -1 fail, 0 success, 1 unstable
 	 */
-    public static TestResult getReport(BlazemeterApi api,String session, BuildLogger logger) {
+    public static TestResult getReport(Api api, String masterId, BuildLogger logger) {
         TestResult testResult = null;
         try {
-            logger.addBuildLogEntry("Trying to request aggregate report. UserKey="+api.getUserKey()+" session="+session);
-            JSONObject aggregate=api.testReport(session);
+            logger.addBuildLogEntry("Trying to request aggregate report. UserKey="+api.getUserKey()+" masterId="+masterId);
+            JSONObject aggregate=api.testReport(masterId);
             testResult = new TestResult(aggregate);
             logger.addBuildLogEntry(testResult.toString());
         } catch (JSONException e) {
@@ -95,28 +93,14 @@ private BzmServiceManager(){
             return testResult;
         }
     }
-	public boolean uploadJMX(BlazemeterApi api,String testId, String filename, String pathname){
-		return api.uploadJmx(testId, filename, pathname);
-	}
-	
-    public void uploadFile(BlazemeterApi api,String testId, String dataFolder, String fileName, BuildLogger logger) {
-        JSONObject json = api.uploadFile(testId, fileName, dataFolder + File.separator + fileName);
-        try {
-            if (!json.get(JsonConstants.RESPONSE_CODE).equals(new Integer(200))) {
-                logger.addErrorLogEntry("Could not upload file " + fileName + " " + json.get("error").toString());
-            }
-        } catch (JSONException e) {
-            logger.addErrorLogEntry("Could not upload file " + e.getMessage());
-        }
-    }
 
-    public static TaskState validateServerTresholds(BlazemeterApi api,String session,BuildLogger logger) {
+    public static TaskState validateServerTresholds(Api api, String session, BuildLogger logger) {
         JSONObject jo = null;
         TaskState serverTresholdsResult=TaskState.SUCCESS;
         JSONObject result=null;
         logger.addBuildLogEntry("Going to validate server tresholds...");
         try {
-            jo=api.getTresholds(session);
+            jo=api.ciStatus(session);
             result=jo.getJSONObject(JsonConstants.RESULT);
             serverTresholdsResult=result.getJSONObject(JsonConstants.DATA).getBoolean("success")?TaskState.SUCCESS:TaskState.FAILED;
         } catch (NullPointerException e){
@@ -133,39 +117,11 @@ private BzmServiceManager(){
     }
 
 
-    public static JSONObject updateTestDuration(BlazemeterApi api,
-                                                String testId,
-                                                String testDuration,
-                                                BuildLogger logger) throws Exception{
-        JSONObject result;
-        JSONObject updateResult=null;
-        try {
-            JSONObject jo = api.getTestConfig(testId);
-            result = jo.getJSONObject(JsonConstants.RESULT);
-            JSONObject configuration = result.getJSONObject(JsonConstants.CONFIGURATION);
-            JSONObject plugins = configuration.getJSONObject(JsonConstants.PLUGINS);
-            String type = configuration.getString(JsonConstants.TYPE);
-            JSONObject options = plugins.getJSONObject(type);
-            JSONObject override = options.getJSONObject(JsonConstants.OVERRIDE);
-            override.put(JsonConstants.DURATION, testDuration);
-            override.put("threads", JSONObject.NULL);
-            configuration.put("serversCount", JSONObject.NULL);
-            updateResult = api.putTestInfo(testId, result);
-        } catch (JSONException je) {
-            logger.addBuildLogEntry("Received JSONException while updating test duration: " + je);
-            throw je;
-        } catch (Exception e) {
-            logger.addBuildLogEntry("Received Exception while updating test duration: " + e);
-            throw e;
-        }
-        return updateResult;
-    }
-
-    public static boolean stopTestSession(BlazemeterApi api, String testId, String sessionId, BuildLogger logger) {
+    public static boolean stopTestSession(Api api, String testId, String sessionId, BuildLogger logger) {
         boolean terminate=false;
         try {
 
-            int statusCode = api.getTestSessionStatusCode(sessionId);
+            int statusCode = api.masterStatus(sessionId);
             if (statusCode < 100) {
                 api.terminateTest(testId);
                 terminate=true;
@@ -181,20 +137,4 @@ private BzmServiceManager(){
         }
     }
 
-
-    public static List<Exception> prepareTest(BlazemeterApi api,
-                                              String testId,
-                                              String testDuration,
-                                              BuildLogger logger){
-        List<Exception> exceptions=new ArrayList<>();
-        try {
-            if (!testDuration.isEmpty()) {
-                updateTestDuration(api, testId, testDuration, logger);
-            }
-        }catch (Exception e){
-            exceptions.add(e);
-        }finally {
-            return exceptions;
-        }
-    }
 }
