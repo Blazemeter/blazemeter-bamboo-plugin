@@ -11,6 +11,7 @@ import com.atlassian.util.concurrent.NotNull;
 import com.blazemeter.bamboo.plugin.configuration.constants.JsonConstants;
 import com.blazemeter.bamboo.plugin.testresult.TestResult;
 import com.google.common.collect.LinkedHashMultimap;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -54,8 +55,9 @@ private ServiceManager(){
         String masterId=null;
         try {
             logger.addBuildLogEntry("Trying to start test with testId="+testId+" for userKey="+api.getUserKey());
+            TestType testType=getTestType(api,testId,logger);
             do {
-                masterId=api.startTest(testId);
+                masterId=api.startTest(testId,testType);
                 countStartRequests++;
                 if (countStartRequests > 5) {
                     logger.addErrorLogEntry("Could not start BlazeMeter Test with userKey=" + api.getUserKey() + " testId=" + testId);
@@ -136,5 +138,26 @@ private ServiceManager(){
             return terminate;
         }
     }
+
+    private static TestType getTestType(Api api,String testId,BuildLogger logger){
+        TestType testType=TestType.http;
+        logger.addBuildLogEntry("Detecting testType....");
+        try{
+            JSONArray result=api.getTestsJSON().getJSONArray(JsonConstants.RESULT);
+            int resultLength=result.length();
+            for (int i=0;i<resultLength;i++){
+                JSONObject jo=result.getJSONObject(i);
+                if(String.valueOf(jo.getInt(JsonConstants.ID)).equals(testId)){
+                    testType= TestType.valueOf(jo.getString(JsonConstants.TYPE));
+                    logger.addBuildLogEntry("Received testType=" + testType.toString() + " for testId=" + testId);
+                }
+            }
+        } catch (Exception e) {
+            logger.addBuildLogEntry("Error while detecting type of test:" + e);
+        }finally {
+            return testType;
+        }
+    }
+
 
 }

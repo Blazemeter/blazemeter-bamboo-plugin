@@ -4,6 +4,7 @@ import com.blazemeter.bamboo.plugin.TestStatus;
 import com.blazemeter.bamboo.plugin.configuration.constants.JsonConstants;
 import com.google.common.collect.LinkedHashMultimap;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,7 +19,7 @@ import java.io.PrintStream;
  *
  */
 public class ApiV3Impl implements Api {
-    PrintStream logger = new PrintStream(System.out);
+    private static final Logger logger = Logger.getLogger(ApiV3Impl.class);
 
     public static final String APP_KEY = "bmboo0x98a8w9s4s7c4";
     HttpWrapper http;
@@ -31,7 +32,7 @@ public class ApiV3Impl implements Api {
         try {
             http = new HttpWrapper();
         } catch (Exception ex) {
-            logger.format("error Instantiating HTTPClient. Exception received: %s", ex);
+            logger.error("Failed to create api for communication with server: %s", ex);
         }
     }
 
@@ -55,9 +56,9 @@ public class ApiV3Impl implements Api {
                 if (result.has("status") && !result.getString("status").equals("ENDED")) {
                     testStatus = TestStatus.Running;
                 } else {
-                    logger.println("Test is not running on server");
+                    logger.error("Master "+id+ " is not running on server");
                     if (result.has("errors") && !result.get("errors").equals(JSONObject.NULL)) {
-                        logger.println("Error received from server: " + result.get("errors").toString());
+                        logger.error("MasterId: "+id+" -> error received from server: " + result.get("errors").toString());
                         testStatus = TestStatus.Error;
                     } else {
                         testStatus = TestStatus.NotRunning;
@@ -65,28 +66,117 @@ public class ApiV3Impl implements Api {
                 }
             }
         } catch (Exception e) {
-            logger.format("Error getting status ", e);
+            logger.error("MasterId: "+id+" ->error getting status ", e);
             testStatus = TestStatus.Error;
         }
         return testStatus;
     }
 
+    @Override
+    public JSONObject getTestsJSON() {
+        String url = this.urlManager.tests(APP_KEY, userKey);
+        JSONObject jo = this.http.response(url, null, Method.GET,JSONObject.class);
+        return jo;
+    }
+
 
     @Override
-    public synchronized String startTest(String testId) {
-        String masterId=null;
-        if (StringUtils.isBlank(userKey)&StringUtils.isBlank(testId)) return null;
+    public synchronized String startTest(String testId, TestType testType) throws JSONException {
+        if (org.apache.commons.lang.StringUtils.isBlank(userKey) & org.apache.commons.lang.StringUtils.isBlank(testId)) return null;
+        String url = "";
+        switch (testType) {
+            case multi:
+                url = this.urlManager.collectionStart(APP_KEY, userKey, testId);
+                break;
+            default:
+                url = this.urlManager.testStart(APP_KEY, userKey, testId);
+        }
+        JSONObject jo = this.http.response(url, null, Method.POST, JSONObject.class);
 
-        String url = this.urlManager.testStart(APP_KEY, userKey, testId);
-        JSONObject json=this.http.response(url, null, Method.GET,JSONObject.class);
-        masterId = String.valueOf(json.getJSONObject(JsonConstants.RESULT).getInt(JsonConstants.ID));
-        return masterId;
+        if (jo==null) {
+            if (logger.isDebugEnabled())
+                logger.debug("Received NULL from server while start operation: will do 5 retries");
+            boolean isActive=this.active(testId);
+            if(!isActive){
+                int retries = 1;
+                while (retries < 6) {
+                    try {
+                        if (logger.isDebugEnabled())
+                            logger.debug("Trying to repeat start request: " + retries + " retry.");
+                        logger.debug("Pausing thread for " + 10*retries + " seconds before doing "+retries+" retry.");
+                        Thread.sleep(10000*retries);
+                        jo = this.http.response(url, null, Method.POST, JSONObject.class);
+                        if (jo!=null) {
+                            break;
+                        }
+                    } catch (InterruptedException ie) {
+                        if (logger.isDebugEnabled())
+                            logger.debug("Start operation was interrupted at pause during " + retries + " request retry.");
+                    } catch (Exception ex) {
+                        if (logger.isDebugEnabled())
+                            logger.debug("Received bad response from server while starting test: " + retries + " retry.");
+                    }
+                    finally {
+                        retries++;
+                    }
+                }
+
+
+            }
+        }
+        JSONObject result=null;
+        try{
+            result = (JSONObject) jo.get(JsonConstants.RESULT);
+        }catch (Exception e){
+            if (logger.isDebugEnabled())
+                logger.debug("Error while starting test: ",e);
+            throw new JSONException("Faild to get 'result' node "+e.getMessage());
+
+        }
+        return String.valueOf(result.getInt(JsonConstants.ID));
     }
+
+
+        @Override
+        public boolean active(String testId) {
+            boolean isActive=false;
+            String url = this.urlManager.activeTests(APP_KEY, userKey);
+            JSONObject jo = null;
+            try {
+                jo = this.http.response(url, null, Method.GET, JSONObject.class);
+                JSONObject result = null;
+                if (jo.has(JsonConstants.RESULT) && (!jo.get(JsonConstants.RESULT).equals(JSONObject.NULL))) {
+                    result = (JSONObject) jo.get(JsonConstants.RESULT);
+                    JSONArray tests = (JSONArray) result.get(JsonConstants.TESTS);
+                    for(int i=0;i<tests.length();i++){
+                        if(String.valueOf(tests.getInt(i)).equals(testId)){
+                            isActive=true;
+                            return isActive;
+                        }
+                    }
+                    JSONArray collections = (JSONArray) result.get(JsonConstants.COLLECTIONS);
+                    for(int i=0;i<collections.length();i++){
+                        if(String.valueOf(collections.getInt(i)).equals(testId)){
+                            isActive=true;
+                            return isActive;
+                        }
+                    }
+                }
+                return isActive;
+            } catch (JSONException je) {
+                logger.info("Failed to check if test=" + testId + " is active: received JSON = " + jo, je);
+                return false;
+            } catch (Exception e) {
+                logger.info("Failed to check if test=" + testId + " is active: received JSON = " + jo, e);
+                return false;
+            }
+        }
+
 
     @Override
     public int getTestCount() throws JSONException, IOException {
         if (StringUtils.isBlank(userKey)) {
-            logger.println("getTests userKey is empty");
+            logger.error("UserKey is empty! Please, check settings.");
             return 0;
         }
 
@@ -100,12 +190,6 @@ public class ApiV3Impl implements Api {
         return arr.length();
     }
 
-
-    /**
-     * @param testId  - test id
-     *                //     * @throws IOException
-     *                //     * @throws ClientProtocolException
-     */
     @Override
     public boolean stopTest(String testId) throws JSONException{
         if (StringUtils.isBlank(userKey)&StringUtils.isBlank(testId)) return false;
@@ -115,11 +199,6 @@ public class ApiV3Impl implements Api {
         return command.equals("shutdown command sent\n");
     }
 
-    /**
-     * @param reportId - report Id same as Session Id, can be obtained from start stop status.
-     *                 //     * @throws IOException
-     *                 //     * @throws ClientProtocolException
-     */
     @Override
     public JSONObject testReport(String reportId) {
         if (StringUtils.isBlank(userKey)&StringUtils.isBlank(reportId)) return null;
@@ -137,10 +216,10 @@ public class ApiV3Impl implements Api {
         LinkedHashMultimap<String, String> testListOrdered = null;
 
         if (userKey == null || userKey.trim().isEmpty()) {
-            logger.println("getTests userKey is empty");
+            logger.error("UserKey is empty! Please, check settings.");
         } else {
             String url = this.urlManager.tests(APP_KEY, userKey);
-            logger.println(url);
+            logger.info("Requesting url -> "+url);
             JSONObject jo = this.http.response(url, null,Method.GET,JSONObject.class);
             try {
                 JSONArray arr = (JSONArray) jo.get(JsonConstants.RESULT);
@@ -151,7 +230,7 @@ public class ApiV3Impl implements Api {
                         try {
                             en = arr.getJSONObject(i);
                         } catch (JSONException e) {
-                            logger.println("Error with the JSON while populating test list, " + e);
+                            logger.error("Error occured while parsing JSON in getTestList() operation, " + e);
                         }
                         String id;
                         String name;
@@ -163,13 +242,13 @@ public class ApiV3Impl implements Api {
 
                             }
                         } catch (JSONException ie) {
-                            logger.println("Error with the JSON while populating test list, " + ie);
+                            logger.error("Error occured while populating test list, " + ie);
                         }
                     }
                 }
             }
             catch (Exception e) {
-                logger.println("Error while populating test list, " + e);
+                logger.error("Error occured while populating test list, " + e);
             }
         }
 

@@ -18,7 +18,9 @@ public interface Api {
 
     TestStatus testStatus(String testId);
 
-    String startTest(String testId) throws JSONException;
+    String startTest(String testId, TestType testType) throws JSONException;
+
+    boolean active(String testId);
 
     int masterStatus(String id);
 
@@ -43,5 +45,7 @@ public interface Api {
     JSONObject getTestConfig(String testId);
 
     JSONObject terminateTest(String testId);
+
+    JSONObject getTestsJSON();
 
 }

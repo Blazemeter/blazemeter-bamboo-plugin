@@ -12,17 +12,19 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
+import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 
 public class HttpWrapper {
+    private static final Logger logger = Logger.getLogger(ApiV3Impl.class);
+
     private transient DefaultHttpClient httpClient = null;
 
     public HttpWrapper() {
         this.httpClient = new DefaultHttpClient();
-//      TODO  this.logger.setDebugEnabled(false);
         HttpParams httpParams = new BasicHttpParams();
         HttpConnectionParams.setConnectionTimeout(httpParams, 90000);
         HttpConnectionParams.setSoTimeout(httpParams, 90000);
@@ -31,9 +33,9 @@ public class HttpWrapper {
 
     public HttpResponse httpResponse(String url, JSONObject data, Method method) throws IOException {
         if (StringUtils.isBlank(url)) return null;
-     /* TODO   if (logger.isDebugEnabled())
+        if (logger.isDebugEnabled())
             logger.debug("Requesting : " + url.substring(0,url.indexOf("?")+14));
-     */   HttpResponse response = null;
+        HttpResponse response = null;
         HttpRequestBase request = null;
 
         try {
@@ -60,14 +62,14 @@ public class HttpWrapper {
 
 
             if (response == null || response.getStatusLine() == null) {
-            /*TODO    if(logger.isDebugEnabled())
-                    logger.debug("Erroneous response (Probably null) for url: \n", url);
-            */    response = null;
+            if(logger.isDebugEnabled())
+                    logger.debug("Erroneous response (Probably null) for url: \n"+ url);
+                response = null;
             }
         } catch (Exception e) {
-        /*TODO    if(logger.isDebugEnabled())
+        if(logger.isDebugEnabled())
                 logger.debug("Problems with creating and sending request: \n", e);
-        */}
+        }
         return response;
     }
 
@@ -81,21 +83,21 @@ public class HttpWrapper {
             response = httpResponse(url, data, method);
             if (response != null) {
                 output = EntityUtils.toString(response.getEntity());
-              /*TODO  if (logger.isDebugEnabled())
+              if (logger.isDebugEnabled())
                     logger.debug("Received object from server: " + output);
-              */  if (output.isEmpty()) {
+                if (output.isEmpty()) {
                     throw new IOException();
                 }
                 jo = new JSONObject(output);
             }
         } catch (IOException ioe) {
-        /*TODO    if (logger.isDebugEnabled())
+        if (logger.isDebugEnabled())
                 logger.debug("Received empty response from server: ",ioe);
-        */    return null;
+            return null;
         } catch (JSONException e) {
-        /*TODO    if (logger.isDebugEnabled())
+        if (logger.isDebugEnabled())
                 logger.debug("ERROR decoding Json: ", e);
-        */    returnType= (Class<T>) String.class;
+            returnType= (Class<T>) String.class;
             return returnType.cast(output);
         }
 
@@ -103,9 +105,9 @@ public class HttpWrapper {
             returnObj=returnType.cast(jo);
 
         }catch (ClassCastException cce){
-        /*TODO    if (logger.isDebugEnabled())
+        if (logger.isDebugEnabled())
                 logger.debug("Failed to parse response from server: ", cce);
-        */    throw new RuntimeException(jo.toString());
+            throw new RuntimeException(jo.toString());
 
         }
         return returnObj;
