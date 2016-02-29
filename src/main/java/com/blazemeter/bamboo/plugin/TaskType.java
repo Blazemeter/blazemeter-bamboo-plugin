@@ -78,9 +78,9 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
             }
             logger.addBuildLogEntry("Check if the test is initialized...");
             initTimeOutPassed=System.currentTimeMillis()>testInitStart+INIT_TEST_TIMEOUT;
-        }while (!(initTimeOutPassed|status.equals(TestStatus.Running.toString())));
+        }while (!(initTimeOutPassed|status.equals(TestStatus.Running)));
 
-        if(status.equals(TestStatus.NotRunning.toString())){
+        if(status.equals(TestStatus.NotRunning)){
             logger.addErrorLogEntry("Test was not initialized, marking build as failed.");
             return resultBuilder.failedWithError().build();
         }
@@ -88,11 +88,11 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         logger.addBuildLogEntry("Test report is available via link: "+"https://a.blazemeter.com/app/#reports/"+this.masterId +"/summary");
 
         long timeOfStart=System.currentTimeMillis();
-        while (status.equals(TestStatus.Running.toString())) {
+        while (status.equals(TestStatus.Running)) {
                 try {
                     Thread.currentThread().sleep(CHECK_INTERVAL);
                 } catch (InterruptedException e) {
-                    logger.addErrorLogEntry("BlazeMeter Interrupted Exception: " + e.getMessage());
+                    logger.addErrorLogEntry("Received interrupted Exception: " + e.getMessage());
                     logger.addBuildLogEntry("Stopping test...");
                     ServiceManager.stopTestSession(this.api, this.testId, this.masterId, logger);
                     break;
@@ -100,10 +100,10 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
 
                 logger.addBuildLogEntry("Check if the test is still running. Time passed since start:" + ((System.currentTimeMillis()-timeOfStart) / 1000 / 60) + " minutes.");
                 status = this.api.testStatus(masterId);
-                if (status.equals(TestStatus.NotRunning.toString())) {
+                if (status.equals(TestStatus.NotRunning)) {
                     logger.addBuildLogEntry("Test is finished earlier then estimated! Time passed since start:" + ((System.currentTimeMillis()-timeOfStart) / 1000 / 60) + " minutes.");
                     break;
-                } else if (status.equals(TestStatus.NotFound.toString())) {
+                } else if (status.equals(TestStatus.NotFound)) {
                     logger.addErrorLogEntry("BlazeMeter test not found!");
                     return resultBuilder.failed().build();
                 }
@@ -113,11 +113,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
 
             logger.addBuildLogEntry("Test finished. Checking for test report...");
             TestResult result= ServiceManager.getReport(this.api, this.masterId, logger);
-        TaskState serverTresholdsResult=TaskState.SUCCESS;
-        if(this.api instanceof ApiV3Impl){
-            serverTresholdsResult= ServiceManager.validateServerTresholds(this.api,this.masterId,logger);
-        }
-
+        TaskState serverTresholdsResult= ServiceManager.validateServerTresholds(this.api,this.masterId,logger);
         if(serverTresholdsResult.equals(TaskState.FAILED)|serverTresholdsResult.equals(TaskState.ERROR)){
             return resultBuilder.failed().build();
         }else {
