@@ -33,12 +33,12 @@ public class HttpWrapper {
 
     public HttpResponse httpResponse(String url, JSONObject data, Method method) throws IOException {
         if (StringUtils.isBlank(url)) return null;
-        if (logger.isDebugEnabled())
-            logger.debug("Requesting : " + url.substring(0,url.indexOf("?")+14));
         HttpResponse response = null;
         HttpRequestBase request = null;
 
         try {
+            if (logger.isDebugEnabled())
+                logger.debug("Requesting : " + url.substring(0,url.indexOf("?")+14));
             if (method == Method.GET) {
                 request = new HttpGet(url);
             } else if (method == Method.POST) {

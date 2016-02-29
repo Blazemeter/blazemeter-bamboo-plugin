@@ -41,25 +41,30 @@ public class ApiV3Impl implements Api {
         TestStatus testStatus = null;
 
         if (StringUtils.isBlank(userKey) & StringUtils.isBlank(id)) {
+            logger.error("Either userKey or masterId value was empty while getting test status: setting TestStatus=TestStatus.NotFound");
             testStatus = TestStatus.NotFound;
             return testStatus;
         }
 
         try {
+            logger.info("Trying to get test status for masterId = "+id);
             String url = this.urlManager.masterStatus(APP_KEY, userKey, id);
             JSONObject jo = this.http.response(url, null, Method.GET,JSONObject.class);
             JSONObject result = (JSONObject) jo.get(JsonConstants.RESULT);
             if (result.has(JsonConstants.DATA_URL) && result.get(JsonConstants.DATA_URL) == null) {
+                logger.error("Test with masterId = "+id+" was not found on server.");
                 testStatus = TestStatus.NotFound;
             } else {
                 if (result.has("status") && !result.getString("status").equals("ENDED")) {
+                    logger.info("Test with masterId = "+id+" is running on server.");
                     testStatus = TestStatus.Running;
                 } else {
                     logger.error("Master "+id+ " is not running on server");
                     if (result.has("errors") && !result.get("errors").equals(JSONObject.NULL)) {
-                        logger.error("MasterId: "+id+" -> error received from server: " + result.get("errors").toString());
+                        logger.error("Test with masterId = "+id+" -> error received from server: " + result.get("errors").toString());
                         testStatus = TestStatus.Error;
                     } else {
+                        logger.info("Test with masterId = "+id+" is not running on server.");
                         testStatus = TestStatus.NotRunning;
                     }
                 }
@@ -73,16 +78,28 @@ public class ApiV3Impl implements Api {
 
     @Override
     public JSONObject getTestsJSON() {
-        String url = this.urlManager.tests(APP_KEY, userKey);
-        JSONObject jo = this.http.response(url, null, Method.GET,JSONObject.class);
-        return jo;
-    }
+        if (StringUtils.isBlank(userKey)){
+            logger.error("UserKey was empty while getting testList: returning null object.");
+            return null;
+        }
+        JSONObject jo=null;
+        try{
+            logger.info("Trying to get tests...");
+            String url = this.urlManager.tests(APP_KEY, userKey);
+            jo = this.http.response(url, null, Method.GET,JSONObject.class);
+        }catch (Exception e){
+            logger.error("Got an exception while trying to get tests from server: "+e);
+        }finally {
+            return jo;
+        }
+     }
 
 
     @Override
     public synchronized String startTest(String testId, TestType testType) throws JSONException {
         if (StringUtils.isBlank(userKey) & StringUtils.isBlank(testId)) return null;
         String url = "";
+        logger.info("Trying to start test with testId = "+testId+", testType = "+testType.name());
         switch (testType) {
             case multi:
                 url = this.urlManager.collectionStart(APP_KEY, userKey, testId);
@@ -126,6 +143,7 @@ public class ApiV3Impl implements Api {
         JSONObject result=null;
         try{
             result = (JSONObject) jo.get(JsonConstants.RESULT);
+            logger.info("Got result: "+result.toString());
         }catch (Exception e){
             if (logger.isDebugEnabled())
                 logger.debug("Error while starting test: ",e);
@@ -139,6 +157,7 @@ public class ApiV3Impl implements Api {
         @Override
         public boolean active(String testId) {
             boolean isActive=false;
+            logger.info("Checking if test with testId = "+testId+" is active.");
             String url = this.urlManager.activeTests(APP_KEY, userKey);
             JSONObject jo = null;
             try {
@@ -146,9 +165,11 @@ public class ApiV3Impl implements Api {
                 JSONObject result = null;
                 if (jo.has(JsonConstants.RESULT) && (!jo.get(JsonConstants.RESULT).equals(JSONObject.NULL))) {
                     result = (JSONObject) jo.get(JsonConstants.RESULT);
+                    logger.info("Got result: "+result.toString());
                     JSONArray tests = (JSONArray) result.get(JsonConstants.TESTS);
                     for(int i=0;i<tests.length();i++){
                         if(String.valueOf(tests.getInt(i)).equals(testId)){
+                            logger.info("Test with testId = "+testId+" is active.");
                             isActive=true;
                             return isActive;
                         }
@@ -156,6 +177,7 @@ public class ApiV3Impl implements Api {
                     JSONArray collections = (JSONArray) result.get(JsonConstants.COLLECTIONS);
                     for(int i=0;i<collections.length();i++){
                         if(String.valueOf(collections.getInt(i)).equals(testId)){
+                            logger.info("Test collection with testId = "+testId+" is active.");
                             isActive=true;
                             return isActive;
                         }
@@ -175,10 +197,9 @@ public class ApiV3Impl implements Api {
     @Override
     public int getTestCount() throws JSONException, IOException {
         if (StringUtils.isBlank(userKey)) {
-            logger.error("UserKey is empty! Please, check settings.");
+            logger.error("UserKey was empty while getting number of tests: returning '0'.");
             return 0;
         }
-
         String url = this.urlManager.tests(APP_KEY, userKey);
 
         JSONObject jo = this.http.response(url, null,Method.GET,JSONObject.class);
@@ -186,27 +207,37 @@ public class ApiV3Impl implements Api {
         if (!r.equals("200"))
             return 0;
         JSONArray arr = (JSONArray) jo.get(JsonConstants.TESTS);
+        int testNum=arr.length();
+        logger.error("Found "+testNum+" tests on server");
         return arr.length();
     }
 
     @Override
     public boolean stopTest(String masterId) throws JSONException{
-        if (StringUtils.isBlank(userKey)&StringUtils.isBlank(masterId)) return false;
+        if (StringUtils.isBlank(userKey)&StringUtils.isBlank(masterId)){
+            logger.error("UserKey was empty while stopping test: returning 'false'.");
+            return false;
+        }
         logger.info("Stopping test with masterId="+masterId);
         String url = this.urlManager.masterStop(APP_KEY, userKey, masterId);
         JSONArray stopArray=this.http.response(url, null,Method.POST,JSONObject.class).getJSONArray(JsonConstants.RESULT);
+        logger.info("Got stopArray: "+stopArray.toString());
         String command=((JSONObject)stopArray.get(0)).getString(JsonConstants.RESULT);
         return command.equals("shutdown command sent\n");
     }
 
     @Override
     public JSONObject testReport(String reportId) {
-        if (StringUtils.isBlank(userKey)&StringUtils.isBlank(reportId)) return null;
+        if (StringUtils.isBlank(userKey)&StringUtils.isBlank(reportId)) {
+            logger.error("UserKey was empty while getting test report: returning 'null'.");
+            return null;
+        }
 
         String url = this.urlManager.testReport(APP_KEY, userKey, reportId);
         JSONObject summary = (JSONObject) this.http.response(url, null, Method.GET,JSONObject.class).getJSONObject(JsonConstants.RESULT)
                 .getJSONArray("summary")
                 .get(0);
+        logger.info("Got summary: "+summary.toString());
         return summary;
     }
 
@@ -216,13 +247,14 @@ public class ApiV3Impl implements Api {
         LinkedHashMultimap<String, String> testListOrdered = null;
 
         if (userKey == null || userKey.trim().isEmpty()) {
-            logger.error("UserKey is empty! Please, check settings.");
+            logger.error("UserKey was empty while getting testsList.");
         } else {
             String url = this.urlManager.tests(APP_KEY, userKey);
             logger.info("Requesting url -> "+url);
             JSONObject jo = this.http.response(url, null,Method.GET,JSONObject.class);
             try {
                 JSONArray arr = (JSONArray) jo.get(JsonConstants.RESULT);
+                logger.info("Got result: "+arr.toString());
                 if (arr.length() > 0) {
                     testListOrdered = LinkedHashMultimap.create(arr.length(),arr.length());
                     for (int i = 0; i < arr.length(); i++) {
@@ -261,15 +293,19 @@ public class ApiV3Impl implements Api {
         if (userKey == null || userKey.trim().isEmpty()) {
             return false;
         } else {
+            logger.info("Verifying userKey...");
             String url = this.urlManager.tests(APP_KEY, userKey);
             try {
                 JSONObject jo = this.http.response(url, null, Method.GET,JSONObject.class);
-                if (((JSONArray) jo.get(JsonConstants.RESULT)).length() > 0) {
+                JSONArray result=(JSONArray)jo.get(JsonConstants.RESULT);
+                logger.info("Got result: "+result.toString());
+                if ((result).length() > 0) {
                     return true;
                 } else {
                     return false;
                 }
             } catch (Exception e) {
+                logger.error("Got an exception while verifying userKey: "+e);
                 return false;
             }
         }
@@ -280,8 +316,13 @@ public class ApiV3Impl implements Api {
         if (userKey == null || userKey.trim().isEmpty()) {
             return null;
         }
-        String url = this.urlManager.ciStatus(APP_KEY, userKey, sessionId);
-        JSONObject jo = this.http.response(url, null, Method.GET,JSONObject.class);
+        JSONObject jo=null;
+        try {
+            String url = this.urlManager.ciStatus(APP_KEY, userKey, sessionId);
+            jo = this.http.response(url, null, Method.GET,JSONObject.class);
+        }catch (Exception e){
+            logger.error("Got an exception while getting ci status: "+e);
+        }
         return jo;
     }
 
