@@ -119,21 +119,21 @@ private ServiceManager(){
     }
 
 
-    public static boolean stopTestSession(Api api, String testId, String sessionId, BuildLogger logger) {
+    public static boolean stopTestMaster(Api api, String masterId, BuildLogger logger) {
         boolean terminate=false;
         try {
 
-            int statusCode = api.masterStatus(sessionId);
+            int statusCode = api.masterStatus(masterId);
             if (statusCode < 100) {
-                api.terminateTest(testId);
+                api.terminateTest(masterId);
                 terminate=true;
             }
             if (statusCode >= 100|statusCode ==-1) {
-                api.stopTest(testId);
+                api.stopTest(masterId);
                 terminate=false;
             }
         } catch (Exception e) {
-            logger.addBuildLogEntry("Error while trying to stop test with testId=" + testId + ", " + e.getMessage());
+            logger.addBuildLogEntry("Error while trying to stop test with testId=" + masterId + ", " + e.getMessage());
         }finally {
             return terminate;
         }

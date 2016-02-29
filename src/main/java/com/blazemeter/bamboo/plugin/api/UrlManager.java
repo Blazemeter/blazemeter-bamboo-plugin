@@ -2,9 +2,6 @@ package com.blazemeter.bamboo.plugin.api;
 
 import com.blazemeter.bamboo.plugin.Utils;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-
 /**
  * Created by zmicer on 21.2.15.
  */
@@ -31,7 +28,7 @@ public interface UrlManager {
 
     String collectionStart(String appKey, String userKey, String collectionId);
 
-    String testStop(String appKey, String userKey, String testId);
+    String masterStop(String appKey, String userKey, String testId);
 
     String testTerminate(String appKey, String userKey, String testId);
 

@@ -13,4 +13,5 @@ public interface JsonConstants {
     String RESULT = "result";
     String DATA_URL="dataUrl";
     String COLLECTIONS="collections";
+    String PROGRESS="progress";
 }

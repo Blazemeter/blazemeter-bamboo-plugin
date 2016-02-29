@@ -10,7 +10,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.io.PrintStream;
 
 
 /**
@@ -82,7 +81,7 @@ public class ApiV3Impl implements Api {
 
     @Override
     public synchronized String startTest(String testId, TestType testType) throws JSONException {
-        if (org.apache.commons.lang.StringUtils.isBlank(userKey) & org.apache.commons.lang.StringUtils.isBlank(testId)) return null;
+        if (StringUtils.isBlank(userKey) & StringUtils.isBlank(testId)) return null;
         String url = "";
         switch (testType) {
             case multi:
@@ -191,10 +190,11 @@ public class ApiV3Impl implements Api {
     }
 
     @Override
-    public boolean stopTest(String testId) throws JSONException{
-        if (StringUtils.isBlank(userKey)&StringUtils.isBlank(testId)) return false;
-        String url = this.urlManager.testStop(APP_KEY, userKey, testId);
-        JSONArray stopArray=this.http.response(url, null,Method.GET,JSONObject.class).getJSONArray(JsonConstants.RESULT);
+    public boolean stopTest(String masterId) throws JSONException{
+        if (StringUtils.isBlank(userKey)&StringUtils.isBlank(masterId)) return false;
+        logger.info("Stopping test with masterId="+masterId);
+        String url = this.urlManager.masterStop(APP_KEY, userKey, masterId);
+        JSONArray stopArray=this.http.response(url, null,Method.POST,JSONObject.class).getJSONArray(JsonConstants.RESULT);
         String command=((JSONObject)stopArray.get(0)).getString(JsonConstants.RESULT);
         return command.equals("shutdown command sent\n");
     }
@@ -299,7 +299,7 @@ public class ApiV3Impl implements Api {
 
     @Override
     public JSONObject putTestInfo(String testId, JSONObject data) {
-        if(org.apache.commons.lang.StringUtils.isBlank(this.userKey)& org.apache.commons.lang.StringUtils.isBlank(testId)) return null;
+        if(StringUtils.isBlank(this.userKey)& StringUtils.isBlank(testId)) return null;
 
         String url = this.urlManager.getTestConfig(APP_KEY, this.userKey, testId);
         JSONObject jo = this.http.response(url, data, Method.PUT,JSONObject.class);
@@ -308,7 +308,7 @@ public class ApiV3Impl implements Api {
 
     @Override
     public JSONObject getTestConfig(String testId){
-        if(org.apache.commons.lang.StringUtils.isBlank(this.userKey)& org.apache.commons.lang.StringUtils.isBlank(testId)) return null;
+        if(StringUtils.isBlank(this.userKey)& StringUtils.isBlank(testId)) return null;
 
         String url = this.urlManager.getTestConfig(APP_KEY, this.userKey, testId);
         JSONObject jo = this.http.response(url, null, Method.GET,JSONObject.class);
@@ -317,10 +317,9 @@ public class ApiV3Impl implements Api {
 
     @Override
     public JSONObject terminateTest(String testId) {
-        if(org.apache.commons.lang.StringUtils.isBlank(this.userKey)& org.apache.commons.lang.StringUtils.isBlank(testId)) return null;
-
+        if(StringUtils.isBlank(this.userKey)& StringUtils.isBlank(testId)) return null;
         String url = this.urlManager.testTerminate(APP_KEY, this.userKey, testId);
-        return this.http.response(url, null, Method.GET,JSONObject.class);
+        return this.http.response(url, null, Method.POST,JSONObject.class);
 
     }
 
@@ -328,7 +327,7 @@ public class ApiV3Impl implements Api {
     @Override
     public int masterStatus(String id) {
         int statusCode=0;
-        if(org.apache.commons.lang.StringUtils.isBlank(this.userKey)& org.apache.commons.lang.StringUtils.isBlank(id))
+        if(StringUtils.isBlank(this.userKey)& StringUtils.isBlank(id))
         {
             return statusCode;
         }
@@ -336,7 +335,7 @@ public class ApiV3Impl implements Api {
             String url = this.urlManager.masterStatus(APP_KEY, this.userKey, id);
             JSONObject jo = this.http.response(url, null, Method.GET,JSONObject.class);
             JSONObject result = (JSONObject) jo.get(JsonConstants.RESULT);
-            statusCode=result.getInt("statusCode");
+            statusCode=result.getInt(JsonConstants.PROGRESS);
         } catch (Exception e) {
         }finally {
             {

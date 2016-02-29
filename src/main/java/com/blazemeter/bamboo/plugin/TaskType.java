@@ -73,7 +73,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
             } catch (InterruptedException e) {
                 logger.addErrorLogEntry("BlazeMeter Interrupted Exception: " + e.getMessage());
                 logger.addBuildLogEntry("Stopping test...");
-                ServiceManager.stopTestSession(this.api, this.testId, this.masterId, logger);
+                ServiceManager.stopTestMaster(this.api, this.masterId, logger);
                 break;
             }
             logger.addBuildLogEntry("Check if the test is initialized...");
@@ -94,7 +94,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
                 } catch (InterruptedException e) {
                     logger.addErrorLogEntry("Received interrupted Exception: " + e.getMessage());
                     logger.addBuildLogEntry("Stopping test...");
-                    ServiceManager.stopTestSession(this.api, this.testId, this.masterId, logger);
+                    ServiceManager.stopTestMaster(this.api, this.masterId, logger);
                     break;
                 }
 

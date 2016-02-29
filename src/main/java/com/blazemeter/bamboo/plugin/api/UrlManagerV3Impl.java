@@ -91,7 +91,7 @@ public class UrlManagerV3Impl implements UrlManager {
     }
 
     @Override
-    public String testStop(String appKey, String userKey, String masterId) {
+    public String masterStop(String appKey, String userKey, String masterId) {
         String testStop=null;
         try {
             appKey = URLEncoder.encode(appKey, "UTF-8");
