@@ -96,26 +96,36 @@ private ServiceManager(){
         }
     }
 
-    public static TaskState validateServerTresholds(Api api, String session, BuildLogger logger) {
-        JSONObject jo = null;
-        TaskState serverTresholdsResult=TaskState.SUCCESS;
-        JSONObject result=null;
-        logger.addBuildLogEntry("Going to validate server tresholds...");
+    public static TaskState ciStatus(Api api, String masterId, BuildLogger logger) {
+        JSONObject jo;
+        JSONArray failures=new JSONArray();
+        JSONArray errors=new JSONArray();
         try {
-            jo=api.ciStatus(session);
-            result=jo.getJSONObject(JsonConstants.RESULT);
-            serverTresholdsResult=result.getJSONObject(JsonConstants.DATA).getBoolean("success")?TaskState.SUCCESS:TaskState.FAILED;
-        } catch (NullPointerException e){
-            logger.addBuildLogEntry("Server tresholds validation was not executed");
-            logger.addBuildLogEntry(e.getMessage());
-        }catch (JSONException je) {
-            logger.addBuildLogEntry("Server tresholds validation was not executed");
-            logger.addBuildLogEntry("Failed to get tresholds for  session=" + session);
+            jo=api.ciStatus(masterId);
+            logger.addBuildLogEntry("Test status object = " + jo.toString());
+            JSONObject result=jo.getJSONObject(JsonConstants.RESULT);
+            failures=result.getJSONArray(JsonConstants.FAILURES);
+            errors=result.getJSONArray(JsonConstants.ERRORS);
+        } catch (JSONException je) {
+            logger.addErrorLogEntry("No thresholds on server: setting 'success' for CIStatus ");
+        } catch (Exception e) {
+            logger.addErrorLogEntry("No thresholds on server: setting 'success' for CIStatus ");
         }finally {
-            logger.addBuildLogEntry("Server tresholds validation " +
-                    (serverTresholdsResult.equals(TaskState.SUCCESS) ? "passed. Marking build as PASSED" : "failed. Marking build as FAILED"));
-            return serverTresholdsResult;
+            if(errors.length()>0){
+                logger.addErrorLogEntry("Having errors while test status validation...");
+                logger.addErrorLogEntry("Errors: " + errors.toString());
+                logger.addErrorLogEntry("Setting CIStatus="+CIStatus.errors.name());
+                return TaskState.ERROR;
+            }
+            if(failures.length()>0){
+                logger.addErrorLogEntry("Having failures while test status validation...");
+                logger.addErrorLogEntry("Failures: " + failures.toString());
+                logger.addErrorLogEntry("Setting CIStatus="+CIStatus.failures.name());
+                return TaskState.FAILED;
+            }
+            logger.addBuildLogEntry("No errors/failures while validating CIStatus: setting "+CIStatus.success.name());
         }
+        return TaskState.SUCCESS;
     }
 
 
