@@ -75,28 +75,11 @@
 	</taskType>
 	<component key="staticAccessor" class="com.blazemeter.bamboo.plugin.configuration.StaticAccessor" />
 
-	<!-- Report module definition -->
-	<indexReader key="blazemeterIndexReader"
-		name="Reads BlazeMeter result values from index" class="com.blazemeter.bamboo.plugin.index.BlazeMeterIndexReader">
-		<description>Reads the BlazeMeter result from an index document and
-			populates into build result summary</description>
-	</indexReader>
-	<postBuildIndexWriter key="blazemeterIndexWriter"
-		name="Writes BlazeMeter result values to index" class="com.blazemeter.bamboo.plugin.index.BlazeMeterResultsWriter">
-		<description>Writes the BlazeMeter result to an index document
-		</description>
-	</postBuildIndexWriter>
-
 	<!-- BlazeMeter Report Tab -->
 	<xwork key="blazeMeterReports" name="View BlazeMeter Reports">
 		<package name="blazemeterReportView" extends="buildResultView">
 			<action name="viewBlazeMeterReport"	class="com.blazemeter.bamboo.plugin.ui.ViewBlazeMeterReport">
 				<result name="success" type="freemarker">/templates/viewBlazeMeterTestReport.ftl</result>
-			</action>
-		</package>
-		<package name="blazemeterStatisticsView" extends="buildView">
-			<action name="viewBlazeMeterStatistics"	class="com.blazemeter.bamboo.plugin.ui.ViewBlazeMeterStatistics">
-				<result name="success" type="freemarker">/templates/viewBlazeMeterStatistics.ftl</result>
 			</action>
 		</package>
 	</xwork>
@@ -111,10 +94,4 @@
 	</web-item>
 	
 	<!-- Plan report -->
-	<web-item name="BlazemeterAllJobReportPage" i18n-name-key="blazemeterStatistics.label"
-		key="blazemeterAllJobReport" section="build.subMenu/build" weight="80">
-		<description key="BlazemeterAllJobReportPage.description">Display the BlazeMeter Statistics page</description>
-		<label key="blazemeterStatistics.label" />
-		<link linkId="blazemeterAllJobReport">/build/viewBlazeMeterStatistics.action?buildKey=${buildKey}</link>
-	</web-item>
 </atlassian-plugin>
