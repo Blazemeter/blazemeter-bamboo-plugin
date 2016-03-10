@@ -15,4 +15,5 @@ public interface Constants {
     //BlazeMeterConfigTask
      String TEST_LIST ="testlist";
      String BLAZEMETER_ERROR ="blazemeter.error.";
+     String REPORT_URL ="reportUrl";
 }

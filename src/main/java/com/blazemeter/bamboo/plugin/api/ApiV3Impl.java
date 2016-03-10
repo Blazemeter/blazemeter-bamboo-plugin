@@ -384,4 +384,18 @@ public class ApiV3Impl implements Api {
             }
         }
     }
+
+    @Override
+    public String url(){
+        return urlManager.getServerUrl();
+    }
+
+    @Override
+    public JSONObject publicToken(String masterId){
+        if (StringUtils.isBlank(userKey) & StringUtils.isBlank(masterId)) return null;
+
+        String url = this.urlManager.generatePublicToken(APP_KEY, userKey, masterId);
+        JSONObject jo = this.http.response(url, null, Method.POST, JSONObject.class);
+        return jo;
+    }
 }

@@ -1,8 +1,9 @@
 package com.blazemeter.bamboo.plugin;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
+import com.atlassian.bamboo.build.logger.BuildLogger;
+import com.blazemeter.bamboo.plugin.api.Api;
+import com.blazemeter.bamboo.plugin.configuration.constants.JsonConstants;
+import org.json.JSONObject;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -14,12 +15,27 @@ public class Utils {
     private Utils() {
     }
 
-
-    public static void sleep(int sleepPeriod){
+    public static String getReportUrl(Api api, String masterId, BuildLogger logger) {
+        JSONObject jo=null;
+        String publicToken="";
+        String reportUrl=null;
         try {
-            Thread.currentThread().sleep(sleepPeriod);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            jo = api.publicToken(masterId);
+            if(jo.get(JsonConstants.ERROR).equals(JSONObject.NULL)){
+                JSONObject result=jo.getJSONObject(JsonConstants.RESULT);
+                publicToken=result.getString("publicToken");
+                reportUrl=api.url()+"/app/?public-token="+publicToken+"#masters/"+masterId+"/summary";
+            }else{
+                logger.addErrorLogEntry("Problems with generating public-token for report URL: "+jo.get(JsonConstants.ERROR).toString());
+                logger.addErrorLogEntry("Problems with generating public-token for report URL: "+jo.get(JsonConstants.ERROR).toString());
+                reportUrl=api.url()+"/app/#masters/"+masterId+"/summary";
+            }
+
+        } catch (Exception e){
+            logger.addErrorLogEntry("Problems with generating public-token for report URL");
+            logger.addErrorLogEntry("Problems with generating public-token for report URL",e);
+        }finally {
+            return reportUrl;
         }
     }
 
@@ -32,81 +48,4 @@ public class Utils {
         }
         return props.getProperty("version");
     }
-
-
-    public static boolean isFullPath(String path){
-        if (path.startsWith("/")){
-            return true;
-        }
-
-        if (path.length() < 3) {
-            return false;
-        }
-        if (path.substring(0,1).matches("[a-zA-Z]")){//like D:/
-            if (path.substring(1, 2).equals(":") && (path.substring(2, 3).equals("/") || path.substring(2, 3).equals("\\"))){
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-
-    public static String getFileContents(String fn) {
-
-        // ...checks on aFile are elided
-        StringBuilder contents = new StringBuilder();
-        File aFile = new File(fn);
-
-        try {
-
-            // use buffering, reading one line at a time
-            // FileReader always assumes default encoding is OK!
-            BufferedReader input = new BufferedReader(new FileReader(aFile));
-
-            try {
-                String line;    // not declared within while loop
-
-                /*
-                 *         readLine is a bit quirky : it returns the content of a line
-                 *         MINUS the newline. it returns null only for the END of the
-                 *         stream. it returns an empty String if two newlines appear in
-                 *         a row.
-                 */
-                while ((line = input.readLine()) != null) {
-                    contents.append(line);
-                    contents.append(System.getProperty("line.separator"));
-                }
-            } finally {
-                input.close();
-            }
-        } catch (IOException ignored) {
-        }
-
-        return contents.toString();
-    }
-
-    public static boolean checkNumber(String number, boolean isPercentage){
-        try{
-            if (number.equals("-0")){
-                throw new NumberFormatException("Value cannot be -0!");
-            }
-            Integer val = Integer.valueOf(number);
-            if (isPercentage){
-                if (!((val >= 0) && (val <= 100))){
-                    throw new NumberFormatException("Value is not between 0 and 100!");
-                }
-            } else {
-                if (!(val >= 0)){
-                    throw new NumberFormatException("Value must be greater than 0!");
-                }
-            }
-        } catch (NumberFormatException nfe){
-            return false;
-        }
-
-        return true;
-    }
-
-
 }

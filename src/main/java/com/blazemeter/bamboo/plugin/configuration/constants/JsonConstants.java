@@ -17,4 +17,6 @@ public interface JsonConstants {
     String STATUS="status";
     String ERRORS="errors";
     String FAILURES = "failures";
+    String ERROR = "error";
+
 }

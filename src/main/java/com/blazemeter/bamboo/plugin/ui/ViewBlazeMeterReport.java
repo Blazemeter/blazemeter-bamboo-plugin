@@ -9,6 +9,7 @@ import com.atlassian.bamboo.buildqueue.manager.AgentManager;
 import com.atlassian.bamboo.chains.ChainResultsSummaryImpl;
 import com.atlassian.bamboo.chains.ChainStageResult;
 import com.atlassian.bamboo.resultsummary.BuildResultsSummary;
+import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
 
 public class ViewBlazeMeterReport extends PlanResultsAction {
     /**
@@ -18,7 +19,7 @@ public class ViewBlazeMeterReport extends PlanResultsAction {
 	
 	
     private boolean isJob;
-    private String sessionId;
+    private String reportUrl;
     
     public String doExecute() throws Exception {
         String result = super.doExecute();
@@ -26,7 +27,7 @@ public class ViewBlazeMeterReport extends PlanResultsAction {
         if ((this.buildNumber != null) && (this.buildNumber > 0)) {
             this.isJob = true;
             
-            String sessionId = null;
+            String reportUrl = null;
             ChainResultsSummaryImpl chainResults = (ChainResultsSummaryImpl) this.getResultsSummary();
 
             
@@ -36,16 +37,16 @@ public class ViewBlazeMeterReport extends PlanResultsAction {
             	Iterator<BuildResultsSummary> iter = resultSet.iterator();
             	while (iter.hasNext()){
             		BuildResultsSummary brs = iter.next();
-            		if (brs.getCustomBuildData().containsKey("session_id")){
-            			sessionId = brs.getCustomBuildData().get("session_id");
+            		if (brs.getCustomBuildData().containsKey(Constants.REPORT_URL)){
+            			reportUrl = brs.getCustomBuildData().get(Constants.REPORT_URL);
             		}
             	}
             }
             
-            if (sessionId != null){
-            	setSessionId(sessionId);
+            if (reportUrl != null){
+            	reportUrl(reportUrl);
             } else {
-            	setSessionId("");
+            	reportUrl("");
             }
         }
         else {
@@ -59,16 +60,16 @@ public class ViewBlazeMeterReport extends PlanResultsAction {
         this.agentManager = agentManager;
     }
 
-    public boolean getIsJob() {
+    public boolean isJob() {
         return this.isJob;
     }
 
-	public String getSessionId() {
-		return sessionId;
+	public String reportUrl() {
+		return reportUrl;
 	}
 
-	public void setSessionId(String sessionId) {
-		this.sessionId = sessionId;
+	public void reportUrl(String reportUrl) {
+		this.reportUrl = reportUrl;
 	}
 
 }

@@ -48,4 +48,7 @@ public interface Api {
 
     JSONObject getTestsJSON();
 
+    String url();
+
+    JSONObject publicToken(String masterId);
 }
