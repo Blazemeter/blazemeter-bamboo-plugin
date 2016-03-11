@@ -55,11 +55,12 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         this.masterId = ServiceManager.startTest(api, testId, logger);
         long testInitStart = System.currentTimeMillis();
 
+        String reportUrl=null;
         if (masterId.length() == 0) {
             logger.addErrorLogEntry("Failed to retrieve test masterId id! Check, that test was started correctly on server.");
             return resultBuilder.failed().build();
         } else {
-            String reportUrl=Utils.getReportUrl(api,masterId,logger);
+            reportUrl=Utils.getReportUrl(api,masterId,logger);
             context.getBuildContext().getBuildResult().getCustomBuildData().put(Constants.REPORT_URL, reportUrl);
         }
 
@@ -86,7 +87,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
             return resultBuilder.failedWithError().build();
         }
         logger.addBuildLogEntry("Test was initialized on server, testId=" + testId);
-        logger.addBuildLogEntry("Test report is available via link: " + "https://a.blazemeter.com/app/#reports/" + this.masterId + "/summary");
+        logger.addBuildLogEntry("Test report is available via link: " + reportUrl);
 
         long timeOfStart = System.currentTimeMillis();
         while (status.equals(TestStatus.Running)) {
