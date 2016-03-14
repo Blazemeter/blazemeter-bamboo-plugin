@@ -9,7 +9,7 @@ import com.atlassian.bamboo.buildqueue.manager.AgentManager;
 import com.atlassian.bamboo.chains.ChainResultsSummaryImpl;
 import com.atlassian.bamboo.chains.ChainStageResult;
 import com.atlassian.bamboo.resultsummary.BuildResultsSummary;
-import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
+import com.blazemeter.bamboo.plugin.configuration.StaticAccessor;
 
 public class ViewBlazeMeterReport extends PlanResultsAction {
     /**
@@ -37,9 +37,7 @@ public class ViewBlazeMeterReport extends PlanResultsAction {
             	Iterator<BuildResultsSummary> iter = resultSet.iterator();
             	while (iter.hasNext()){
             		BuildResultsSummary brs = iter.next();
-            		if (brs.getCustomBuildData().containsKey(Constants.REPORT_URL)){
-            			reportUrl = brs.getCustomBuildData().get(Constants.REPORT_URL);
-            		}
+                    reportUrl= (String) StaticAccessor.getReportUrls().get(brs.getBuildResultKey());
             	}
             }
             
@@ -71,5 +69,4 @@ public class ViewBlazeMeterReport extends PlanResultsAction {
 	public void reportUrl(String reportUrl) {
 		this.reportUrl = reportUrl;
 	}
-
 }

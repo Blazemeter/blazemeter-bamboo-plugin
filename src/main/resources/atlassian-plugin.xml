@@ -85,7 +85,6 @@
 	</xwork>
 	
 	<!-- Build Report -->
-	<!--
 	<web-item name="BlazemeterJobReportPage" i18n-name-key="blazemeterJobReport.label"
 		key="blazemeterJobReport" section="chainResults.subMenu/chainResults"
 		weight="80">
@@ -93,7 +92,5 @@
 		<label key="blazemeterJobReport.label" />
 		<link linkId="blazemeterJobReport">/build/result/viewBlazeMeterReport.action?buildKey=${buildKey}&amp;buildNumber=${buildNumber}</link>
 	</web-item>
-	
--->
 	<!-- Plan report -->
 </atlassian-plugin>

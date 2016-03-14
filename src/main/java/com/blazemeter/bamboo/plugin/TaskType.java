@@ -1,6 +1,7 @@
 package com.blazemeter.bamboo.plugin;
 
 import java.io.File;
+import java.util.HashMap;
 
 import com.atlassian.bamboo.build.logger.BuildLogger;
 import com.atlassian.bamboo.configuration.ConfigurationMap;
@@ -9,6 +10,7 @@ import com.atlassian.bamboo.task.*;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import com.blazemeter.bamboo.plugin.api.*;
+import com.blazemeter.bamboo.plugin.configuration.StaticAccessor;
 import com.blazemeter.bamboo.plugin.configuration.constants.AdminServletConst;
 import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
 import com.blazemeter.bamboo.plugin.servlet.AdminServlet.Config;
@@ -61,6 +63,8 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
             return resultBuilder.failed().build();
         } else {
             reportUrl=Utils.getReportUrl(api,masterId,logger);
+            HashMap<String,String> reportUrls= StaticAccessor.getReportUrls();
+            reportUrls.put(context.getBuildContext().getBuildResultKey(),reportUrl);
             context.getBuildContext().getBuildResult().getCustomBuildData().put(Constants.REPORT_URL, reportUrl);
         }
 
