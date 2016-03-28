@@ -16,4 +16,11 @@ public interface Constants {
      String TEST_LIST ="testlist";
      String BLAZEMETER_ERROR ="blazemeter.error.";
      String REPORT_URL ="reportUrl";
+
+
+    String PROXY_HOST="http.proxyHost";
+    String PROXY_PORT="http.proxyPort";
+    String PROXY_USER="http.proxyUser";
+    String PROXY_PASS="http.proxyPassword";
+    String USE_PROXY="http.useProxy";
 }

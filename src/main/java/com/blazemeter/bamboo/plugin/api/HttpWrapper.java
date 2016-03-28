@@ -1,16 +1,21 @@
 package com.blazemeter.bamboo.plugin.api;
 
+import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.Credentials;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
@@ -20,15 +25,41 @@ import java.io.IOException;
 
 public class HttpWrapper {
     private static final Logger logger = Logger.getLogger(ApiV3Impl.class);
+    private boolean useProxy=false;
+    private String proxyHost=null;
+    private int proxyPort=0;
+    private String proxyUser=null;
+    private String proxyPass=null;
 
-    private transient DefaultHttpClient httpClient = null;
+    private transient CloseableHttpClient httpClient = null;
+    private HttpHost proxy=null;
 
     public HttpWrapper() {
-        this.httpClient = new DefaultHttpClient();
-        HttpParams httpParams = new BasicHttpParams();
-        HttpConnectionParams.setConnectionTimeout(httpParams, 90000);
-        HttpConnectionParams.setSoTimeout(httpParams, 90000);
-        this.httpClient.setParams(httpParams);
+        this.httpClient = HttpClients.createDefault();
+        useProxy=Boolean.parseBoolean(System.getProperty(Constants.USE_PROXY));
+        proxyHost=System.getProperty(Constants.PROXY_HOST);
+
+        try{
+            this.proxyPort=Integer.parseInt(System.getProperty(Constants.PROXY_PORT));
+        }catch (NumberFormatException nfe){
+            logger.warn("Failed to read http.proxyPort: ",nfe);
+        }
+
+        if(useProxy&&!org.apache.commons.lang3.StringUtils.isBlank(this.proxyHost)){
+            this.proxy=new HttpHost(proxyHost,proxyPort);
+
+            this.proxyUser=System.getProperty(Constants.PROXY_USER);
+            this.proxyPass=System.getProperty(Constants.PROXY_PASS);
+            if(!org.apache.commons.lang3.StringUtils.isEmpty(this.proxyUser)&&!org.apache.commons.lang3.StringUtils.isEmpty(this.proxyPass)){
+                Credentials cr=new UsernamePasswordCredentials(proxyUser, proxyPass);
+                AuthScope aus=new AuthScope(proxyHost, proxyPort);
+                CredentialsProvider credsProvider = new BasicCredentialsProvider();
+                credsProvider.setCredentials(aus,cr);
+                this.httpClient = HttpClients.custom().setProxy(proxy).setDefaultCredentialsProvider(credsProvider).build();
+            }else {
+                this.httpClient = HttpClients.custom().setProxy(proxy).build();
+            }
+        }
     }
 
     public HttpResponse httpResponse(String url, JSONObject data, Method method) throws IOException {
@@ -66,9 +97,9 @@ public class HttpWrapper {
                     logger.debug("Erroneous response (Probably null) for url: \n"+ url);
                 response = null;
             }
-        } catch (Exception e) {
+        } catch (Throwable thr) {
         if(logger.isDebugEnabled())
-                logger.debug("Problems with creating and sending request: \n", e);
+                logger.debug("Problems with creating and sending request: \n", thr);
         }
         return response;
     }
