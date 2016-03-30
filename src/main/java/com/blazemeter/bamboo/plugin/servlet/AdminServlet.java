@@ -89,10 +89,10 @@ public class AdminServlet extends HttpServlet {
 			context.put(AdminServletConst.USER_KEY_ERROR, "");
 			context.put(AdminServletConst.URL_ERROR, "");
 		} else {
-			context.put(AdminServletConst.USER_KEY_ERROR, "User key is not saved! Check that user key "
-                    + req.getParameter(AdminServletConst.USER_KEY).trim() + " is valid!");
-            context.put(AdminServletConst.URL_ERROR, "Server url is not saved! Check that server url "
-                    + req.getParameter(AdminServletConst.URL).trim() + " is valid!");
+			context.put(AdminServletConst.USER_KEY_ERROR, "User key is not saved! Check user key "
+                    + req.getParameter(AdminServletConst.USER_KEY).trim() + " and proxy settings.");
+            context.put(AdminServletConst.URL_ERROR, "Server url is not saved! Check server url "
+                    + req.getParameter(AdminServletConst.URL).trim() + " and proxy settings.");
         }
 		renderer.render(AdminServletConst.BLAZEMETER_ADMIN_VM, context, resp.getWriter());
 	}
