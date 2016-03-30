@@ -5,9 +5,18 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
+    <properties>
+        <jenkins.build.number>local</jenkins.build.number>
+        <bamboo.version>5.7.2</bamboo.version>
+        <bamboo.data.version>5.7.2</bamboo.data.version>
+        <amps.version>5.0.13</amps.version>
+        <plugin.testrunner.version>1.2.3</plugin.testrunner.version>
+    </properties>
+
+
     <groupId>com.blazemeter.bamboo.plugin</groupId>
     <artifactId>BlazeMeterBamboo</artifactId>
-    <version>2.0</version>
+    <version>2.0.${jenkins.build.number}</version>
 
     <organization>
         <name>BlazeMeter LTD.</name>
@@ -18,12 +27,6 @@
     <description>This is the com.blazemeter.bamboo.plugin:BlazeMeterBamboo plugin for Atlassian Bamboo.</description>
     <packaging>atlassian-plugin</packaging>
 
-    <properties>
-        <bamboo.version>5.7.2</bamboo.version>
-        <bamboo.data.version>5.7.2</bamboo.data.version>
-        <amps.version>5.0.13</amps.version>
-        <plugin.testrunner.version>1.2.3</plugin.testrunner.version>
-    </properties>
 
     <dependencies>
         <dependency>

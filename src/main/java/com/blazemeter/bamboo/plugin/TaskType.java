@@ -41,6 +41,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         TaskResultBuilder resultBuilder = TaskResultBuilder.create(context);
         ConfigurationMap configMap = context.getConfigurationMap();
         logger.addBuildLogEntry("Executing BlazeMeter task...");
+        logger.addBuildLogEntry("BlazemeterBamboo plugin v."+Utils.getVersion());
         PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
         String userKey = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
         String serverUrl = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
