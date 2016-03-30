@@ -8,6 +8,10 @@ import com.blazemeter.bamboo.plugin.Utils;
 public interface UrlManager {
     String CLIENT_IDENTIFICATION = "_clientId=CI_BAMBOO&_clientVersion="
             + Utils.getVersion()+"&​";
+    String LATEST="/api/latest";
+    String TESTS="/tests";
+    String MASTERS="/masters";
+    String WEB="/web";
 
 
     String getServerUrl();

@@ -203,10 +203,10 @@ public class ApiV3Impl implements Api {
         String url = this.urlManager.tests(APP_KEY, userKey);
 
         JSONObject jo = this.http.response(url, null,Method.GET,JSONObject.class);
-        String r = jo.get(JsonConstants.RESPONSE_CODE).toString();
-        if (!r.equals("200"))
+        if(jo==null){
             return 0;
-        JSONArray arr = (JSONArray) jo.get(JsonConstants.TESTS);
+        }
+        JSONArray arr = (JSONArray) jo.get(JsonConstants.RESULT);
         int testNum=arr.length();
         logger.error("Found "+testNum+" tests on server");
         return arr.length();

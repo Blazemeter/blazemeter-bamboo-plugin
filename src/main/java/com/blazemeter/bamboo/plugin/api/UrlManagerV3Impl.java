@@ -11,7 +11,7 @@ import java.net.URLEncoder;
 public class UrlManagerV3Impl implements UrlManager {
 
     private String serverUrl = "";
-    UrlManagerV3Impl(String blazeMeterUrl) {
+    public UrlManagerV3Impl(String blazeMeterUrl) {
         this.serverUrl = blazeMeterUrl;
     }
 
