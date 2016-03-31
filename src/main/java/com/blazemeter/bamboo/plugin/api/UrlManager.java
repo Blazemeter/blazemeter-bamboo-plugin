@@ -1,13 +1,13 @@
 package com.blazemeter.bamboo.plugin.api;
 
-import com.blazemeter.bamboo.plugin.Utils;
+import com.blazemeter.bamboo.plugin.ServiceManager;
 
 /**
  * Created by zmicer on 21.2.15.
  */
 public interface UrlManager {
     String CLIENT_IDENTIFICATION = "_clientId=CI_BAMBOO&_clientVersion="
-            + Utils.getVersion()+"&​";
+            + ServiceManager.getVersion()+"&​";
     String LATEST="/api/latest";
     String TESTS="/tests";
     String MASTERS="/masters";

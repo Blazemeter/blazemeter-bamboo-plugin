@@ -41,7 +41,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         TaskResultBuilder resultBuilder = TaskResultBuilder.create(context);
         ConfigurationMap configMap = context.getConfigurationMap();
         logger.addBuildLogEntry("Executing BlazeMeter task...");
-        logger.addBuildLogEntry("BlazemeterBamboo plugin v."+Utils.getVersion());
+        logger.addBuildLogEntry("BlazemeterBamboo plugin v."+ ServiceManager.getVersion());
         PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
         String userKey = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
         String serverUrl = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
@@ -63,7 +63,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
             logger.addErrorLogEntry("Failed to retrieve test masterId id! Check, that test was started correctly on server.");
             return resultBuilder.failed().build();
         } else {
-            reportUrl=Utils.getReportUrl(api,masterId,logger);
+            reportUrl= ServiceManager.getReportUrl(api,masterId,logger);
             HashMap<String,String> reportUrls= StaticAccessor.getReportUrls();
             reportUrls.put(context.getBuildContext().getBuildResultKey(),reportUrl);
             context.getBuildContext().getBuildResult().getCustomBuildData().put(Constants.REPORT_URL, reportUrl);
