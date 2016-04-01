@@ -78,6 +78,8 @@ private ServiceManager(){
             e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
+            tests.put("Check blazemeter & proxy-settings",
+                      "Check blazemeter & proxy-settings");
         }finally {
             return tests;
         }

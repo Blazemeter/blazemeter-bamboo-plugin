@@ -130,6 +130,10 @@ public class HttpWrapper {
                 logger.debug("ERROR decoding Json: ", e);
             returnType= (Class<T>) String.class;
             return returnType.cast(output);
+        } catch (Exception e){
+            if (logger.isDebugEnabled())
+                logger.debug("Error occured while doing request to server: check user-key," +
+                        "serverUrl and proxy settings ", e);
         }
 
         try{
