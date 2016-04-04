@@ -60,7 +60,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
 
         String reportUrl=null;
         if (masterId==null||masterId.length() == 0) {
-            logger.addErrorLogEntry("Failed to retrieve test masterId id! Check, that test was started correctly on server.");
+            logger.addErrorLogEntry("Failed to start test.");
             return resultBuilder.failed().build();
         } else {
             reportUrl= ServiceManager.getReportUrl(api,masterId,logger);
