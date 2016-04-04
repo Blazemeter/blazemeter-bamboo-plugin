@@ -55,7 +55,14 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
 		String serverUrl = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
 		context.put(AdminServletConst.URL, serverUrl);
 		this.api= new ApiV3Impl(userKey,serverUrl);
-        context.put(Constants.TEST_LIST, ServiceManager.getTestsAsMap(this.api));
+        try{
+			context.put(Constants.TEST_LIST, ServiceManager.getTestsAsMap(this.api));
+		}catch (Exception e){
+			LinkedHashMultimap<String,String> tests= LinkedHashMultimap.create();
+			tests.put("Check blazemeter & proxy-settings",
+					"Check blazemeter & proxy-settings");
+			context.put(Constants.TEST_LIST, tests);
+		}
 	}
 
 	@Override
