@@ -106,6 +106,7 @@ private ServiceManager(){
             logger.addBuildLogEntry("Test with testId="+testId+" was started with masterId="+masterId.toString());
         } catch (Exception e) {
             logger.addErrorLogEntry("Error: Exception while starting BlazeMeter Test [" + e.getMessage() + "]");
+            logger.addErrorLogEntry("Check server & proxy settings");
         }
         return masterId;
     }
