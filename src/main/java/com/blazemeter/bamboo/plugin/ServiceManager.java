@@ -104,7 +104,7 @@ private ServiceManager(){
                 }
             } while (masterId.length()==0);
             logger.addBuildLogEntry("Test with testId="+testId+" was started with masterId="+masterId.toString());
-        } catch (JSONException e) {
+        } catch (Exception e) {
             logger.addErrorLogEntry("Error: Exception while starting BlazeMeter Test [" + e.getMessage() + "]");
         }
         return masterId;

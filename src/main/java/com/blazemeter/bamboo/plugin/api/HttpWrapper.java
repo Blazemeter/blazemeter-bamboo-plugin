@@ -105,7 +105,7 @@ public class HttpWrapper {
     }
 
 
-    public <T> T response(String url, JSONObject data, Method method, Class<T> returnType){
+    public <T> T response(String url, JSONObject data, Method method, Class<T> returnType) throws Exception{
         T returnObj=null;
         JSONObject jo = null;
         String output = null;

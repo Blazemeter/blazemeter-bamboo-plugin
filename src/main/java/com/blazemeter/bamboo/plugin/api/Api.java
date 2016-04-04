@@ -18,13 +18,13 @@ public interface Api {
 
     TestStatus testStatus(String testId);
 
-    String startTest(String testId, TestType testType) throws JSONException;
+    String startTest(String testId, TestType testType) throws Exception;
 
     boolean active(String testId);
 
     int masterStatus(String id);
 
-    int getTestCount() throws JSONException, IOException;
+    int getTestCount() throws Exception;
 
     boolean stopTest(String testId) throws JSONException;
 
@@ -39,10 +39,6 @@ public interface Api {
     String getUserKey();
 
     void  setUserKey(String userKey);
-
-    JSONObject putTestInfo(String testId, JSONObject data);
-
-    JSONObject getTestConfig(String testId);
 
     JSONObject terminateTest(String testId);
 

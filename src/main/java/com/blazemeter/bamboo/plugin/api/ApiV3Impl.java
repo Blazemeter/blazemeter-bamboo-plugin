@@ -96,7 +96,7 @@ public class ApiV3Impl implements Api {
 
 
     @Override
-    public synchronized String startTest(String testId, TestType testType) throws JSONException {
+    public synchronized String startTest(String testId, TestType testType) throws Exception {
         if (StringUtils.isBlank(userKey) & StringUtils.isBlank(testId)) return null;
         String url = "";
         logger.info("Trying to start test with testId = "+testId+", testType = "+testType.name());
@@ -107,7 +107,14 @@ public class ApiV3Impl implements Api {
             default:
                 url = this.urlManager.testStart(APP_KEY, userKey, testId);
         }
-        JSONObject jo = this.http.response(url, null, Method.POST, JSONObject.class);
+        JSONObject jo=null;
+        try{
+           jo = this.http.response(url, null, Method.POST, JSONObject.class);
+        }catch (Exception e){
+            logger.error("Failed to start test due to error: ",e);
+            logger.error("Check server & proxy settings");
+            throw e;
+        }
 
         if (jo==null) {
             if (logger.isDebugEnabled())
@@ -195,14 +202,19 @@ public class ApiV3Impl implements Api {
 
 
     @Override
-    public int getTestCount() throws JSONException, IOException {
+    public int getTestCount() throws Exception {
         if (StringUtils.isBlank(userKey)) {
             logger.error("UserKey was empty while getting number of tests: returning '0'.");
             return 0;
         }
         String url = this.urlManager.tests(APP_KEY, userKey);
-
-        JSONObject jo = this.http.response(url, null,Method.GET,JSONObject.class);
+        JSONObject jo=null;
+        try{
+           jo = this.http.response(url, null,Method.GET,JSONObject.class);
+        }catch (Exception e){
+            logger.error("Failed to start test due to error: ",e);
+            logger.error("Check server & proxy settings");
+        }
         if(jo==null){
             return 0;
         }
@@ -220,7 +232,13 @@ public class ApiV3Impl implements Api {
         }
         logger.info("Stopping test with masterId="+masterId);
         String url = this.urlManager.masterStop(APP_KEY, userKey, masterId);
-        JSONArray stopArray=this.http.response(url, null,Method.POST,JSONObject.class).getJSONArray(JsonConstants.RESULT);
+        JSONArray stopArray=null;
+        try {
+            stopArray=this.http.response(url, null,Method.POST,JSONObject.class).getJSONArray(JsonConstants.RESULT);
+        }catch (Exception e){
+            logger.error("Failed to start test due to error: ",e);
+            logger.error("Check server & proxy settings");
+        }
         logger.info("Got stopArray: "+stopArray.toString());
         String command=((JSONObject)stopArray.get(0)).getString(JsonConstants.RESULT);
         return command.equals("shutdown command sent\n");
@@ -228,16 +246,24 @@ public class ApiV3Impl implements Api {
 
     @Override
     public JSONObject testReport(String reportId) {
-        if (StringUtils.isBlank(userKey)&StringUtils.isBlank(reportId)) {
+        if (StringUtils.isBlank(userKey) & StringUtils.isBlank(reportId)) {
             logger.error("UserKey was empty while getting test report: returning 'null'.");
             return null;
         }
 
         String url = this.urlManager.testReport(APP_KEY, userKey, reportId);
-        JSONObject summary = (JSONObject) this.http.response(url, null, Method.GET,JSONObject.class).getJSONObject(JsonConstants.RESULT)
-                .getJSONArray("summary")
-                .get(0);
-        logger.info("Got summary: "+summary.toString());
+        JSONObject summary = null;
+        try {
+            summary = (JSONObject) this.http.response(url, null, Method.GET, JSONObject.class).getJSONObject(JsonConstants.RESULT)
+                    .getJSONArray("summary")
+                    .get(0);
+
+        } catch (Exception e) {
+            logger.error("Failed to start test due to error: ", e);
+            logger.error("Check server & proxy settings");
+        }
+
+        logger.info("Got summary: " + summary.toString());
         return summary;
     }
 
@@ -251,8 +277,8 @@ public class ApiV3Impl implements Api {
         } else {
             String url = this.urlManager.tests(APP_KEY, userKey);
             logger.info("Requesting url -> "+url);
-            JSONObject jo = this.http.response(url, null,Method.GET,JSONObject.class);
             try {
+                JSONObject jo = this.http.response(url, null,Method.GET,JSONObject.class);
                 JSONArray arr = (JSONArray) jo.get(JsonConstants.RESULT);
                 logger.info("Got result: "+arr.toString());
                 if (arr.length() > 0) {
@@ -338,30 +364,19 @@ public class ApiV3Impl implements Api {
         this.userKey=userKey;
     }
 
-    @Override
-    public JSONObject putTestInfo(String testId, JSONObject data) {
-        if(StringUtils.isBlank(this.userKey)& StringUtils.isBlank(testId)) return null;
-
-        String url = this.urlManager.getTestConfig(APP_KEY, this.userKey, testId);
-        JSONObject jo = this.http.response(url, data, Method.PUT,JSONObject.class);
-        return jo;
-    }
-
-    @Override
-    public JSONObject getTestConfig(String testId){
-        if(StringUtils.isBlank(this.userKey)& StringUtils.isBlank(testId)) return null;
-
-        String url = this.urlManager.getTestConfig(APP_KEY, this.userKey, testId);
-        JSONObject jo = this.http.response(url, null, Method.GET,JSONObject.class);
-        return jo;
-    }
 
     @Override
     public JSONObject terminateTest(String testId) {
-        if(StringUtils.isBlank(this.userKey)& StringUtils.isBlank(testId)) return null;
+        if (StringUtils.isBlank(this.userKey) & StringUtils.isBlank(testId)) return null;
         String url = this.urlManager.testTerminate(APP_KEY, this.userKey, testId);
-        return this.http.response(url, null, Method.POST,JSONObject.class);
-
+        JSONObject jo = null;
+        try {
+            jo = this.http.response(url, null, Method.POST, JSONObject.class);
+        } catch (Exception e) {
+            logger.error("Failed to start test due to error: ", e);
+            logger.error("Check server & proxy settings");
+        }
+        return jo;
     }
 
 
@@ -391,11 +406,17 @@ public class ApiV3Impl implements Api {
     }
 
     @Override
-    public JSONObject publicToken(String masterId){
+    public JSONObject publicToken(String masterId) {
         if (StringUtils.isBlank(userKey) & StringUtils.isBlank(masterId)) return null;
 
         String url = this.urlManager.generatePublicToken(APP_KEY, userKey, masterId);
-        JSONObject jo = this.http.response(url, null, Method.POST, JSONObject.class);
+        JSONObject jo = null;
+        try {
+            jo = this.http.response(url, null, Method.POST, JSONObject.class);
+        } catch (Exception e) {
+            logger.error("Failed to start test due to error: ", e);
+            logger.error("Check server & proxy settings");
+        }
         return jo;
     }
 }

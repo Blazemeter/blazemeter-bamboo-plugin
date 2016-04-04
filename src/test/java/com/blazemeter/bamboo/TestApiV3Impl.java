@@ -37,13 +37,6 @@ public class TestApiV3Impl {
     }
 
 
-
-    @Test
-    public void getTestInfo_null() {
-        apiV3 = new ApiV3Impl(null, TestConstants.mockedApiUrl);
-        Assert.assertEquals(apiV3.getTestConfig(null), null);
-    }
-
     @Test
     public void getTestStatus_Running() {
         apiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID,
@@ -93,6 +86,8 @@ public class TestApiV3Impl {
             e.printStackTrace();
         } catch (JSONException e) {
             e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -112,31 +107,52 @@ public class TestApiV3Impl {
     @Test
     public void startTest_null() throws JSONException {
         apiV3 = new ApiV3Impl(null, null);
-        Assert.assertEquals(apiV3.startTest(null, null), null);
+        try {
+            Assert.assertEquals(apiV3.startTest(null, null), null);
+        } catch (Exception e) {
+            Assert.fail();
+        }
     }
 
     @Test
     public void startTest_http() throws JSONException {
         apiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
-        Assert.assertEquals(apiV3.startTest(TestConstants.TEST_MASTER_ID, TestType.http), "15102806");
+        try {
+            Assert.assertEquals(apiV3.startTest(TestConstants.TEST_MASTER_ID, TestType.http), "15102806");
+        }catch (Exception e){
+            Assert.fail();
+        }
     }
 
     @Test
     public void startTest_jmeter() throws JSONException {
         apiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
-        Assert.assertEquals(apiV3.startTest(TestConstants.TEST_MASTER_ID, TestType.jmeter), "15102806");
+        try {
+            Assert.assertEquals(apiV3.startTest(TestConstants.TEST_MASTER_ID, TestType.jmeter), "15102806");
+        } catch (Exception e) {
+            Assert.fail();
+        }
     }
 
     @Test
     public void startTest_followme() throws JSONException {
         apiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
-        Assert.assertEquals(apiV3.startTest(TestConstants.TEST_MASTER_ID, TestType.followme), "15102806");
+        try {
+            Assert.assertEquals(apiV3.startTest(TestConstants.TEST_MASTER_ID, TestType.followme), "15102806");
+        } catch (Exception e) {
+            Assert.fail();
+        }
+
     }
 
     @Test
     public void startTest_multi() throws JSONException {
         apiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
-        Assert.assertEquals(apiV3.startTest(TestConstants.TEST_MASTER_ID, TestType.multi), "15105877");
+        try {
+            Assert.assertEquals(apiV3.startTest(TestConstants.TEST_MASTER_ID, TestType.multi), "15105877");
+        } catch (Exception e) {
+            Assert.fail();
+        }
     }
 
     @Test
@@ -195,24 +211,36 @@ public class TestApiV3Impl {
     @Test
     public void getTestsCount_1() throws IOException, JSONException, ServletException {
         apiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_1_TEST, TestConstants.mockedApiUrl);
-        int count = apiV3.getTestCount();
-        Assert.assertTrue(count == 1);
+        try {
+            int count = apiV3.getTestCount();
+            Assert.assertTrue(count == 1);
+        } catch (Exception e) {
+            Assert.fail();
+        }
 
     }
 
     @Test
     public void getTestsCount_0() throws IOException, JSONException, ServletException {
         apiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_0_TESTS, TestConstants.mockedApiUrl);
-        int count = apiV3.getTestCount();
-        Assert.assertTrue(count == 0);
+        try {
+            int count = apiV3.getTestCount();
+            Assert.assertTrue(count == 0);
+        } catch (Exception e) {
+            Assert.fail();
+        }
 
     }
 
     @Test
     public void getTestsCount_null() throws IOException, JSONException, ServletException {
         apiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_INVALID, TestConstants.mockedApiUrl);
-        int count = apiV3.getTestCount();
-        Assert.assertTrue(count == 0);
+        try {
+            int count = apiV3.getTestCount();
+            Assert.assertTrue(count == 0);
+        } catch (Exception e) {
+            Assert.fail();
+        }
 
     }
 
