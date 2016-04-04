@@ -119,6 +119,11 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         //BlazeMeter test stopped due to user test duration setup reached
 
         logger.addBuildLogEntry("Test finished. Checking for test report...");
+        try {
+            Thread.sleep(180000);
+        } catch (InterruptedException e) {
+            logger.addErrorLogEntry("Error: thread was interrupted during sleep()");
+        }
         TestResult result = ServiceManager.getReport(this.api, this.masterId, logger);
         TaskState ciStatus = ServiceManager.ciStatus(this.api, this.masterId, logger);
         switch (ciStatus) {
