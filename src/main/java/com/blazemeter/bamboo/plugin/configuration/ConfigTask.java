@@ -59,8 +59,7 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
 			context.put(Constants.TEST_LIST, ServiceManager.getTestsAsMap(this.api));
 		}catch (Exception e){
 			LinkedHashMultimap<String,String> tests= LinkedHashMultimap.create();
-			tests.put("Check blazemeter & proxy-settings",
-					"Check blazemeter & proxy-settings");
+			tests.put("Check blazemeter & proxy-settings","");
 			context.put(Constants.TEST_LIST, tests);
 		}
 	}
