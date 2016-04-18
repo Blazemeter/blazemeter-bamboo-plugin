@@ -1,2 +1,2 @@
 [@ww.select cssClass="builderSelectWidget" labelKey='blazemeter.test' name='selectedtest' list='testlist' required='true' emptyOption='false'/]
-<label><input type="checkbox" name="checkbox" value="value">Download JTL report:</label>
+[@ww.checkbox labelKey="blazemeter.config.jtl" name='jtl.report' toggle='true' description=''/]
