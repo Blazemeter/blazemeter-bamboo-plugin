@@ -18,13 +18,13 @@ import com.blazemeter.bamboo.plugin.testresult.TestResult;
 import org.apache.commons.lang3.StringUtils;
 
 public class TaskType implements com.atlassian.bamboo.task.TaskType {
-	private static final int CHECK_INTERVAL = 60000;
+	private static final int CHECK_INTERVAL = 30000;
     private static final int INIT_TEST_TIMEOUT = 600000;
 
     String testId;
     String masterId;
     Api api;
-
+    boolean jtlReport=false;
 	File rootDirectory;
 
 	ProcessService processService;
@@ -46,7 +46,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         String userKey = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
         String serverUrl = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
         this.testId = configMap.get(Constants.SETTINGS_SELECTED_TEST_ID);
-
+        this.jtlReport=configMap.getAsBoolean(Constants.SETTINGS_JTL_REPORT);
         if (StringUtils.isBlank(userKey)) {
             logger.addErrorLogEntry("BlazeMeter user key not defined!");
             return resultBuilder.failed().build();
@@ -116,15 +116,27 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
             }
         }
 
+        boolean active=true;
+        int activeCheck=1;
+        while(active&&activeCheck<11){
+            try {
+                Thread.currentThread().sleep(CHECK_INTERVAL);
+            } catch (InterruptedException e) {
+                logger.addErrorLogEntry("Thread was interrupted during sleep()");
+                logger.addErrorLogEntry("Received interrupted Exception: " + e.getMessage());
+                break;
+            }
+            logger.addBuildLogEntry("Checking, if test is active, testId="+this.testId+", retry # "+activeCheck);
+            active=this.api.active(this.testId);
+            activeCheck++;
+        }
         //BlazeMeter test stopped due to user test duration setup reached
 
-        logger.addBuildLogEntry("Test finished. Checking for test report...");
-        try {
-            Thread.sleep(180000);
-        } catch (InterruptedException e) {
-            logger.addErrorLogEntry("Error: thread was interrupted during sleep()");
-        }
         TestResult result = ServiceManager.getReport(this.api, this.masterId, logger);
+        if(this.jtlReport){
+            logger.addBuildLogEntry("Requesting JTL report for test with masterId="+this.masterId);
+            ServiceManager.downloadJtlReports(this.api,this.masterId,context.getBuildContext().getBuildNumber(),logger);
+        }
         TaskState ciStatus = ServiceManager.ciStatus(this.api, this.masterId, logger);
         switch (ciStatus) {
             case FAILED:

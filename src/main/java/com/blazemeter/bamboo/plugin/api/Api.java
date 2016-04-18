@@ -6,6 +6,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.List;
 
 
 /**
@@ -39,6 +40,8 @@ public interface Api {
     String getUserKey();
 
     void  setUserKey(String userKey);
+
+    List<String> getListOfSessionIds(String masterId);
 
     JSONObject terminateTest(String testId);
 

@@ -2,6 +2,7 @@ package com.blazemeter.bamboo.plugin;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -206,6 +207,15 @@ private ServiceManager(){
             logger.addBuildLogEntry("Error while detecting type of test:" + e);
         }finally {
             return testType;
+        }
+    }
+
+
+    public static void downloadJtlReports(Api api,String masterId, //FilePath filePath,
+                                          int buildNumber, BuildLogger logger) {
+        List<String> sessionsIds = api.getListOfSessionIds(masterId);
+        for (String s : sessionsIds) {
+//            downloadJtlReport(api, s, filePath,buildNumber, jenBuildLog, bzmBuildLog);
         }
     }
 

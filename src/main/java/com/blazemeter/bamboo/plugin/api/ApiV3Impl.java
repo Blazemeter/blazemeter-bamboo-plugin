@@ -10,6 +10,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -419,4 +421,28 @@ public class ApiV3Impl implements Api {
         }
         return jo;
     }
+
+
+    @Override
+    public List<String> getListOfSessionIds(String masterId) {
+        List<String> sessionsIds = new ArrayList<String>();
+        String url = this.urlManager.listOfSessionIds(APP_KEY, userKey, masterId);
+        JSONObject jo =  null;
+        try {
+            jo=this.http.response(url, null, Method.GET, JSONObject.class);
+
+            JSONArray sessions = jo.getJSONObject(JsonConstants.RESULT).getJSONArray("sessions");
+            int sessionsLength = sessions.length();
+            for (int i = 0; i < sessionsLength; i++) {
+                sessionsIds.add(sessions.getJSONObject(i).getString(JsonConstants.ID));
+            }
+        } catch (JSONException je) {
+            logger.info("Failed to get list of sessions from JSONObject " + jo, je);
+        } catch (Exception e) {
+            logger.info("Failed to get list of sessions from JSONObject " + jo, e);
+        } finally {
+            return sessionsIds;
+        }
+    }
+
 }
