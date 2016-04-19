@@ -1,12 +1,14 @@
 package com.blazemeter.bamboo.plugin;
 
 import java.io.IOException;
+import java.io.File;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
 import com.atlassian.bamboo.build.logger.BuildLogger;
+import com.atlassian.bamboo.task.TaskContext;
 import com.atlassian.bamboo.task.TaskState;
 import com.atlassian.util.concurrent.NotNull;
 import com.blazemeter.bamboo.plugin.api.Api;
@@ -211,9 +213,9 @@ private ServiceManager(){
     }
 
 
-    public static void downloadJtlReports(Api api,String masterId, //FilePath filePath,
-                                          int buildNumber, BuildLogger logger) {
+    public static void downloadJtlReports(Api api,String masterId, TaskContext context, BuildLogger logger) {
         List<String> sessionsIds = api.getListOfSessionIds(masterId);
+        File jtlDir=new File(context.getWorkingDirectory().getAbsolutePath()+"/"+context.getBuildContext().getBuildResultKey());
         for (String s : sessionsIds) {
 //            downloadJtlReport(api, s, filePath,buildNumber, jenBuildLog, bzmBuildLog);
         }

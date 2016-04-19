@@ -135,7 +135,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         TestResult result = ServiceManager.getReport(this.api, this.masterId, logger);
         if(this.jtlReport){
             logger.addBuildLogEntry("Requesting JTL report for test with masterId="+this.masterId);
-            ServiceManager.downloadJtlReports(this.api,this.masterId,context.getBuildContext().getBuildNumber(),logger);
+            ServiceManager.downloadJtlReports(this.api,this.masterId,context,logger);
         }
         TaskState ciStatus = ServiceManager.ciStatus(this.api, this.masterId, logger);
         switch (ciStatus) {
