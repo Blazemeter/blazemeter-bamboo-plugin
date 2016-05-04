@@ -12,7 +12,7 @@ import java.io.IOException;
  * Time: 12:51 PM
  */
 public class TestResult {
-    protected double std              ;
+//    protected double std              ;
     protected double average          ;
     protected double min              ;
     protected double max              ;
@@ -26,7 +26,7 @@ public class TestResult {
     protected long   n                ;
 
     public TestResult(JSONObject json) throws IOException, JSONException {
-        this.std = json.getDouble("std");
+//        this.std = json.getDouble("std");
         this.average = json.getDouble("avg");
         this.min = json.getDouble("min");
         this.max = json.getDouble("max");
@@ -52,26 +52,31 @@ public class TestResult {
 
     @Override
     public String toString() {
-        String hits=String.valueOf(this.hits);
-        String errorPercentage=String.valueOf(this.errorPercentage);
-        String average=String.valueOf(this.average);
-        String min=String.valueOf(this.min);
-        String max=String.valueOf(this.max);
-        return "AggregateTestResult ->" +
-               " hits=" + hits +
-               ", errors percentage=" + errorPercentage +
-               ", average=" + average +
-               ", min=" + min +
-               ", max=" + max;
+        try{
+            String hits=String.valueOf(this.hits);
+            String errorPercentage=String.valueOf(this.errorPercentage);
+            String average=String.valueOf(this.average);
+            String min=String.valueOf(this.min);
+            String max=String.valueOf(this.max);
+            return "AggregateTestResult ->" +
+                    " hits=" + hits +
+                    ", errors percentage=" + errorPercentage +
+                    ", average=" + average +
+                    ", min=" + min +
+                    ", max=" + max;
+
+        }catch (Exception e){
+            return "Failed to create aggregate report from JSON object - "+e.getMessage();
+        }
     }
 
-    public double getStd() {
-        return std;
-    }
+//    public double getStd() {
+//        return std;
+//    }
 
-    public void setStd(double std) {
-        this.std = std;
-    }
+//    public void setStd(double std) {
+//        this.std = std;
+//    }
 
     public double getAverage() {
         return average;
