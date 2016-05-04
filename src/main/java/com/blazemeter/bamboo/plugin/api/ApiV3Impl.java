@@ -255,17 +255,19 @@ public class ApiV3Impl implements Api {
 
         String url = this.urlManager.testReport(APP_KEY, userKey, reportId);
         JSONObject summary = null;
+        JSONObject jo = null;
         try {
-            summary = (JSONObject) this.http.response(url, null, Method.GET, JSONObject.class).getJSONObject(JsonConstants.RESULT)
+            jo = this.http.response(url, null, Method.GET, JSONObject.class);
+            summary = (JSONObject) jo.getJSONObject(JsonConstants.RESULT)
                     .getJSONArray("summary")
                     .get(0);
 
+            logger.info("Got summary: " + summary.toString());
+        } catch (JSONException e) {
+            logger.error("Problems with getting aggregate test report...", e);
         } catch (Exception e) {
-            logger.error("Failed to start test due to error: ", e);
-            logger.error("Check server & proxy settings");
+            logger.error("Problems with getting aggregate test report...", e);
         }
-
-        logger.info("Got summary: " + summary.toString());
         return summary;
     }
 

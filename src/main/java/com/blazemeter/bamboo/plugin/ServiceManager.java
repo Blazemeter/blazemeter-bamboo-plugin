@@ -128,11 +128,11 @@ private ServiceManager(){
             testResult = new TestResult(aggregate);
             logger.addBuildLogEntry(testResult.toString());
         } catch (JSONException e) {
-            logger.addErrorLogEntry("Problems with getting aggregate test report...",e);
+            logger.addErrorLogEntry("Problems with getting aggregate test report - check test report on server");
         } catch (IOException e) {
-            logger.addErrorLogEntry("Problems with getting aggregate test report...", e);
+            logger.addErrorLogEntry("Problems with getting aggregate test report - check test report on server");
         } catch (NullPointerException e){
-            logger.addErrorLogEntry("Problems with getting aggregate test report...", e);
+            logger.addErrorLogEntry("Problems with getting aggregate test report - check test report on server");
         }
         finally {
             return testResult;
