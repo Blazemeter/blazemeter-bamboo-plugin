@@ -447,4 +447,15 @@ public class ApiV3Impl implements Api {
         }
     }
 
+
+
+        @Override
+        public JSONObject retrieveJtlZip(String sessionId) throws Exception {
+            if (StringUtils.isBlank(userKey) & StringUtils.isBlank(sessionId)) return null;
+            logger.info("Trying to get JTLZIP url for the sessionId=" + sessionId);
+            String url = this.urlManager.retrieveJTLZIP(APP_KEY, userKey, sessionId);
+            logger.info("Trying to retrieve JTLZIP json for the sessionId=" + sessionId);
+            JSONObject jtlzip = this.http.response(url, null, Method.GET, JSONObject.class);
+            return jtlzip;
+        }
 }

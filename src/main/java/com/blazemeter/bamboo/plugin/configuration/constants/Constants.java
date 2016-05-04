@@ -17,6 +17,8 @@ public interface Constants {
      String TEST_LIST ="testlist";
      String BLAZEMETER_ERROR ="blazemeter.error.";
      String REPORT_URL ="reportUrl";
+     String BM_KPIS="bm-kpis.jtl";
+     String BM_ARTEFACTS="bm-artefacts.zip";
 
 
     String PROXY_HOST="http.proxyHost";

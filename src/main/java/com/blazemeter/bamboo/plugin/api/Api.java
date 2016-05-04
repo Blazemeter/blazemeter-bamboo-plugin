@@ -25,6 +25,8 @@ public interface Api {
 
     int masterStatus(String id);
 
+    JSONObject retrieveJtlZip(String sessionId) throws Exception;
+
     int getTestCount() throws Exception;
 
     boolean stopTest(String testId) throws JSONException;

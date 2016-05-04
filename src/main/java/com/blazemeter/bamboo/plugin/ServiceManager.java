@@ -1,11 +1,11 @@
 package com.blazemeter.bamboo.plugin;
 
-import java.io.IOException;
-import java.io.File;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import com.atlassian.bamboo.build.logger.BuildLogger;
 import com.atlassian.bamboo.task.TaskContext;
@@ -14,9 +14,11 @@ import com.atlassian.util.concurrent.NotNull;
 import com.blazemeter.bamboo.plugin.api.Api;
 import com.blazemeter.bamboo.plugin.api.CIStatus;
 import com.blazemeter.bamboo.plugin.api.TestType;
+import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
 import com.blazemeter.bamboo.plugin.configuration.constants.JsonConstants;
 import com.blazemeter.bamboo.plugin.testresult.TestResult;
 import com.google.common.collect.LinkedHashMultimap;
+import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,7 +29,9 @@ import org.json.JSONObject;
  *
  */
 public class ServiceManager {
-private ServiceManager(){
+    private final static int BUFFER_SIZE = 2048;
+
+    private ServiceManager(){
 	}
 
     public static String getReportUrl(Api api, String masterId, BuildLogger logger) {
@@ -217,9 +221,101 @@ private ServiceManager(){
         List<String> sessionsIds = api.getListOfSessionIds(masterId);
         File jtlDir=new File(context.getWorkingDirectory().getAbsolutePath()+"/"+context.getBuildContext().getBuildResultKey());
         for (String s : sessionsIds) {
-//            downloadJtlReport(api, s, filePath,buildNumber, jenBuildLog, bzmBuildLog);
+            downloadJtlReport(api, s, jtlDir,logger);
         }
     }
 
+
+    public static void downloadJtlReport(Api api, String sessionId, File jtlDir,BuildLogger logger) {
+
+        String dataUrl=null;
+        URL url=null;
+        try {
+            JSONObject jo=api.retrieveJtlZip(sessionId);
+            JSONArray data=jo.getJSONObject(JsonConstants.RESULT).getJSONArray(JsonConstants.DATA);
+            for(int i=0;i<data.length();i++){
+                String title=data.getJSONObject(i).getString("title");
+                if(title.equals("Zip")){
+                    dataUrl=data.getJSONObject(i).getString(JsonConstants.DATA_URL);
+                    break;
+                }
+            }
+            File jtlZip=new File(jtlDir + "/" +sessionId+"-"+ Constants.BM_ARTEFACTS);
+            url=new URL(dataUrl);
+            FileUtils.copyURLToFile(url, jtlZip);
+            logger.addBuildLogEntry("Downloading JTLZIP .... ");
+            String jtlZipCanonicalPath=jtlZip.getCanonicalPath();
+            logger.addBuildLogEntry("Saving ZIP to " + jtlZipCanonicalPath);
+            unzip(jtlZip.getAbsolutePath(), jtlZipCanonicalPath.substring(0,jtlZipCanonicalPath.length()-4), logger);
+            File sample_jtl=new File(jtlDir,"sample.jtl");
+            File bm_kpis_jtl=new File(jtlDir,Constants.BM_KPIS);
+            if(sample_jtl.exists()){
+                sample_jtl.renameTo(bm_kpis_jtl);
+            }
+        } catch (JSONException e) {
+            logger.addErrorLogEntry("Unable to get  JTLZIP from "+url+" "+e.getMessage());
+        } catch (MalformedURLException e) {
+            logger.addErrorLogEntry("Unable to get  JTLZIP from "+url+" "+e.getMessage());
+        } catch (IOException e) {
+            logger.addErrorLogEntry("Unable to get JTLZIP from "+url+" "+e.getMessage());
+        } catch (Exception e) {
+            logger.addErrorLogEntry("Unable to get JTLZIP from "+url+" "+e.getMessage());
+        }
+    }
+
+
+    public static void unzip(String srcZipFileName,
+                             String destDirectoryName, BuildLogger logger) {
+        try {
+            BufferedInputStream bufIS = null;
+            // create the destination directory structure (if needed)
+            File destDirectory = new File(destDirectoryName);
+            destDirectory.mkdirs();
+
+            // open archive for reading
+            File file = new File(srcZipFileName);
+            ZipFile zipFile = new ZipFile(file, ZipFile.OPEN_READ);
+
+            //for every zip archive entry do
+            Enumeration<? extends ZipEntry> zipFileEntries = zipFile.entries();
+            while (zipFileEntries.hasMoreElements()) {
+                ZipEntry entry = (ZipEntry) zipFileEntries.nextElement();
+                if(entry.getName().substring((entry.getName().length()-4)).equals(".jtl")&!entry.isDirectory()){
+                    logger.addBuildLogEntry("\tExtracting jtl report: " + entry);
+
+                    //create destination file
+                    File destFile = new File(destDirectory, entry.getName());
+
+                    //create parent directories if needed
+                    File parentDestFile = destFile.getParentFile();
+                    parentDestFile.mkdirs();
+
+                    bufIS = new BufferedInputStream(
+                            zipFile.getInputStream(entry));
+                    int currentByte;
+
+                    // buffer for writing file
+                    byte data[] = new byte[BUFFER_SIZE];
+
+                    // write the current file to disk
+                    FileOutputStream fOS = new FileOutputStream(destFile);
+                    BufferedOutputStream bufOS = new BufferedOutputStream(fOS, BUFFER_SIZE);
+
+                    while ((currentByte = bufIS.read(data, 0, BUFFER_SIZE)) != -1) {
+                        bufOS.write(data, 0, currentByte);
+                    }
+
+                    // close BufferedOutputStream
+                    bufOS.flush();
+                    bufOS.close();
+
+                }
+
+            }
+            bufIS.close();
+        } catch (Exception e) {
+            logger.addErrorLogEntry("Failed to unzip report: check that it is downloaded");
+        }
+    }
 
 }
