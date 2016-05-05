@@ -219,7 +219,7 @@ public class ServiceManager {
 
     public static void downloadJtlReports(Api api,String masterId, TaskContext context, BuildLogger logger) {
         List<String> sessionsIds = api.getListOfSessionIds(masterId);
-        File jtlDir=new File(context.getWorkingDirectory().getAbsolutePath()+"/"+context.getBuildContext().getBuildResultKey());
+        File jtlDir=new File(context.getWorkingDirectory().getAbsolutePath()+"/build # "+context.getBuildContext().getBuildNumber());
         for (String s : sessionsIds) {
             downloadJtlReport(api, s, jtlDir,logger);
         }
