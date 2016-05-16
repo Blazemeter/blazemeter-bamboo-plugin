@@ -9,6 +9,7 @@ public interface Constants {
     //settings properties
      String SETTINGS_SELECTED_TEST_ID = "selectedtest";
      String SETTINGS_JTL_REPORT = "jtl.report";
+     String SETTINGS_JUNIT_REPORT = "junit.report";
 
      String NOT_IMPLEMENTED="This call is not implemented.";
 
