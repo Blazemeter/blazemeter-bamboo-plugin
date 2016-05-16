@@ -458,4 +458,14 @@ public class ApiV3Impl implements Api {
             JSONObject jtlzip = this.http.response(url, null, Method.GET, JSONObject.class);
             return jtlzip;
         }
+
+    @Override
+    public String retrieveJunit(String masterId) throws Exception {
+        if (StringUtils.isBlank(userKey) & StringUtils.isBlank(masterId)) return null;
+        logger.info("Trying to get Junit url for the masterId=" + masterId);
+        String url = this.urlManager.retrieveJUNITXML(APP_KEY, userKey, masterId);
+        logger.info("Trying to retrieve Junit for the masterId=" + masterId);
+        String junit = this.http.response(url, null, Method.GET, String.class);
+        return junit;
+    }
 }

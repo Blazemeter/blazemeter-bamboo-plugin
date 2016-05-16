@@ -225,6 +225,16 @@ public class ServiceManager {
         }
     }
 
+    public static void downloadJunitReport(Api api,String masterId, TaskContext context, BuildLogger logger) {
+        try {
+            String junit = api.retrieveJunit(masterId);
+        } catch (Exception e) {
+            logger.addErrorLogEntry("Failed to get junit report for test with masterId="+masterId,e);
+        }
+        File junitDir=new File(context.getWorkingDirectory().getAbsolutePath()+"/build # "+context.getBuildContext().getBuildNumber());
+
+    }
+
 
     public static void downloadJtlReport(Api api, String sessionId, File jtlDir,BuildLogger logger) {
 

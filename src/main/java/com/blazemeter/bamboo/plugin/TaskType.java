@@ -25,6 +25,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
     String masterId;
     Api api;
     boolean jtlReport=false;
+    boolean junitReport=false;
 	File rootDirectory;
 
 	ProcessService processService;
@@ -47,6 +48,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         String serverUrl = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
         this.testId = configMap.get(Constants.SETTINGS_SELECTED_TEST_ID);
         this.jtlReport=configMap.getAsBoolean(Constants.SETTINGS_JTL_REPORT);
+        this.junitReport=configMap.getAsBoolean(Constants.SETTINGS_JUNIT_REPORT);
         if (StringUtils.isBlank(userKey)) {
             logger.addErrorLogEntry("BlazeMeter user key not defined!");
             return resultBuilder.failed().build();
@@ -139,6 +141,13 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         }else {
             logger.addBuildLogEntry("JTL report won't be requested for test with masterId="+this.masterId);
         }
+        if(this.junitReport){
+            logger.addBuildLogEntry("Requesting Junit report for test with masterId="+this.masterId);
+            ServiceManager.downloadJunitReport(this.api,this.masterId,context,logger);
+        }else {
+            logger.addBuildLogEntry("Junit report won't be requested for test with masterId="+this.masterId);
+        }
+
         TaskState ciStatus = ServiceManager.ciStatus(this.api, this.masterId, logger);
         switch (ciStatus) {
             case FAILED:

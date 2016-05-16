@@ -27,6 +27,8 @@ public interface Api {
 
     JSONObject retrieveJtlZip(String sessionId) throws Exception;
 
+    String retrieveJunit(String masterId) throws Exception;
+
     int getTestCount() throws Exception;
 
     boolean stopTest(String testId) throws JSONException;
