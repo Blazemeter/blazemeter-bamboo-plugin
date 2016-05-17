@@ -16,6 +16,7 @@ import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
 import com.blazemeter.bamboo.plugin.servlet.AdminServlet.Config;
 import com.blazemeter.bamboo.plugin.testresult.TestResult;
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONArray;
 
 public class TaskType implements com.atlassian.bamboo.task.TaskType {
 	private static final int CHECK_INTERVAL = 30000;
@@ -76,7 +77,10 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
 
         TestStatus status;
         boolean initTimeOutPassed = false;
-
+        if(!StringUtils.isBlank(this.jmeterProps)){
+            JSONArray props=ServiceManager.prepareSessionProperties(this.jmeterProps,logger);
+//            BzmServiceManager.properties(this.api,props,masterId,jenBuildLog);
+        }
         do {
             status = this.api.testStatus(masterId);
             try {

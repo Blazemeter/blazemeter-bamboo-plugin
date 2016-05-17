@@ -289,6 +289,28 @@ public class ServiceManager {
     }
 
 
+    public static JSONArray prepareSessionProperties(String sesssionProperties, BuildLogger logger) throws JSONException {
+        List<String> propList = Arrays.asList(sesssionProperties.split(","));
+        JSONArray props = new JSONArray();
+        logger.addBuildLogEntry("Preparing jmeter properties for the test...");
+        for (String s : propList) {
+            try {
+                JSONObject prop = new JSONObject();
+                List<String> pr = Arrays.asList(s.split("="));
+                if (pr.size() > 1) {
+                    prop.put("key", pr.get(0));
+                    prop.put("value", pr.get(1));
+                }
+                props.put(prop);
+            } catch (Exception e) {
+                logger.addErrorLogEntry("Failed to prepare jmeter property " + s + " for the test: " + e.getMessage());
+            }
+        }
+        return props;
+    }
+
+
+
     public static void unzip(String srcZipFileName,
                              String destDirectoryName, BuildLogger logger) {
         try {
