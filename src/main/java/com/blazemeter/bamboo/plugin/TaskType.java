@@ -22,6 +22,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
     private static final int INIT_TEST_TIMEOUT = 600000;
 
     String testId;
+    String jmeterProps;
     String masterId;
     Api api;
     boolean jtlReport=false;
@@ -47,6 +48,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         String userKey = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
         String serverUrl = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
         this.testId = configMap.get(Constants.SETTINGS_SELECTED_TEST_ID);
+        this.jmeterProps = configMap.get(Constants.SETTINGS_JMETER_PROPERTIES);
         this.jtlReport=configMap.getAsBoolean(Constants.SETTINGS_JTL_REPORT);
         this.junitReport=configMap.getAsBoolean(Constants.SETTINGS_JUNIT_REPORT);
         if (StringUtils.isBlank(userKey)) {

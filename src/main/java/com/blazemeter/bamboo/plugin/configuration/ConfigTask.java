@@ -24,9 +24,12 @@ import com.opensymphony.xwork.TextProvider;
 
 public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskRequirementSupport{
 
-	private static final List<String> FIELDS_TO_COPY = ImmutableList.of(Constants.SETTINGS_SELECTED_TEST_ID,
-			Constants.SETTINGS_JTL_REPORT,Constants.SETTINGS_JUNIT_REPORT);
-    private Api api;
+	private static final List<String> FIELDS_TO_COPY =
+			ImmutableList.of(Constants.SETTINGS_SELECTED_TEST_ID,
+					Constants.SETTINGS_JTL_REPORT,
+					Constants.SETTINGS_JUNIT_REPORT,
+					Constants.SETTINGS_JMETER_PROPERTIES);
+	private Api api;
 
 	private TextProvider textProvider;
 	
@@ -107,6 +110,7 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
 		final Map<String, String> config = super.generateTaskConfigMap(params, previousTaskDefinition);
 
 		config.put(Constants.SETTINGS_SELECTED_TEST_ID, params.getString(Constants.SETTINGS_SELECTED_TEST_ID).trim());
+		config.put(Constants.SETTINGS_JMETER_PROPERTIES, params.getString(Constants.SETTINGS_JMETER_PROPERTIES).trim());
 		String jtlReport=params.getString(Constants.SETTINGS_JTL_REPORT)==null?"false":"true";
 		String junitReport=params.getString(Constants.SETTINGS_JUNIT_REPORT)==null?"false":"true";
 		config.put(Constants.SETTINGS_JTL_REPORT, jtlReport);
