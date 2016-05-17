@@ -254,10 +254,23 @@ public class ServiceManager {
             }
             File jtlZip=new File(jtlDir + "/" +sessionId+"-"+ Constants.BM_ARTEFACTS);
             url=new URL(dataUrl);
-            FileUtils.copyURLToFile(url, jtlZip);
-            logger.addBuildLogEntry("Downloading JTLZIP .... ");
+            logger.addBuildLogEntry("Jtl url = " + url.toString() + " sessionId = " + sessionId);
+            int i = 1;
+            boolean jtl = false;
+            while (!jtl && i < 4) {
+                try {
+                    logger.addBuildLogEntry("Downloading JTLZIP for sessionId = " + sessionId + " attemp # " + i);
+                    int conTo = (int) (10000 * Math.pow(3, i - 1));
+                    logger.addBuildLogEntry("Saving ZIP to " + jtlZip.getAbsolutePath());
+                    FileUtils.copyURLToFile(url, jtlZip,conTo,30000);
+                    jtl = true;
+                } catch (Exception e) {
+                    logger.addErrorLogEntry("Unable to get JTLZIP from " + url + ", " + e);
+                } finally {
+                    i++;
+                }
+            }
             String jtlZipCanonicalPath=jtlZip.getCanonicalPath();
-            logger.addBuildLogEntry("Saving ZIP to " + jtlZipCanonicalPath);
             unzip(jtlZip.getAbsolutePath(), jtlZipCanonicalPath.substring(0,jtlZipCanonicalPath.length()-4), logger);
             File sample_jtl=new File(jtlDir,"sample.jtl");
             File bm_kpis_jtl=new File(jtlDir,Constants.BM_KPIS);
