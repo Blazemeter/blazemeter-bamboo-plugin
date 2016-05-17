@@ -293,4 +293,15 @@ public class UrlManagerV3Impl implements UrlManager {
         return activeTests= serverUrl +"/api/latest/web/active?api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
 
     }
+
+    @Override
+    public String properties(String appKey, String userKey, String sessionId) {
+        try {
+            appKey = URLEncoder.encode(appKey, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return serverUrl +LATEST+"/sessions/"+sessionId+"/properties?target=all&api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
+    }
+
 }

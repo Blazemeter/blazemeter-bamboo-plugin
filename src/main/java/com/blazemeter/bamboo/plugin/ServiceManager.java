@@ -30,6 +30,7 @@ import org.json.JSONObject;
  */
 public class ServiceManager {
     private final static int BUFFER_SIZE = 2048;
+    private final static int DELAY=10000;
 
     private ServiceManager(){
 	}
@@ -309,6 +310,29 @@ public class ServiceManager {
         return props;
     }
 
+
+    public static void properties(Api api, JSONArray properties, String masterId, BuildLogger logger) {
+        List<String> sessionsIds = api.getListOfSessionIds(masterId);
+        logger.addBuildLogEntry("Trying to submit jmeter properties: got " + sessionsIds.size() + " sessions");
+        for (String s : sessionsIds) {
+            logger.addBuildLogEntry("Submitting jmeter properties to sessionId=" + s);
+            int n = 1;
+            boolean submit = false;
+            while (!submit && n < 6) {
+                try {
+                    submit = api.properties(properties, s);
+                    if (!submit) {
+                        logger.addBuildLogEntry("Failed to submit jmeter properties to sessionId=" + s+" retry # "+n);
+                        Thread.sleep(DELAY);
+                    }
+                } catch (Exception e) {
+                    logger.addErrorLogEntry("Failed to submit jmeter properties to sessionId=" + s, e);
+                } finally {
+                    n++;
+                }
+            }
+        }
+    }
 
 
     public static void unzip(String srcZipFileName,

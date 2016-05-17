@@ -40,7 +40,7 @@ public class TestHttpWrapper {
     public void response_25() throws IOException {
         String url = TestConstants.mockedApiUrl + "/api/latest/user?api_key=mockedAPIKeyValid&app_key=jnk100x987c06f4e10c4_clientId=CI_JENKINS&_clientVersion=2.1.-SNAPSHOT&";
         try {
-            JSONObject response = wrap.response(url, null, Method.GET, JSONObject.class);
+            JSONObject response = wrap.response(url, null, Method.GET, JSONObject.class,JSONObject.class);
             Assert.assertTrue(response.length() == 25);
 
         } catch (RuntimeException re) {
@@ -53,7 +53,7 @@ public class TestHttpWrapper {
     @Test
     public void response_null() throws IOException, RuntimeException {
         try {
-            wrap.response(null, null, Method.GET, JSONObject.class);
+            wrap.response(null, null, Method.GET, JSONObject.class,JSONObject.class);
         } catch (RuntimeException re) {
             Assert.fail();
         }  catch (Exception e) {
@@ -66,7 +66,7 @@ public class TestHttpWrapper {
     @Test
     public void responseString_null() throws IOException, RuntimeException {
         try {
-            wrap.response(null, null, Method.GET, String.class);
+            wrap.response(null, null, Method.GET, String.class,JSONObject.class);
         } catch (RuntimeException re) {
             Assert.fail();
         }  catch (Exception e) {

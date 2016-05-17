@@ -8,10 +8,8 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.*;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -62,14 +60,14 @@ public class HttpWrapper {
         }
     }
 
-    public HttpResponse httpResponse(String url, JSONObject data, Method method) throws IOException {
+    public <V> HttpResponse httpResponse(String url, V data, Method method) throws IOException {
         if (StringUtils.isBlank(url)) return null;
+        if (logger.isDebugEnabled())
+            logger.debug("Requesting : " + url.substring(0,url.indexOf("?")+14));
         HttpResponse response = null;
         HttpRequestBase request = null;
 
         try {
-            if (logger.isDebugEnabled())
-                logger.debug("Requesting : " + url.substring(0,url.indexOf("?")+14));
             if (method == Method.GET) {
                 request = new HttpGet(url);
             } else if (method == Method.POST) {
@@ -82,30 +80,40 @@ public class HttpWrapper {
                 if (data != null) {
                     ((HttpPut) request).setEntity(new StringEntity(data.toString()));
                 }
+            } else if(method == Method.PATCH){
+                request = new HttpPatch(url);
+                if (data != null) {
+                    ((HttpPatch) request).setEntity(new StringEntity(data.toString()));
+                }
             }
             else {
                 throw new RuntimeException("Unsupported method: " + method.toString());
             }
             request.setHeader("Accept", "application/json");
             request.setHeader("Content-type", "application/json; charset=UTF-8");
-
+            if(proxy!=null){
+                RequestConfig conf = RequestConfig.custom()
+                        .setProxy(proxy)
+                        .build();
+                request.setConfig(conf);
+            }
             response = this.httpClient.execute(request);
 
 
             if (response == null || response.getStatusLine() == null) {
-            if(logger.isDebugEnabled())
+                if(logger.isDebugEnabled())
                     logger.debug("Erroneous response (Probably null) for url: \n"+ url);
                 response = null;
             }
-        } catch (Throwable thr) {
-        if(logger.isDebugEnabled())
-                logger.debug("Problems with creating and sending request: \n", thr);
+        } catch (Exception e) {
+            if(logger.isDebugEnabled())
+                logger.debug("Problems with creating and sending request: \n", e);
         }
         return response;
     }
 
 
-    public <T> T response(String url, JSONObject data, Method method, Class<T> returnType) throws Exception{
+    public <T,V> T response(String url, V data, Method method, Class<T> returnType,Class<V> dataType){
         T returnObj=null;
         JSONObject jo = null;
         String output = null;
@@ -114,7 +122,7 @@ public class HttpWrapper {
             response = httpResponse(url, data, method);
             if (response != null) {
                 output = EntityUtils.toString(response.getEntity());
-              if (logger.isDebugEnabled())
+                if (logger.isDebugEnabled())
                     logger.debug("Received object from server: " + output);
                 if (output.isEmpty()) {
                     throw new IOException();
@@ -122,29 +130,26 @@ public class HttpWrapper {
                 jo = new JSONObject(output);
             }
         } catch (IOException ioe) {
-        if (logger.isDebugEnabled())
+            if (logger.isDebugEnabled())
                 logger.debug("Received empty response from server: ",ioe);
             return null;
         } catch (JSONException e) {
-        if (logger.isDebugEnabled())
+            if (logger.isDebugEnabled())
                 logger.debug("ERROR decoding Json: ", e);
             returnType= (Class<T>) String.class;
             return returnType.cast(output);
-        } catch (Exception e){
-            if (logger.isDebugEnabled())
-                logger.debug("Error occured while doing request to server: check user-key," +
-                        "serverUrl and proxy settings ", e);
         }
 
         try{
             returnObj=returnType.cast(jo);
 
         }catch (ClassCastException cce){
-        if (logger.isDebugEnabled())
+            if (logger.isDebugEnabled())
                 logger.debug("Failed to parse response from server: ", cce);
             throw new RuntimeException(jo.toString());
 
         }
         return returnObj;
     }
+
 }

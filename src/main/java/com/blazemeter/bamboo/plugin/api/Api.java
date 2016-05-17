@@ -2,6 +2,7 @@ package com.blazemeter.bamboo.plugin.api;
 
 import com.blazemeter.bamboo.plugin.TestStatus;
 import com.google.common.collect.LinkedHashMultimap;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -54,4 +55,8 @@ public interface Api {
     String url();
 
     JSONObject publicToken(String masterId);
+
+    boolean properties(JSONArray properties, String sessionId) throws Exception;
+
 }
+

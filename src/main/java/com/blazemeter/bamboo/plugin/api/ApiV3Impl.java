@@ -51,7 +51,7 @@ public class ApiV3Impl implements Api {
         try {
             logger.info("Trying to get test status for masterId = "+id);
             String url = this.urlManager.masterStatus(APP_KEY, userKey, id);
-            JSONObject jo = this.http.response(url, null, Method.GET,JSONObject.class);
+            JSONObject jo = this.http.response(url, null, Method.GET,JSONObject.class,JSONObject.class);
             JSONObject result = (JSONObject) jo.get(JsonConstants.RESULT);
             if (result.has(JsonConstants.DATA_URL) && result.get(JsonConstants.DATA_URL) == null) {
                 logger.error("Test with masterId = "+id+" was not found on server.");
@@ -88,7 +88,7 @@ public class ApiV3Impl implements Api {
         try{
             logger.info("Trying to get tests...");
             String url = this.urlManager.tests(APP_KEY, userKey);
-            jo = this.http.response(url, null, Method.GET,JSONObject.class);
+            jo = this.http.response(url, null, Method.GET,JSONObject.class,JSONObject.class);
         }catch (Exception e){
             logger.error("Got an exception while trying to get tests from server: "+e);
         }finally {
@@ -111,7 +111,7 @@ public class ApiV3Impl implements Api {
         }
         JSONObject jo=null;
         try{
-           jo = this.http.response(url, null, Method.POST, JSONObject.class);
+           jo = this.http.response(url, null, Method.POST, JSONObject.class,JSONObject.class);
         }catch (Exception e){
             logger.error("Failed to start test due to error: ",e);
             logger.error("Check server & proxy settings");
@@ -130,7 +130,7 @@ public class ApiV3Impl implements Api {
                             logger.debug("Trying to repeat start request: " + retries + " retry.");
                         logger.debug("Pausing thread for " + 10*retries + " seconds before doing "+retries+" retry.");
                         Thread.sleep(10000*retries);
-                        jo = this.http.response(url, null, Method.POST, JSONObject.class);
+                        jo = this.http.response(url, null, Method.POST, JSONObject.class,JSONObject.class);
                         if (jo!=null) {
                             break;
                         }
@@ -170,7 +170,7 @@ public class ApiV3Impl implements Api {
             String url = this.urlManager.activeTests(APP_KEY, userKey);
             JSONObject jo = null;
             try {
-                jo = this.http.response(url, null, Method.GET, JSONObject.class);
+                jo = this.http.response(url, null, Method.GET, JSONObject.class,JSONObject.class);
                 JSONObject result = null;
                 if (jo.has(JsonConstants.RESULT) && (!jo.get(JsonConstants.RESULT).equals(JSONObject.NULL))) {
                     result = (JSONObject) jo.get(JsonConstants.RESULT);
@@ -212,7 +212,7 @@ public class ApiV3Impl implements Api {
         String url = this.urlManager.tests(APP_KEY, userKey);
         JSONObject jo=null;
         try{
-           jo = this.http.response(url, null,Method.GET,JSONObject.class);
+           jo = this.http.response(url, null,Method.GET,JSONObject.class,JSONObject.class);
         }catch (Exception e){
             logger.error("Failed to start test due to error: ",e);
             logger.error("Check server & proxy settings");
@@ -236,7 +236,7 @@ public class ApiV3Impl implements Api {
         String url = this.urlManager.masterStop(APP_KEY, userKey, masterId);
         JSONArray stopArray=null;
         try {
-            stopArray=this.http.response(url, null,Method.POST,JSONObject.class).getJSONArray(JsonConstants.RESULT);
+            stopArray=this.http.response(url, null,Method.POST,JSONObject.class,JSONObject.class).getJSONArray(JsonConstants.RESULT);
         }catch (Exception e){
             logger.error("Failed to start test due to error: ",e);
             logger.error("Check server & proxy settings");
@@ -257,7 +257,7 @@ public class ApiV3Impl implements Api {
         JSONObject summary = null;
         JSONObject jo = null;
         try {
-            jo = this.http.response(url, null, Method.GET, JSONObject.class);
+            jo = this.http.response(url, null, Method.GET, JSONObject.class,JSONObject.class);
             summary = (JSONObject) jo.getJSONObject(JsonConstants.RESULT)
                     .getJSONArray("summary")
                     .get(0);
@@ -282,7 +282,7 @@ public class ApiV3Impl implements Api {
             String url = this.urlManager.tests(APP_KEY, userKey);
             logger.info("Requesting url -> "+url);
             try {
-                JSONObject jo = this.http.response(url, null,Method.GET,JSONObject.class);
+                JSONObject jo = this.http.response(url, null,Method.GET,JSONObject.class,JSONObject.class);
                 JSONArray arr = (JSONArray) jo.get(JsonConstants.RESULT);
                 logger.info("Got result: "+arr.toString());
                 if (arr.length() > 0) {
@@ -326,7 +326,7 @@ public class ApiV3Impl implements Api {
             logger.info("Verifying userKey...");
             String url = this.urlManager.tests(APP_KEY, userKey);
             try {
-                JSONObject jo = this.http.response(url, null, Method.GET,JSONObject.class);
+                JSONObject jo = this.http.response(url, null, Method.GET,JSONObject.class,JSONObject.class);
                 JSONArray result=(JSONArray)jo.get(JsonConstants.RESULT);
                 logger.info("Got result: "+result.toString());
                 if ((result).length() > 0) {
@@ -349,7 +349,7 @@ public class ApiV3Impl implements Api {
         JSONObject jo=null;
         try {
             String url = this.urlManager.ciStatus(APP_KEY, userKey, sessionId);
-            jo = this.http.response(url, null, Method.GET,JSONObject.class);
+            jo = this.http.response(url, null, Method.GET,JSONObject.class,JSONObject.class);
         }catch (Exception e){
             logger.error("Got an exception while getting ci status: "+e);
         }
@@ -375,7 +375,7 @@ public class ApiV3Impl implements Api {
         String url = this.urlManager.testTerminate(APP_KEY, this.userKey, testId);
         JSONObject jo = null;
         try {
-            jo = this.http.response(url, null, Method.POST, JSONObject.class);
+            jo = this.http.response(url, null, Method.POST, JSONObject.class,JSONObject.class);
         } catch (Exception e) {
             logger.error("Failed to start test due to error: ", e);
             logger.error("Check server & proxy settings");
@@ -393,7 +393,7 @@ public class ApiV3Impl implements Api {
         }
         try {
             String url = this.urlManager.masterStatus(APP_KEY, this.userKey, id);
-            JSONObject jo = this.http.response(url, null, Method.GET,JSONObject.class);
+            JSONObject jo = this.http.response(url, null, Method.GET,JSONObject.class,JSONObject.class);
             JSONObject result = (JSONObject) jo.get(JsonConstants.RESULT);
             statusCode=result.getInt(JsonConstants.PROGRESS);
         } catch (Exception e) {
@@ -416,7 +416,7 @@ public class ApiV3Impl implements Api {
         String url = this.urlManager.generatePublicToken(APP_KEY, userKey, masterId);
         JSONObject jo = null;
         try {
-            jo = this.http.response(url, null, Method.POST, JSONObject.class);
+            jo = this.http.response(url, null, Method.POST, JSONObject.class,JSONObject.class);
         } catch (Exception e) {
             logger.error("Failed to start test due to error: ", e);
             logger.error("Check server & proxy settings");
@@ -431,7 +431,7 @@ public class ApiV3Impl implements Api {
         String url = this.urlManager.listOfSessionIds(APP_KEY, userKey, masterId);
         JSONObject jo =  null;
         try {
-            jo=this.http.response(url, null, Method.GET, JSONObject.class);
+            jo=this.http.response(url, null, Method.GET, JSONObject.class,JSONObject.class);
 
             JSONArray sessions = jo.getJSONObject(JsonConstants.RESULT).getJSONArray("sessions");
             int sessionsLength = sessions.length();
@@ -455,7 +455,7 @@ public class ApiV3Impl implements Api {
             logger.info("Trying to get JTLZIP url for the sessionId=" + sessionId);
             String url = this.urlManager.retrieveJTLZIP(APP_KEY, userKey, sessionId);
             logger.info("Trying to retrieve JTLZIP json for the sessionId=" + sessionId);
-            JSONObject jtlzip = this.http.response(url, null, Method.GET, JSONObject.class);
+            JSONObject jtlzip = this.http.response(url, null, Method.GET, JSONObject.class,JSONObject.class);
             return jtlzip;
         }
 
@@ -465,7 +465,23 @@ public class ApiV3Impl implements Api {
         logger.info("Trying to get Junit url for the masterId=" + masterId);
         String url = this.urlManager.retrieveJUNITXML(APP_KEY, userKey, masterId);
         logger.info("Trying to retrieve Junit for the masterId=" + masterId);
-        String junit = this.http.response(url, null, Method.GET, String.class);
+        String junit = this.http.response(url, null, Method.GET, String.class,JSONObject.class);
         return junit;
     }
+
+    @Override
+    public boolean properties(JSONArray properties, String sessionId) throws Exception {
+        if (StringUtils.isBlank(userKey) & StringUtils.isBlank(sessionId)) return false;
+        String url = this.urlManager.properties(APP_KEY, userKey, sessionId);
+        JSONObject jo = this.http.response(url, properties, Method.POST, JSONObject.class,JSONArray.class);
+        try {
+            if (jo.get(JsonConstants.RESULT).equals(JSONObject.NULL)) {
+                return false;
+            }
+        } catch (Exception e) {
+            throw new Exception("Failed to submit report properties to sessionId=" + sessionId, e);
+        }
+        return true;
+    }
+
 }

@@ -55,4 +55,7 @@ public interface UrlManager {
     String generatePublicToken(String appKey, String userKey, String sessionId);
 
     String listOfSessionIds(String appKey, String userKey, String masterId);
+
+    String properties(String appKey, String userKey, String sessionId);
+
 }

@@ -79,7 +79,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         boolean initTimeOutPassed = false;
         if(!StringUtils.isBlank(this.jmeterProps)){
             JSONArray props=ServiceManager.prepareSessionProperties(this.jmeterProps,logger);
-//            BzmServiceManager.properties(this.api,props,masterId,jenBuildLog);
+            ServiceManager.properties(this.api,props,masterId,logger);
         }
         do {
             status = this.api.testStatus(masterId);
