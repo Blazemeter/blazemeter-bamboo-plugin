@@ -12,6 +12,7 @@ public interface Constants {
      String SETTINGS_JUNIT_REPORT = "junit.report";
      String SETTINGS_JMETER_PROPERTIES = "jmeter.properties";
      String SETTINGS_NOTES = "notes";
+     String SETTINGS_JTL_PATH="jtl.path";
 
      String NOT_IMPLEMENTED="This call is not implemented.";
 

@@ -2,4 +2,5 @@
 [@ww.textfield labelKey="blazemeter.config.jmeterProps" name="jmeter.properties" required='false'/]
 [@ww.textarea labelKey="blazemeter.config.notes" name="notes" required='false'/]
 [@ww.checkbox labelKey="blazemeter.config.jtl" name='jtl.report' toggle='true' description=''/]
+[@ww.textfield labelKey="blazemeter.config.jtl.path" name="jtl.path" required='false'/]
 [@ww.checkbox labelKey="blazemeter.config.junit" name='junit.report' toggle='true' description=''/]
