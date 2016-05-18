@@ -240,9 +240,8 @@ public class ServiceManager {
     }
 
 
-    public static void downloadJtlReports(Api api,String masterId, TaskContext context, BuildLogger logger) {
+    public static void downloadJtlReports(Api api,String masterId, File jtlDir, BuildLogger logger) {
         List<String> sessionsIds = api.getListOfSessionIds(masterId);
-        File jtlDir=new File(context.getWorkingDirectory().getAbsolutePath()+"/build # "+context.getBuildContext().getBuildNumber());
         for (String s : sessionsIds) {
             downloadJtlReport(api, s, jtlDir,logger);
         }
@@ -332,6 +331,23 @@ public class ServiceManager {
         return props;
     }
 
+    public static File resolvePath(TaskContext context, String path) throws Exception {
+        File f = null;
+        File root = new File("/");
+        if (path.startsWith("/")) {
+            f = new File(root, path);
+        } else {
+            f = new File(context.getWorkingDirectory(), path);
+        }
+        if (!f.exists()) {
+            try {
+                f.mkdirs();
+            } catch (Exception e) {
+                throw new Exception("Failed to find filepath = " + f.getName());
+            }
+        }
+        return f;
+    }
 
     public static void properties(Api api, JSONArray properties, String masterId, BuildLogger logger) {
         List<String> sessionsIds = api.getListOfSessionIds(masterId);

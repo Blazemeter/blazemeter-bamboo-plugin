@@ -26,6 +26,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
     String jmeterProps;
     String masterId;
     String notes;
+    String jtlPath;
     Api api;
     boolean jtlReport=false;
     boolean junitReport=false;
@@ -54,6 +55,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         this.jtlReport=configMap.getAsBoolean(Constants.SETTINGS_JTL_REPORT);
         this.junitReport=configMap.getAsBoolean(Constants.SETTINGS_JUNIT_REPORT);
         this.notes = configMap.get(Constants.SETTINGS_NOTES);
+        this.jtlPath=configMap.get(Constants.SETTINGS_JTL_PATH);
         if (StringUtils.isBlank(userKey)) {
             logger.addErrorLogEntry("BlazeMeter user key not defined!");
             return resultBuilder.failed().build();
@@ -144,8 +146,18 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
 
         TestResult result = ServiceManager.getReport(this.api, this.masterId, logger);
         if(this.jtlReport){
+            File jtl=null;
+            try {
+                jtl=ServiceManager.resolvePath(context,this.jtlPath);
+            } catch (Exception e) {
+                logger.addBuildLogEntry("Failed to create directory for downloading jtl report.");
+                jtl=new File(context.getWorkingDirectory().getAbsolutePath()
+                        +"/build # "
+                        +context.getBuildContext().getBuildNumber());
+                logger.addBuildLogEntry("Default directory "+jtl.getAbsolutePath()+" will be used.");
+            }
             logger.addBuildLogEntry("Requesting JTL report for test with masterId="+this.masterId);
-            ServiceManager.downloadJtlReports(this.api,this.masterId,context,logger);
+            ServiceManager.downloadJtlReports(this.api,this.masterId,jtl,logger);
         }else {
             logger.addBuildLogEntry("JTL report won't be requested for test with masterId="+this.masterId);
         }
