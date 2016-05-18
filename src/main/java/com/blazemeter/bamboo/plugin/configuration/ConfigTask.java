@@ -28,7 +28,8 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
 			ImmutableList.of(Constants.SETTINGS_SELECTED_TEST_ID,
 					Constants.SETTINGS_JTL_REPORT,
 					Constants.SETTINGS_JUNIT_REPORT,
-					Constants.SETTINGS_JMETER_PROPERTIES);
+					Constants.SETTINGS_JMETER_PROPERTIES,
+					Constants.SETTINGS_NOTES);
 	private Api api;
 
 	private TextProvider textProvider;
@@ -111,6 +112,7 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
 
 		config.put(Constants.SETTINGS_SELECTED_TEST_ID, params.getString(Constants.SETTINGS_SELECTED_TEST_ID).trim());
 		config.put(Constants.SETTINGS_JMETER_PROPERTIES, params.getString(Constants.SETTINGS_JMETER_PROPERTIES).trim());
+		config.put(Constants.SETTINGS_NOTES, params.getString(Constants.SETTINGS_NOTES).trim());
 		String jtlReport=params.getString(Constants.SETTINGS_JTL_REPORT)==null?"false":"true";
 		String junitReport=params.getString(Constants.SETTINGS_JUNIT_REPORT)==null?"false":"true";
 		config.put(Constants.SETTINGS_JTL_REPORT, jtlReport);
