@@ -58,4 +58,6 @@ public interface UrlManager {
 
     String properties(String appKey, String userKey, String sessionId);
 
+    String masterId(String appKey,String userKey, String masterId);
+
 }

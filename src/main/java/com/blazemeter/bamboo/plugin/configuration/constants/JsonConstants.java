@@ -9,14 +9,14 @@ public interface JsonConstants {
     String ID = "id";
     String NAME = "name";
     String TESTS = "tests";
-    String RESPONSE_CODE = "response_code";
     String RESULT = "result";
     String DATA_URL="dataUrl";
     String COLLECTIONS="collections";
     String PROGRESS="progress";
-    String STATUS="status";
     String ERRORS="errors";
     String FAILURES = "failures";
     String ERROR = "error";
+    String NOTE="note";
+
 
 }

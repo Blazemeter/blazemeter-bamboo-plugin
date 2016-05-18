@@ -304,4 +304,14 @@ public class UrlManagerV3Impl implements UrlManager {
         return serverUrl +LATEST+"/sessions/"+sessionId+"/properties?target=all&api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
     }
 
+    @Override
+    public String masterId(String appKey, String userKey, String masterId) {
+        String masterIdUrl=null;
+        try {
+            appKey = URLEncoder.encode(appKey, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return masterIdUrl= serverUrl +LATEST+"/masters/"+masterId+"?api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
+    }
 }

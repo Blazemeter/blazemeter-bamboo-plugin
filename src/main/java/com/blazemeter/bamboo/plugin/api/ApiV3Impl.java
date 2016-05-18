@@ -484,4 +484,18 @@ public class ApiV3Impl implements Api {
         return true;
     }
 
+    @Override
+    public boolean notes(String note, String masterId) throws Exception {
+        if (StringUtils.isBlank(userKey) & StringUtils.isBlank(masterId)) return false;
+        JSONObject noteJson=new JSONObject("{'"+JsonConstants.NOTE+"':'"+note+"'}");
+        String url = this.urlManager.masterId(APP_KEY, userKey, masterId);
+        JSONObject jo=this.http.response(url, noteJson, Method.PATCH, JSONObject.class,JSONObject.class);
+        try{
+            if(!jo.get(JsonConstants.ERROR).equals(JSONObject.NULL)){
+                return false;
+            }}catch (Exception e){
+            throw new Exception("Failed to submit report notest to masterId="+masterId,e);
+        }
+        return true ;
+    }
 }

@@ -93,6 +93,28 @@ public class ServiceManager {
         }
     }
 
+
+    public static boolean notes(Api api, String masterId, String notes,BuildLogger logger){
+        boolean note=false;
+        int n = 1;
+        logger.addBuildLogEntry("Trying to PATCH notes to test report on server: masterId=" + masterId);
+        while (!note && n < 6) {
+            try {
+                Thread.sleep(DELAY);
+                int statusCode = api.masterStatus(masterId);
+                if (statusCode > 20) {
+                    note = api.notes(notes, masterId);
+                }
+            } catch (Exception e) {
+                logger.addErrorLogEntry("Failed to PATCH notes to test report on server: masterId=" + masterId + " " + e.getMessage());
+            } finally {
+                n++;
+            }
+
+        }
+        return note;
+    }
+
     public static Map<String, Collection<String>> getTestsAsMap(Api api) {
         return getTests(api).asMap();
     }

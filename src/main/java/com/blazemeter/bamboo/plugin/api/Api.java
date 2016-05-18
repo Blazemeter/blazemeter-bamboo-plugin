@@ -58,5 +58,7 @@ public interface Api {
 
     boolean properties(JSONArray properties, String sessionId) throws Exception;
 
+    boolean notes(String note,String masterId)throws Exception;
+
 }
 

@@ -25,6 +25,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
     String testId;
     String jmeterProps;
     String masterId;
+    String notes;
     Api api;
     boolean jtlReport=false;
     boolean junitReport=false;
@@ -52,6 +53,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         this.jmeterProps = configMap.get(Constants.SETTINGS_JMETER_PROPERTIES);
         this.jtlReport=configMap.getAsBoolean(Constants.SETTINGS_JTL_REPORT);
         this.junitReport=configMap.getAsBoolean(Constants.SETTINGS_JUNIT_REPORT);
+        this.notes = configMap.get(Constants.SETTINGS_NOTES);
         if (StringUtils.isBlank(userKey)) {
             logger.addErrorLogEntry("BlazeMeter user key not defined!");
             return resultBuilder.failed().build();
@@ -73,7 +75,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
             reportUrls.put(context.getBuildContext().getBuildResultKey(),reportUrl);
             context.getBuildContext().getBuildResult().getCustomBuildData().put(Constants.REPORT_URL, reportUrl);
         }
-
+        ServiceManager.notes(this.api,masterId,this.notes,logger);
 
         TestStatus status;
         boolean initTimeOutPassed = false;
