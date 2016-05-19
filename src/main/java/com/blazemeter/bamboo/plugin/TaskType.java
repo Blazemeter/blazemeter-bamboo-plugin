@@ -27,6 +27,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
     String masterId;
     String notes;
     String jtlPath;
+    String junitPath;
     Api api;
     boolean jtlReport=false;
     boolean junitReport=false;
@@ -56,6 +57,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         this.junitReport=configMap.getAsBoolean(Constants.SETTINGS_JUNIT_REPORT);
         this.notes = configMap.get(Constants.SETTINGS_NOTES);
         this.jtlPath=configMap.get(Constants.SETTINGS_JTL_PATH);
+        this.junitPath=configMap.get(Constants.SETTINGS_JUNIT_PATH);
         if (StringUtils.isBlank(userKey)) {
             logger.addErrorLogEntry("BlazeMeter user key not defined!");
             return resultBuilder.failed().build();
@@ -145,15 +147,15 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         //BlazeMeter test stopped due to user test duration setup reached
 
         TestResult result = ServiceManager.getReport(this.api, this.masterId, logger);
+        File dd=new File(context.getWorkingDirectory().getAbsolutePath()+"/build # "
+                +context.getBuildContext().getBuildNumber());
         if(this.jtlReport){
             File jtl=null;
             try {
                 jtl=ServiceManager.resolvePath(context,this.jtlPath,logger);
             } catch (Exception e) {
                 logger.addBuildLogEntry("Failed to create directory for downloading jtl report.");
-                jtl=new File(context.getWorkingDirectory().getAbsolutePath()
-                        +"/build # "
-                        +context.getBuildContext().getBuildNumber());
+                jtl=dd;
                 logger.addBuildLogEntry("Default directory "+jtl.getAbsolutePath()+" will be used.");
             }
             logger.addBuildLogEntry("Requesting JTL report for test with masterId="+this.masterId);
@@ -162,8 +164,17 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
             logger.addBuildLogEntry("JTL report won't be requested for test with masterId="+this.masterId);
         }
         if(this.junitReport){
+            File junit=null;
             logger.addBuildLogEntry("Requesting Junit report for test with masterId="+this.masterId);
-            ServiceManager.downloadJunitReport(this.api,this.masterId,context,logger);
+            try {
+                junit=ServiceManager.resolvePath(context,this.junitPath,logger);
+            } catch (Exception e) {
+                logger.addBuildLogEntry("Failed to create directory for downloading jtl report.");
+                junit=dd;
+                logger.addBuildLogEntry("Default directory "+junit.getAbsolutePath()+" will be used.");
+            }
+            logger.addBuildLogEntry("Requesting JTL report for test with masterId="+this.masterId);
+            ServiceManager.downloadJunitReport(this.api,this.masterId,junit,logger);
         }else {
             logger.addBuildLogEntry("Junit report won't be requested for test with masterId="+this.masterId);
         }

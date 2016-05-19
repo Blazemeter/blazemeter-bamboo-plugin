@@ -247,11 +247,10 @@ public class ServiceManager {
         }
     }
 
-    public static void downloadJunitReport(Api api,String masterId, TaskContext context, BuildLogger logger) {
+    public static void downloadJunitReport(Api api,String masterId, File junitD, BuildLogger logger) {
         try {
             String junit = api.retrieveJunit(masterId);
-            File junitFile=new File(context.getWorkingDirectory().getAbsolutePath()+"/build # "+
-                    context.getBuildContext().getBuildNumber(),masterId+".xml");
+            File junitFile=new File(junitD,masterId+".xml");
             logger.addBuildLogEntry("Trying to save junit report to "+junitFile.getAbsolutePath());
             FileUtils.writeStringToFile(junitFile,junit);
         } catch (Exception e) {
