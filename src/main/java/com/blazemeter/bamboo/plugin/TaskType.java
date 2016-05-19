@@ -148,7 +148,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         if(this.jtlReport){
             File jtl=null;
             try {
-                jtl=ServiceManager.resolvePath(context,this.jtlPath);
+                jtl=ServiceManager.resolvePath(context,this.jtlPath,logger);
             } catch (Exception e) {
                 logger.addBuildLogEntry("Failed to create directory for downloading jtl report.");
                 jtl=new File(context.getWorkingDirectory().getAbsolutePath()

@@ -331,7 +331,7 @@ public class ServiceManager {
         return props;
     }
 
-    public static File resolvePath(TaskContext context, String path) throws Exception {
+    public static File resolvePath(TaskContext context, String path,BuildLogger logger) throws Exception {
         File f = null;
         File root = new File("/");
         if (path.startsWith("/")) {
@@ -340,10 +340,18 @@ public class ServiceManager {
             f = new File(context.getWorkingDirectory(), path);
         }
         if (!f.exists()) {
+            boolean mkDir = false;
             try {
-                f.mkdirs();
+                mkDir = f.mkdirs();
             } catch (Exception e) {
                 throw new Exception("Failed to find filepath = " + f.getName());
+            } finally {
+                if (!mkDir) {
+                    logger.addBuildLogEntry("Failed to create "+f.getAbsolutePath()+" , workspace will be used.");
+                    f = new File(context.getWorkingDirectory(), path);
+                    f.mkdirs();
+                    logger.addBuildLogEntry("Resolving path into "+f.getAbsolutePath());
+                }
             }
         }
         return f;
