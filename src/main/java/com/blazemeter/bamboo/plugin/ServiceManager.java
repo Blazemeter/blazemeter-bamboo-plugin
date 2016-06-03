@@ -319,8 +319,8 @@ public class ServiceManager {
                 JSONObject prop = new JSONObject();
                 List<String> pr = Arrays.asList(s.split("="));
                 if (pr.size() > 1) {
-                    prop.put("key", pr.get(0));
-                    prop.put("value", pr.get(1));
+                    prop.put("key", pr.get(0).trim());
+                    prop.put("value", pr.get(1).trim());
                 }
                 props.put(prop);
             } catch (Exception e) {
