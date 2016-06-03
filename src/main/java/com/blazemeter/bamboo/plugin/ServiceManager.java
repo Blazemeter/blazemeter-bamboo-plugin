@@ -346,14 +346,14 @@ public class ServiceManager {
                 throw new Exception("Failed to find filepath = " + f.getName());
             } finally {
                 if (!mkDir) {
-                    logger.addBuildLogEntry("Failed to create "+f.getAbsolutePath()+" , workspace will be used.");
+                    logger.addBuildLogEntry("Failed to create "+f.getCanonicalPath()+" , workspace will be used.");
                     f = new File(context.getWorkingDirectory(), path);
                     f.mkdirs();
-                    logger.addBuildLogEntry("Resolving path into "+f.getAbsolutePath());
+                    logger.addBuildLogEntry("Resolving path into "+f.getCanonicalPath());
                 }
             }
         }
-        return f;
+        return f.getCanonicalFile();
     }
 
     public static void properties(Api api, JSONArray properties, String masterId, BuildLogger logger) {

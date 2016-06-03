@@ -169,7 +169,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
             try {
                 junit=ServiceManager.resolvePath(context,this.junitPath,logger);
             } catch (Exception e) {
-                logger.addBuildLogEntry("Failed to create directory for downloading jtl report.");
+                logger.addBuildLogEntry("Failed to create directory for downloading junit report.");
                 junit=dd;
                 logger.addBuildLogEntry("Default directory "+junit.getAbsolutePath()+" will be used.");
             }
