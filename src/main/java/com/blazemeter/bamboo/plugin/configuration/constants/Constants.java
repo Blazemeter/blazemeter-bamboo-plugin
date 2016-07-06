@@ -1,9 +1,8 @@
 package com.blazemeter.bamboo.plugin.configuration.constants;
 
 public interface Constants {
-    //runner properties
-	 String USER_KEY = "USER_KEY";
-	
+
+    String BZM_HTTP_LOG="BZM-HTTP-LOG";
 //	 String SETTINGS_API_VERSION = "api_version";
 
     //settings properties

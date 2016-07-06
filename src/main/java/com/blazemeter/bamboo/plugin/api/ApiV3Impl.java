@@ -3,6 +3,7 @@ package com.blazemeter.bamboo.plugin.api;
 import com.blazemeter.bamboo.plugin.TestStatus;
 import com.blazemeter.bamboo.plugin.configuration.constants.JsonConstants;
 import com.google.common.collect.LinkedHashMultimap;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
@@ -487,7 +488,8 @@ public class ApiV3Impl implements Api {
     @Override
     public boolean notes(String note, String masterId) throws Exception {
         if (StringUtils.isBlank(userKey) & StringUtils.isBlank(masterId)) return false;
-        JSONObject noteJson=new JSONObject("{'"+JsonConstants.NOTE+"':'"+note+"'}");
+        String noteEsc = StringEscapeUtils.escapeJson("{'"+ JsonConstants.NOTE+"':'"+note+"'}");
+        JSONObject noteJson=new JSONObject(noteEsc);
         String url = this.urlManager.masterId(APP_KEY, userKey, masterId);
         JSONObject jo=this.http.response(url, noteJson, Method.PATCH, JSONObject.class,JSONObject.class);
         try{

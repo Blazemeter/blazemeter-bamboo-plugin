@@ -103,7 +103,7 @@ public class ServiceManager {
                 Thread.sleep(DELAY);
                 int statusCode = api.masterStatus(masterId);
                 if (statusCode > 20) {
-                    note = api.notes(notes.replaceAll("[\n\r]",""), masterId);
+                    note = api.notes(notes, masterId);
                 }
             } catch (Exception e) {
                 logger.addErrorLogEntry("Failed to PATCH notes to test report on server: masterId=" + masterId + " " + e.getMessage());
@@ -336,7 +336,8 @@ public class ServiceManager {
         if (path.startsWith("/")) {
             f = new File(root, path);
         } else {
-            f = new File(context.getWorkingDirectory(), path);
+            f = new File(context.getWorkingDirectory().getAbsolutePath()+"/build # "
+                    +context.getBuildContext().getBuildNumber(), path);
         }
         if (!f.exists()) {
             boolean mkDir = false;
