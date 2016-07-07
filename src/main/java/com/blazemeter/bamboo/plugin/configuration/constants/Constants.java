@@ -16,6 +16,7 @@ package com.blazemeter.bamboo.plugin.configuration.constants;
 public interface Constants {
 
     String BZM_HTTP_LOG="BZM-HTTP-LOG";
+    String HTTP_LOG="http-log";
 //	 String SETTINGS_API_VERSION = "api_version";
 
     //settings properties

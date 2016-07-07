@@ -14,7 +14,7 @@
 
 package com.blazemeter.bamboo;
 
-import com.blazemeter.bamboo.plugin.api.HttpWrapper;
+import com.blazemeter.bamboo.plugin.api.HttpUtility;
 import com.blazemeter.bamboo.plugin.api.Method;
 import org.json.JSONObject;
 import org.junit.AfterClass;
@@ -31,7 +31,7 @@ public class TestHttpWrapper {
     private String userKey = "1234567890";
     private String appKey = "jnk100x987c06f4e10c4";
     private String testId = "12345";
-    private HttpWrapper wrap = new HttpWrapper();
+    private HttpUtility wrap = new HttpUtility();
 
     @BeforeClass
     public static void setUp() throws IOException {

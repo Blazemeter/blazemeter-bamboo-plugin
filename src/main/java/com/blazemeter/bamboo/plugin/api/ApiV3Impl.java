@@ -32,7 +32,7 @@ public class ApiV3Impl implements Api {
     private static final Logger logger = Logger.getLogger(ApiV3Impl.class);
 
     public static final String APP_KEY = "bmboo0x98a8w9s4s7c4";
-    HttpWrapper http;
+    HttpUtility http;
     UrlManagerV3Impl urlManager;
     private String userKey;
 
@@ -40,11 +40,13 @@ public class ApiV3Impl implements Api {
     	this.userKey=userKey;
         urlManager = new UrlManagerV3Impl(serverUrl);
         try {
-            http = new HttpWrapper();
+            http = new HttpUtility();
         } catch (Exception ex) {
             logger.error("Failed to create api for communication with server: %s", ex);
         }
     }
+
+
 
 
     @Override

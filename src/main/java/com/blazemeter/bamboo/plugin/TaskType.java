@@ -76,6 +76,10 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
             logger.addErrorLogEntry("BlazeMeter user key not defined!");
             return resultBuilder.failed().build();
         }
+        File dd=new File(context.getWorkingDirectory().getAbsolutePath()+"/build # "
+                +context.getBuildContext().getBuildNumber());
+
+        HttpUtility.setHttpLog(dd+File.separator+Constants.HTTP_LOG);
         this.api = new ApiV3Impl(userKey, serverUrl);
 
         rootDirectory = context.getRootDirectory();
@@ -161,8 +165,6 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         //BlazeMeter test stopped due to user test duration setup reached
 
         TestResult result = ServiceManager.getReport(this.api, this.masterId, logger);
-        File dd=new File(context.getWorkingDirectory().getAbsolutePath()+"/build # "
-                +context.getBuildContext().getBuildNumber());
         if(this.jtlReport){
             File jtl=null;
             try {

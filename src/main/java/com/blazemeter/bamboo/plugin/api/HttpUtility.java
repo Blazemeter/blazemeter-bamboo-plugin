@@ -39,7 +39,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 
 public class HttpUtility {
-    private static final Logger logger = Logger.getLogger(Constants.BZM_HTTP_LOG);
+    private static final Logger logger = Logger.getLogger(HttpUtility.class);
     private boolean useProxy=false;
     private String proxyHost=null;
     private int proxyPort=0;
@@ -57,7 +57,7 @@ public class HttpUtility {
         try{
             this.proxyPort=Integer.parseInt(System.getProperty(Constants.PROXY_PORT));
         }catch (NumberFormatException nfe){
-            logger.debug("Failed to read http.proxyPort: ",nfe);
+            logger.error("Failed to read http.proxyPort: ",nfe);
         }
         if(useProxy&&!org.apache.commons.lang3.StringUtils.isBlank(this.proxyHost)){
             this.proxy=new HttpHost(proxyHost,proxyPort);
@@ -92,7 +92,7 @@ public class HttpUtility {
 
     public <V> HttpResponse httpResponse(String url, V data, Method method) throws IOException {
         if (StringUtils.isBlank(url)) return null;
-            logger.debug("Requesting : " + url.substring(0,url.indexOf("?")+14));
+            logger.info("Requesting : " + url.substring(0,url.indexOf("?")+14));
         HttpResponse response = null;
         HttpRequestBase request = null;
 
@@ -130,11 +130,11 @@ public class HttpUtility {
 
 
             if (response == null || response.getStatusLine() == null) {
-                    logger.debug("Erroneous response (Probably null) for url: \n"+ url);
+                    logger.info("Erroneous response (Probably null) for url: \n"+ url);
                 response = null;
             }
         } catch (Exception e) {
-                logger.debug("Problems with creating and sending request: \n", e);
+                logger.error("Problems with creating and sending request: \n", e);
         }
         return response;
     }
@@ -149,17 +149,17 @@ public class HttpUtility {
             response = httpResponse(url, data, method);
             if (response != null) {
                 output = EntityUtils.toString(response.getEntity());
-                    logger.debug("Received object from server: " + output);
+                    logger.info("Received object from server: " + output);
                 if (output.isEmpty()) {
                     throw new IOException();
                 }
                 jo = new JSONObject(output);
             }
         } catch (IOException ioe) {
-                logger.debug("Received empty response from server: ",ioe);
+                logger.error("Received empty response from server: ",ioe);
             return null;
         } catch (JSONException e) {
-                logger.debug("ERROR decoding Json: ", e);
+                logger.error("ERROR decoding Json: ", e);
             returnType= (Class<T>) String.class;
             return returnType.cast(output);
         }
@@ -168,7 +168,7 @@ public class HttpUtility {
             returnObj=returnType.cast(jo);
 
         }catch (ClassCastException cce){
-                logger.debug("Failed to parse response from server: ", cce);
+                logger.error("Failed to parse response from server: ", cce);
             throw new RuntimeException(jo.toString());
 
         }

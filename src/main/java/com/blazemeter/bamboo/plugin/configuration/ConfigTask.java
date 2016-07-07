@@ -56,7 +56,7 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
 	@Override
 	public void populateContextForCreate(Map<String, Object> context) {
 		super.populateContextForCreate(context);
-        PluginSettingsFactory pluginSettingsFactory=StaticAccessor.getSettingsFactory();
+		PluginSettingsFactory pluginSettingsFactory=StaticAccessor.getSettingsFactory();
         PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
 		String userKey = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
 		String serverUrl = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
@@ -68,7 +68,7 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
 	@Override
 	public void populateContextForEdit(Map<String, Object> context, TaskDefinition taskDefinition) {
 		super.populateContextForEdit(context, taskDefinition);
-        taskConfiguratorHelper.populateContextWithConfiguration(context, taskDefinition, FIELDS_TO_COPY);
+		taskConfiguratorHelper.populateContextWithConfiguration(context, taskDefinition, FIELDS_TO_COPY);
         PluginSettingsFactory pluginSettingsFactory=StaticAccessor.getSettingsFactory();
         PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
 		String userKey = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
