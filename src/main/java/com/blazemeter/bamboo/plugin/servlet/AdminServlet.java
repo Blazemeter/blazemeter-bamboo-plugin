@@ -33,6 +33,7 @@ import com.atlassian.sal.api.transaction.TransactionTemplate;
 import com.atlassian.sal.api.transaction.TransactionCallback;
 import com.blazemeter.bamboo.plugin.api.Api;
 import com.blazemeter.bamboo.plugin.api.ApiV3Impl;
+import com.blazemeter.bamboo.plugin.api.HttpUtility;
 import com.blazemeter.bamboo.plugin.configuration.constants.AdminServletConst;
 
 public class AdminServlet extends HttpServlet {
@@ -89,6 +90,7 @@ public class AdminServlet extends HttpServlet {
 		context.put(AdminServletConst.URL, url);
 
 	   Api api= new ApiV3Impl(userKey, url);
+		HttpUtility.resetHttpLog();
 		if (api.verifyUserKey()){
 			transactionTemplate.execute(new TransactionCallback() {
 				public Object doInTransaction() {
