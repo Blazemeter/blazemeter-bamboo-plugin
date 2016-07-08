@@ -259,7 +259,7 @@ public class ServiceManager {
     public static void downloadJunitReport(Api api,String masterId, File junitD, BuildLogger logger) {
         try {
             String junit = api.retrieveJunit(masterId);
-            File junitFile=new File(junitD,masterId+".xml");
+            File junitFile=new File(junitD,Constants.BM_TRESHOLDS);
             logger.addBuildLogEntry("Trying to save junit report to "+junitFile.getAbsolutePath());
             FileUtils.writeStringToFile(junitFile,junit);
         } catch (Exception e) {
@@ -307,6 +307,7 @@ public class ServiceManager {
             if(sample_jtl.exists()){
                 sample_jtl.renameTo(bm_kpis_jtl);
             }
+            FileUtils.deleteQuietly(jtlZip);
         } catch (JSONException e) {
             logger.addErrorLogEntry("Unable to get  JTLZIP from "+url+" "+e.getMessage());
         } catch (MalformedURLException e) {
@@ -406,7 +407,6 @@ public class ServiceManager {
             Enumeration<? extends ZipEntry> zipFileEntries = zipFile.entries();
             while (zipFileEntries.hasMoreElements()) {
                 ZipEntry entry = (ZipEntry) zipFileEntries.nextElement();
-                if(entry.getName().substring((entry.getName().length()-4)).equals(".jtl")&!entry.isDirectory()){
                     logger.addBuildLogEntry("\tExtracting jtl report: " + entry);
 
                     //create destination file
@@ -434,14 +434,10 @@ public class ServiceManager {
                     // close BufferedOutputStream
                     bufOS.flush();
                     bufOS.close();
-
-                }
-
             }
             bufIS.close();
         } catch (Exception e) {
             logger.addErrorLogEntry("Failed to unzip report: check that it is downloaded");
         }
     }
-
 }

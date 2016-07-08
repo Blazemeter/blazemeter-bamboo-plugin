@@ -17,6 +17,8 @@ public interface Constants {
 
     String BZM_HTTP_LOG="BZM-HTTP-LOG";
     String HTTP_LOG="http-log";
+    String BM_TRESHOLDS="bm-thresholds.xml";
+
 //	 String SETTINGS_API_VERSION = "api_version";
 
     //settings properties
