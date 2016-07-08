@@ -78,12 +78,13 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         }
         File dd=new File(context.getWorkingDirectory().getAbsolutePath()+"/build # "
                 +context.getBuildContext().getBuildNumber());
-
-        HttpUtility.setHttpLog(dd+File.separator+Constants.HTTP_LOG);
+        String httpLog=dd+File.separator+Constants.HTTP_LOG;
+        HttpUtility.setHttpLog(httpLog);
         this.api = new ApiV3Impl(userKey, serverUrl);
 
         rootDirectory = context.getRootDirectory();
         logger.addBuildLogEntry("Attempting to start test with id:" + testId);
+        logger.addBuildLogEntry("Http log will be available at " + httpLog);
         this.masterId = ServiceManager.startTest(api, testId, logger);
         long testInitStart = System.currentTimeMillis();
 
