@@ -130,27 +130,23 @@ public class ApiV3Impl implements Api {
         }
 
         if (jo==null) {
-            if (logger.isDebugEnabled())
-                logger.debug("Received NULL from server while start operation: will do 5 retries");
+                logger.info("Received NULL from server while start operation: will do 5 retries");
             boolean isActive=this.active(testId);
             if(!isActive){
                 int retries = 1;
                 while (retries < 6) {
                     try {
-                        if (logger.isDebugEnabled())
-                            logger.debug("Trying to repeat start request: " + retries + " retry.");
-                        logger.debug("Pausing thread for " + 10*retries + " seconds before doing "+retries+" retry.");
+                        logger.info("Trying to repeat start request: " + retries + " retry.");
+                        logger.info("Pausing thread for " + 10*retries + " seconds before doing "+retries+" retry.");
                         Thread.sleep(10000*retries);
                         jo = this.http.response(url, null, Method.POST, JSONObject.class,JSONObject.class);
                         if (jo!=null) {
                             break;
                         }
                     } catch (InterruptedException ie) {
-                        if (logger.isDebugEnabled())
-                            logger.debug("Start operation was interrupted at pause during " + retries + " request retry.");
+                        logger.info("Start operation was interrupted at pause during " + retries + " request retry.");
                     } catch (Exception ex) {
-                        if (logger.isDebugEnabled())
-                            logger.debug("Received bad response from server while starting test: " + retries + " retry.");
+                        logger.info("Received bad response from server while starting test: " + retries + " retry.");
                     }
                     finally {
                         retries++;
@@ -160,15 +156,14 @@ public class ApiV3Impl implements Api {
 
             }
         }
-        JSONObject result=null;
-        try{
+        JSONObject result = null;
+        try {
             result = (JSONObject) jo.get(JsonConstants.RESULT);
-            logger.info("Got result: "+result.toString());
-        }catch (Exception e){
-            if (logger.isDebugEnabled())
-                logger.debug("Error while starting test: ",e);
-            throw new JSONException("Faild to get 'result' node "+e.getMessage());
-
+            logger.info("Got result: " + result.toString());
+        } catch (Exception e) {
+            logger.info("Error while starting test: ", e);
+            String error = jo.get(JsonConstants.ERROR).toString();
+            return error;
         }
         return String.valueOf(result.getInt(JsonConstants.ID));
     }

@@ -130,24 +130,28 @@ public class ServiceManager {
 
 	public static String startTest(Api api, String testId, BuildLogger logger) {
         int countStartRequests = 0;
-        String masterId=null;
+        String startResponse=null;
         try {
             logger.addBuildLogEntry("Trying to start test with testId="+testId+" for userKey="+api.getUserKey());
             TestType testType=getTestType(api,testId,logger);
             do {
-                masterId=api.startTest(testId,testType);
+                startResponse=api.startTest(testId,testType);
                 countStartRequests++;
                 if (countStartRequests > 5) {
                     logger.addErrorLogEntry("Could not start BlazeMeter Test with userKey=" + api.getUserKey() + " testId=" + testId);
-                    return masterId;
+                    return startResponse;
                 }
-            } while (masterId.length()==0);
-            logger.addBuildLogEntry("Test with testId="+testId+" was started with masterId="+masterId.toString());
-        } catch (Exception e) {
-            logger.addErrorLogEntry("Error: Exception while starting BlazeMeter Test [" + e.getMessage() + "]");
+            } while (startResponse.length()==0);
+            Integer.parseInt(startResponse);
+            logger.addBuildLogEntry("Test with testId="+testId+" was started with masterId="+startResponse);
+        }catch (NumberFormatException e) {
+            logger.addErrorLogEntry("Error while starting BlazeMeter Test: "+startResponse);
+            throw new NumberFormatException(startResponse);
+        }catch (Exception e) {
+            logger.addErrorLogEntry("Error while starting BlazeMeter Test [" + e.getMessage() + "]");
             logger.addErrorLogEntry("Check server & proxy settings");
         }
-        return masterId;
+        return startResponse;
     }
 
 
