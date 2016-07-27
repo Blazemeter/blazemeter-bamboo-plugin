@@ -54,7 +54,7 @@ public interface Api {
 
     void  setUserKey(String userKey);
 
-    List<String> getListOfSessionIds(String masterId);
+    List<String> getListOfSessionIds(String masterId) throws Exception;
 
     JSONObject terminateTest(String testId);
 

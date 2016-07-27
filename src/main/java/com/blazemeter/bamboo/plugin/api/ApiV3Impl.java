@@ -432,25 +432,27 @@ public class ApiV3Impl implements Api {
 
 
     @Override
-    public List<String> getListOfSessionIds(String masterId) {
+    public List<String> getListOfSessionIds(String masterId) throws Exception{
         List<String> sessionsIds = new ArrayList<String>();
         String url = this.urlManager.listOfSessionIds(APP_KEY, userKey, masterId);
         JSONObject jo =  null;
+            jo=this.http.response(url, null, Method.GET, JSONObject.class, JSONObject.class);
+        JSONArray sessions = jo.getJSONObject(JsonConstants.RESULT).getJSONArray("sessions");
+        JSONArray errors = null;
         try {
-            jo=this.http.response(url, null, Method.GET, JSONObject.class,JSONObject.class);
+            errors = sessions.getJSONObject(0).getJSONArray(JsonConstants.ERRORS);
+        } catch (Exception e) {
+        } finally {
+            if (errors!=null&&errors.length() > 0) {
+                throw new Exception(errors.toString());
+            }
+        }
 
-            JSONArray sessions = jo.getJSONObject(JsonConstants.RESULT).getJSONArray("sessions");
             int sessionsLength = sessions.length();
             for (int i = 0; i < sessionsLength; i++) {
                 sessionsIds.add(sessions.getJSONObject(i).getString(JsonConstants.ID));
             }
-        } catch (JSONException je) {
-            logger.info("Failed to get list of sessions from JSONObject " + jo, je);
-        } catch (Exception e) {
-            logger.info("Failed to get list of sessions from JSONObject " + jo, e);
-        } finally {
             return sessionsIds;
-        }
     }
 
 

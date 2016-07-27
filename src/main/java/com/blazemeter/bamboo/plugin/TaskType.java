@@ -120,7 +120,13 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
                 ServiceManager.stopTestMaster(this.api, this.masterId, logger);
                 break;
             }
-            logger.addBuildLogEntry("Check if the test is initialized...");
+            try {
+                this.api.getListOfSessionIds(this.masterId);
+                logger.addBuildLogEntry("Check if the test is initialized...");
+            } catch (Exception e) {
+                logger.addErrorLogEntry(e.getMessage());
+                return resultBuilder.failedWithError().build();
+            }
             initTimeOutPassed = System.currentTimeMillis() > testInitStart + INIT_TEST_TIMEOUT;
         } while (!(initTimeOutPassed | status.equals(TestStatus.Running)));
 

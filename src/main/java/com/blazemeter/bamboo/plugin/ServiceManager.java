@@ -253,10 +253,15 @@ public class ServiceManager {
     }
 
 
-    public static void downloadJtlReports(Api api,String masterId, File jtlDir, BuildLogger logger) {
-        List<String> sessionsIds = api.getListOfSessionIds(masterId);
-        for (String s : sessionsIds) {
-            downloadJtlReport(api, s, jtlDir,logger);
+    public static void downloadJtlReports(Api api,String masterId, File jtlDir, BuildLogger logger){
+        List<String> sessionsIds = null;
+        try {
+            sessionsIds = api.getListOfSessionIds(masterId);
+            for (String s : sessionsIds) {
+                downloadJtlReport(api, s, jtlDir, logger);
+            }
+        } catch (Throwable e) {
+            logger.addErrorLogEntry("Failed to download jtl reports: "+e.getMessage());
         }
     }
 
@@ -371,8 +376,13 @@ public class ServiceManager {
         return f.getCanonicalFile();
     }
 
-    public static void properties(Api api, JSONArray properties, String masterId, BuildLogger logger) {
-        List<String> sessionsIds = api.getListOfSessionIds(masterId);
+    public static void properties(Api api, JSONArray properties, String masterId, BuildLogger logger){
+        List<String> sessionsIds=null;
+        try{
+            sessionsIds = api.getListOfSessionIds(masterId);
+        }catch (Exception e){
+            logger.addErrorLogEntry("Failed to get sessionIds: "+e.getMessage());
+        }
         logger.addBuildLogEntry("Trying to submit jmeter properties: got " + sessionsIds.size() + " sessions");
         for (String s : sessionsIds) {
             logger.addBuildLogEntry("Submitting jmeter properties to sessionId=" + s);
