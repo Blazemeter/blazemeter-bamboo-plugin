@@ -181,6 +181,7 @@ public class ServiceManager {
 
     public static TaskState ciStatus(Api api, String masterId, BuildLogger logger) {
         JSONObject jo;
+        TaskState taskState = TaskState.SUCCESS;
         JSONArray failures=new JSONArray();
         JSONArray errors=new JSONArray();
         try {
@@ -194,21 +195,24 @@ public class ServiceManager {
         } catch (Exception e) {
             logger.addErrorLogEntry("No thresholds on server: setting 'success' for CIStatus ");
         }finally {
-            if(errors.length()>0){
+            if (errors.length() > 0) {
                 logger.addErrorLogEntry("Having errors while test status validation...");
                 logger.addErrorLogEntry("Errors: " + errors.toString());
-                logger.addErrorLogEntry("Setting CIStatus="+ CIStatus.errors.name());
-                return TaskState.ERROR;
+                logger.addErrorLogEntry("Setting CIStatus=" + CIStatus.errors.name());
+                taskState = errorsFailed(errors) ? TaskState.FAILED : TaskState.ERROR;
             }
-            if(failures.length()>0){
+            if (failures.length() > 0) {
                 logger.addErrorLogEntry("Having failures while test status validation...");
                 logger.addErrorLogEntry("Failures: " + failures.toString());
-                logger.addErrorLogEntry("Setting CIStatus="+CIStatus.failures.name());
-                return TaskState.FAILED;
+                logger.addErrorLogEntry("Setting CIStatus=" + CIStatus.failures.name());
+                taskState=TaskState.FAILED;
+                return taskState;
             }
-            logger.addBuildLogEntry("No errors/failures while validating CIStatus: setting "+CIStatus.success.name());
+            if (taskState.equals(TaskState.SUCCESS)) {
+                logger.addBuildLogEntry("No errors/failures while validating CIStatus: setting " + CIStatus.success.name());
+            }
         }
-        return TaskState.SUCCESS;
+        return taskState;
     }
 
 
@@ -454,4 +458,22 @@ public class ServiceManager {
             logger.addErrorLogEntry("Failed to unzip report: check that it is downloaded");
         }
     }
+
+
+    public static boolean errorsFailed(JSONArray errors) {
+        int l = errors.length();
+        for (int i = 0; i < l; i++) {
+            try {
+                if (errors.getJSONObject(i).getInt(JsonConstants.CODE) == 0 | errors.getJSONObject(i).getInt(JsonConstants.CODE) == 70404) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } catch (JSONException je) {
+                return false;
+            }
+        }
+        return false;
+    }
+
 }

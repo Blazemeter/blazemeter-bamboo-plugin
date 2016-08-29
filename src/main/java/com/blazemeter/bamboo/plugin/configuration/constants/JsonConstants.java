@@ -28,6 +28,8 @@ public interface JsonConstants {
     String ERROR = "error";
     String NOTE="note";
     String SESSIONS="sessions";
+    String CODE="code";
+
 
 
 }

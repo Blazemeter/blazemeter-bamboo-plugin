@@ -451,26 +451,6 @@ public class MockedAPI {
     }
 
 
-
-    public static void autoDetectVersion()  throws IOException{
-        File jsonFile = new File(TestConstants.RESOURCES + "/autoDetectVersion_v2.json");
-        String autoDetectVersion= FileUtils.readFileToString(jsonFile);
-        mockServer.when(
-                request()
-                        .withMethod("GET")
-                        .withPath("/api/latest/user")
-                        .withHeader("Accept", "application/json")
-                        .withQueryStringParameters(
-                                new Parameter("api_key", TestConstants.MOCKED_USER_KEY_V2)
-                        ),
-                unlimited()
-        )
-                .respond(
-                        response().withHeader("application/json")
-                                .withStatusCode(200).withBody(autoDetectVersion));
-}
-
-
     public static void getTestConfig()  throws IOException{
         File jsonFile = new File(TestConstants.RESOURCES + "/getTestConfig.json");
         String getTestConfig= FileUtils.readFileToString(jsonFile);
@@ -510,7 +490,7 @@ public class MockedAPI {
 
     public static void getCIStatus()  throws IOException{
         File returnFile=new File(TestConstants.RESOURCES+"/getCIStatus_failure.json");
-        String returnStr= FileUtils.readFileToString(returnFile);
+        String returnStr=FileUtils.readFileToString(returnFile);
         mockServer.when(
                 request()
                         .withMethod("GET")
@@ -526,7 +506,7 @@ public class MockedAPI {
                                 .withStatusCode(200).withBody(returnStr));
 
         returnFile=new File(TestConstants.RESOURCES+"/getCIStatus_success.json");
-        returnStr= FileUtils.readFileToString(returnFile);
+        returnStr=FileUtils.readFileToString(returnFile);
         mockServer.when(
                 request()
                         .withMethod("GET")
@@ -542,12 +522,44 @@ public class MockedAPI {
                                 .withStatusCode(200).withBody(returnStr));
 
 
-        returnFile=new File(TestConstants.RESOURCES+"/getCIStatus_error.json");
-        returnStr= FileUtils.readFileToString(returnFile);
+        returnFile=new File(TestConstants.RESOURCES+"/getCIStatus_error_61700.json");
+        returnStr=FileUtils.readFileToString(returnFile);
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath("/api/latest/masters/" + TestConstants.TEST_MASTER_ERROR +"/ci-status")
+                        .withPath("/api/latest/masters/" + TestConstants.TEST_MASTER_ERROR_61700 +"/ci-status")
+                        .withHeader("Accept", "application/json")
+                        .withQueryStringParameters(
+                                new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
+                        ),
+                unlimited()
+        )
+                .respond(
+                        response().withHeader("application/json")
+                                .withStatusCode(200).withBody(returnStr));
+
+        returnFile=new File(TestConstants.RESOURCES+"/getCIStatus_error_0.json");
+        returnStr=FileUtils.readFileToString(returnFile);
+        mockServer.when(
+                request()
+                        .withMethod("GET")
+                        .withPath("/api/latest/masters/" + TestConstants.TEST_MASTER_ERROR_0 +"/ci-status")
+                        .withHeader("Accept", "application/json")
+                        .withQueryStringParameters(
+                                new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
+                        ),
+                unlimited()
+        )
+                .respond(
+                        response().withHeader("application/json")
+                                .withStatusCode(200).withBody(returnStr));
+
+        returnFile=new File(TestConstants.RESOURCES+"/getCIStatus_error_70404.json");
+        returnStr=FileUtils.readFileToString(returnFile);
+        mockServer.when(
+                request()
+                        .withMethod("GET")
+                        .withPath("/api/latest/masters/" + TestConstants.TEST_MASTER_ERROR_70404 +"/ci-status")
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
