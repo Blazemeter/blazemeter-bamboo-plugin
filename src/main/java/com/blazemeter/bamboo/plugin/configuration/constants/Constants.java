@@ -18,6 +18,7 @@ public interface Constants {
     String BZM_HTTP_LOG="BZM-HTTP-LOG";
     String HTTP_LOG="http-log";
     String BM_TRESHOLDS="bm-thresholds.xml";
+    String THREE_DOTS ="...";
 
 //	 String SETTINGS_API_VERSION = "api_version";
 
@@ -31,6 +32,7 @@ public interface Constants {
      String SETTINGS_JUNIT_PATH="junit.path";
 
      String NOT_IMPLEMENTED="This call is not implemented.";
+     String UNKNOWN_TYPE="unknown_type";
 
 
     //BlazeMeterConfigTask

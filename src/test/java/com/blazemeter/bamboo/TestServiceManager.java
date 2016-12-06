@@ -59,13 +59,13 @@ public class TestServiceManager {
     public void getTests(){
         Api api = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
         LinkedHashMultimap<String,String> tests=ServiceManager.getTests(api);
-        Assert.assertTrue(tests.size()==5);
+        Assert.assertTrue(tests.size()==4);
     }
 
     @Test
     public void startTest(){
         Api api = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
-        String testId=ServiceManager.startTest(api,TestConstants.TEST_MASTER_ID,log);
+        String testId=ServiceManager.startTest(api,TestConstants.TEST_MASTER_TUT_GY,log);
         Assert.assertEquals("15102806",testId);
     }
 

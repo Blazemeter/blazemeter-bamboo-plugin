@@ -18,7 +18,6 @@ import java.util.Map;
 
 import com.blazemeter.bamboo.plugin.api.Api;
 import com.blazemeter.bamboo.plugin.api.ApiV3Impl;
-import com.blazemeter.bamboo.plugin.api.HttpUtility;
 import com.blazemeter.bamboo.plugin.configuration.constants.AdminServletConst;
 import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
 import com.google.common.collect.LinkedHashMultimap;
@@ -57,7 +56,6 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
 	@Override
 	public void populateContextForCreate(Map<String, Object> context) {
 		super.populateContextForCreate(context);
-		HttpUtility.resetHttpLog();
 		PluginSettingsFactory pluginSettingsFactory=StaticAccessor.getSettingsFactory();
         PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
 		String userKey = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
@@ -70,7 +68,6 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
 	@Override
 	public void populateContextForEdit(Map<String, Object> context, TaskDefinition taskDefinition) {
 		super.populateContextForEdit(context, taskDefinition);
-		HttpUtility.resetHttpLog();
 		taskConfiguratorHelper.populateContextWithConfiguration(context, taskDefinition, FIELDS_TO_COPY);
         PluginSettingsFactory pluginSettingsFactory=StaticAccessor.getSettingsFactory();
         PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
@@ -90,7 +87,6 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
 	@Override
 	public void populateContextForView(Map<String, Object> context, TaskDefinition taskDefinition) {
 		super.populateContextForView(context, taskDefinition);
-		HttpUtility.resetHttpLog();
 		taskConfiguratorHelper.populateContextWithConfiguration(context, taskDefinition, FIELDS_TO_COPY);
 	}
 
@@ -100,7 +96,7 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
 
 		final String selectedTest = params.getString(Constants.SETTINGS_SELECTED_TEST_ID);
 
-        if (StringUtils.isEmpty(this.api.getUserKey())) {
+        if (StringUtils.isEmpty(this.api.getApiKey())) {
 			errorCollection.addErrorMessage("Cannot load tests from BlazeMeter server. Invalid user key!");
 		}
 

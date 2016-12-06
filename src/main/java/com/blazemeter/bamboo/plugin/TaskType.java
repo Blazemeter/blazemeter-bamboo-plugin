@@ -79,7 +79,6 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         File dd=new File(context.getWorkingDirectory().getAbsolutePath()+"/build # "
                 +context.getBuildContext().getBuildNumber());
         String httpLog=dd+File.separator+Constants.HTTP_LOG;
-        HttpUtility.setHttpLog(httpLog);
         this.api = new ApiV3Impl(userKey, serverUrl);
 
         rootDirectory = context.getRootDirectory();
@@ -111,7 +110,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
             ServiceManager.properties(this.api,props,masterId,logger);
         }
         do {
-            status = this.api.testStatus(masterId);
+            status = this.api.masterStatus(masterId);
             try {
                 Thread.currentThread().sleep(CHECK_INTERVAL);
             } catch (InterruptedException e) {
@@ -149,7 +148,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
             }
 
             logger.addBuildLogEntry("Check if the test is still running. Time passed since start:" + ((System.currentTimeMillis() - timeOfStart) / 1000 / 60) + " minutes.");
-            status = this.api.testStatus(masterId);
+            status = this.api.masterStatus(masterId);
             if (status.equals(TestStatus.NotRunning)) {
                 logger.addBuildLogEntry("Test is finished earlier then estimated! Time passed since start:" + ((System.currentTimeMillis() - timeOfStart) / 1000 / 60) + " minutes.");
                 break;

@@ -49,15 +49,15 @@ public class ServiceManager {
         String publicToken="";
         String reportUrl=null;
         try {
-            jo = api.publicToken(masterId);
+            jo = api.generatePublicToken(masterId);
             if(jo.get(JsonConstants.ERROR).equals(JSONObject.NULL)){
                 JSONObject result=jo.getJSONObject(JsonConstants.RESULT);
                 publicToken=result.getString("publicToken");
-                reportUrl=api.url()+"/app/?public-token="+publicToken+"#masters/"+masterId+"/summary";
+                reportUrl=api.getServerUrl()+"/app/?public-token="+publicToken+"#masters/"+masterId+"/summary";
             }else{
                 logger.addErrorLogEntry("Problems with generating public-token for report URL: "+jo.get(JsonConstants.ERROR).toString());
                 logger.addErrorLogEntry("Problems with generating public-token for report URL: "+jo.get(JsonConstants.ERROR).toString());
-                reportUrl=api.url()+"/app/#masters/"+masterId+"/summary";
+                reportUrl=api.getServerUrl()+"/app/#masters/"+masterId+"/summary";
             }
 
         } catch (Exception e){
@@ -90,7 +90,7 @@ public class ServiceManager {
 	public static LinkedHashMultimap<String, String> getTests(Api api) {
         LinkedHashMultimap<String,String> tests= LinkedHashMultimap.create();
         try {
-			tests=api.getTestList();
+			tests=api.testsMultiMap();
 		} catch (IOException e) {
             e.printStackTrace();
         } catch (Exception e) {
@@ -110,7 +110,7 @@ public class ServiceManager {
         while (!note && n < 6) {
             try {
                 Thread.sleep(DELAY);
-                int statusCode = api.masterStatus(masterId);
+                int statusCode = api.getTestMasterStatusCode(masterId);
                 if (statusCode > 20) {
                     note = api.notes(notes, masterId);
                 }
@@ -130,40 +130,36 @@ public class ServiceManager {
 
 	public static String startTest(Api api, String testId, BuildLogger logger) {
         int countStartRequests = 0;
-        String startResponse=null;
+        HashMap<String, String> startTestResp = new HashMap<String, String>();
         try {
-            logger.addBuildLogEntry("Trying to start test with testId="+testId+" for userKey="+api.getUserKey());
-            TestType testType=getTestType(api,testId,logger);
+            logger.addBuildLogEntry("Trying to start test with testId="+testId+" for userKey="+api.getApiKey());
+
             do {
-                startResponse=api.startTest(testId,testType);
+                boolean collection = collection(testId, api);
+                startTestResp=api.startTest(testId,collection);
                 countStartRequests++;
                 if (countStartRequests > 5) {
-                    logger.addErrorLogEntry("Could not start BlazeMeter Test with userKey=" + api.getUserKey() + " testId=" + testId);
-                    return startResponse;
+                    logger.addErrorLogEntry("Could not start BlazeMeter Test with userKey=" + api.getApiKey() + " testId=" + testId);
+                    return startTestResp.get(JsonConstants.ID);
                 }
-            } while (startResponse.length()==0);
-            Integer.parseInt(startResponse);
-            logger.addBuildLogEntry("Test with testId="+testId+" was started with masterId="+startResponse);
+            } while (startTestResp.get(JsonConstants.ID).length()==0);
+            Integer.parseInt(startTestResp.get(JsonConstants.ID));
+            logger.addBuildLogEntry("Test with testId="+testId+" was started with masterId="+startTestResp.get(JsonConstants.ID));
         }catch (NumberFormatException e) {
-            logger.addErrorLogEntry("Error while starting BlazeMeter Test: "+startResponse);
-            throw new NumberFormatException(startResponse);
+            logger.addErrorLogEntry("Error while starting BlazeMeter Test: "+startTestResp.get(JsonConstants.ID));
+            throw new NumberFormatException(startTestResp.get(JsonConstants.ID));
         }catch (Exception e) {
             logger.addErrorLogEntry("Error while starting BlazeMeter Test [" + e.getMessage() + "]");
             logger.addErrorLogEntry("Check server & proxy settings");
         }
-        return startResponse;
+        return startTestResp.get(JsonConstants.ID);
     }
 
 
-	/**
-	 * Get report results.
-	 * @param logger 
-	 * @return -1 fail, 0 success, 1 unstable
-	 */
     public static TestResult getReport(Api api, String masterId, BuildLogger logger) {
         TestResult testResult = null;
         try {
-            logger.addBuildLogEntry("Trying to request aggregate report. UserKey="+api.getUserKey()+" masterId="+masterId);
+            logger.addBuildLogEntry("Trying to request aggregate report. UserKey="+api.getApiKey()+" masterId="+masterId);
             JSONObject aggregate=api.testReport(masterId);
             testResult = new TestResult(aggregate);
             logger.addBuildLogEntry(testResult.toString());
@@ -185,11 +181,10 @@ public class ServiceManager {
         JSONArray failures=new JSONArray();
         JSONArray errors=new JSONArray();
         try {
-            jo=api.ciStatus(masterId);
+            jo=api.getCIStatus(masterId);
             logger.addBuildLogEntry("Test status object = " + jo.toString());
-            JSONObject result=jo.getJSONObject(JsonConstants.RESULT);
-            failures=result.getJSONArray(JsonConstants.FAILURES);
-            errors=result.getJSONArray(JsonConstants.ERRORS);
+            failures=jo.getJSONArray(JsonConstants.FAILURES);
+            errors=jo.getJSONArray(JsonConstants.ERRORS);
         } catch (JSONException je) {
             logger.addErrorLogEntry("No thresholds on server: setting 'success' for CIStatus ");
         } catch (Exception e) {
@@ -220,7 +215,7 @@ public class ServiceManager {
         boolean terminate=false;
         try {
 
-            int statusCode = api.masterStatus(masterId);
+            int statusCode = api.getTestMasterStatusCode(masterId);
             if (statusCode < 100) {
                 api.terminateTest(masterId);
                 terminate=true;
@@ -233,26 +228,6 @@ public class ServiceManager {
             logger.addBuildLogEntry("Error while trying to stop test with testId=" + masterId + ", " + e.getMessage());
         }finally {
             return terminate;
-        }
-    }
-
-    private static TestType getTestType(Api api,String testId,BuildLogger logger){
-        TestType testType=TestType.http;
-        logger.addBuildLogEntry("Detecting testType....");
-        try{
-            JSONArray result=api.getTestsJSON().getJSONArray(JsonConstants.RESULT);
-            int resultLength=result.length();
-            for (int i=0;i<resultLength;i++){
-                JSONObject jo=result.getJSONObject(i);
-                if(String.valueOf(jo.getInt(JsonConstants.ID)).equals(testId)){
-                    testType= TestType.valueOf(jo.getString(JsonConstants.TYPE));
-                    logger.addBuildLogEntry("Received testType=" + testType.toString() + " for testId=" + testId);
-                }
-            }
-        } catch (Exception e) {
-            logger.addBuildLogEntry("Error while detecting type of test:" + e);
-        }finally {
-            return testType;
         }
     }
 
@@ -271,7 +246,7 @@ public class ServiceManager {
 
     public static void downloadJunitReport(Api api,String masterId, File junitD, BuildLogger logger) {
         try {
-            String junit = api.retrieveJunit(masterId);
+            String junit = api.retrieveJUNITXML(masterId);
             File junitFile=new File(junitD,Constants.BM_TRESHOLDS);
             logger.addBuildLogEntry("Trying to save junit report to "+junitFile.getAbsolutePath());
             FileUtils.writeStringToFile(junitFile,junit);
@@ -475,5 +450,28 @@ public class ServiceManager {
         }
         return false;
     }
+
+    public static boolean collection(String testId,Api api) throws Exception{
+        boolean exists=false;
+        boolean collection=false;
+
+        LinkedHashMultimap tests = api.testsMultiMap();
+        Set<Map.Entry> entries = tests.entries();
+        for (Map.Entry e : entries) {
+            int point = ((String) e.getValue()).indexOf(".");
+            if (testId.contains(((String) e.getValue()).substring(0,point))) {
+                collection = (((String) e.getValue()).substring(point+1)).contains("multi");
+                exists=true;
+            }
+            if (collection) {
+                break;
+            }
+        }
+        if(!exists){
+            throw new Exception("Test with test id = "+testId+" is not present on server");
+        }
+        return collection;
+    }
+
 
 }

@@ -70,4 +70,8 @@ public interface UrlManager {
 
     String masterId(String appKey,String userKey, String masterId);
 
-}
+    String version(String appKey);
+
+    String testConfig(String appKey, String userKey, String testId);
+
+    }

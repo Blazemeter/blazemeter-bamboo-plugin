@@ -324,4 +324,30 @@ public class UrlManagerV3Impl implements UrlManager {
         }
         return masterIdUrl= serverUrl +LATEST+"/masters/"+masterId+"?api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
     }
+
+    @Override
+    public String version(String appKey) {
+        String version=null;
+        try {
+            appKey = URLEncoder.encode(appKey, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return version= serverUrl +LATEST+WEB+"/version?app_key="+appKey+ CLIENT_IDENTIFICATION;
+    }
+
+    @Override
+    public String testConfig(String appKey, String userKey, String testId){
+        String getTestInfo=null;
+        try {
+            appKey = URLEncoder.encode(appKey, "UTF-8");
+            userKey = URLEncoder.encode(userKey, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        getTestInfo= serverUrl +LATEST+"/tests/"+testId+"?api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
+
+        return getTestInfo;
+    }
+
 }

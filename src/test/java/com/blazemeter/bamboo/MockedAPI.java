@@ -302,7 +302,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("POST")
-                        .withPath("/api/latest/tests/"+TestConstants.TEST_MASTER_ID +"/start")
+                        .withPath("/api/latest/tests/"+TestConstants.TEST_MASTER_TUT_GY +"/start")
                         .withHeader("Accept", "application/json")
                         .withQueryStringParameters(
                                 new Parameter("api_key", TestConstants.MOCKED_USER_KEY_VALID)
@@ -394,7 +394,7 @@ public class MockedAPI {
                         response().withHeader("application/json")
                                 .withStatusCode(200).withBody(getTests));
 
-        jsonFile = new File(TestConstants.RESOURCES + "/getTests_6.json");
+        jsonFile = new File(TestConstants.RESOURCES + "/getTests_5.json");
         getTests= FileUtils.readFileToString(jsonFile);
         mockServer.when(
                 request()
@@ -452,7 +452,7 @@ public class MockedAPI {
 
 
     public static void getTestConfig()  throws IOException{
-        File jsonFile = new File(TestConstants.RESOURCES + "/getTestConfig.json");
+        File jsonFile = new File(TestConstants.RESOURCES + "/testConfig.json");
         String getTestConfig= FileUtils.readFileToString(jsonFile);
         mockServer.when(
                 request()

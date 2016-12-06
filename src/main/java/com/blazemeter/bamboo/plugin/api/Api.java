@@ -11,62 +11,80 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  */
+
 package com.blazemeter.bamboo.plugin.api;
 
-import com.blazemeter.bamboo.plugin.TestStatus;
 import com.google.common.collect.LinkedHashMultimap;
+import com.blazemeter.bamboo.plugin.TestStatus;
+import okhttp3.MediaType;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import javax.mail.MessagingException;
+import javax.servlet.ServletException;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 
 public interface Api {
-    String APP_KEY = "bmboo0x98a8w9s4s7c4";
 
-    TestStatus testStatus(String testId);
+    MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+    MediaType TEXT = MediaType.parse("text/plain; charset=ISO-8859-1");
+    String ACCEPT="Accept";
+    String CONTENT_TYPE="Content-type";
+    String APP_JSON="application/json";
+    String APP_JSON_UTF_8="application/json; charset=UTF-8";
 
-    String startTest(String testId, TestType testType) throws Exception;
+    String APP_KEY = "jnk100x987c06f4e10c4";
 
-    boolean active(String testId);
+    TestStatus masterStatus(String id);
 
-    int masterStatus(String id);
+    int getTestMasterStatusCode(String id);
 
-    JSONObject retrieveJtlZip(String sessionId) throws Exception;
+    HashMap<String,String> startTest(String testId, boolean collection) throws JSONException,IOException;
 
-    String retrieveJunit(String masterId) throws Exception;
+    int getTestCount() throws JSONException, IOException, ServletException;
 
-    int getTestCount() throws Exception;
+    JSONObject stopTest(String testId) throws IOException, JSONException;
 
-    boolean stopTest(String testId) throws JSONException;
+    void terminateTest(String testId) throws IOException;
 
     JSONObject testReport(String reportId);
 
-    LinkedHashMultimap<String, String> getTestList() throws IOException;
+    LinkedHashMultimap<String, String> testsMultiMap() throws IOException, MessagingException;
 
-    boolean verifyUserKey();
+    JSONObject getUser() throws IOException,JSONException;
 
-    JSONObject ciStatus(String sessionId);
+    JSONObject getCIStatus(String sessionId) throws JSONException, IOException;
 
-    String getUserKey();
+    boolean active(String testId);
 
-    void  setUserKey(String userKey);
+    String retrieveJUNITXML(String sessionId) throws IOException;
 
-    List<String> getListOfSessionIds(String masterId) throws Exception;
+    JSONObject retrieveJtlZip(String sessionId) throws IOException, JSONException;
 
-    JSONObject terminateTest(String testId);
+    List<String> getListOfSessionIds(String masterId) throws IOException,JSONException;
 
-    JSONObject getTestsJSON();
+    JSONObject generatePublicToken(String sessionId)throws IOException,JSONException;
 
-    String url();
+    String getServerUrl();
 
-    JSONObject publicToken(String masterId);
+    void setServerUrl(String serverUrl);
 
-    boolean properties(JSONArray properties, String sessionId) throws Exception;
+    boolean ping() throws Exception;
 
     boolean notes(String note,String masterId)throws Exception;
 
+    boolean properties(JSONArray properties, String sessionId) throws Exception;
+
+    JSONObject testConfig(String testId) throws IOException, JSONException;
+
+    String getApiKey();
+
+    void setApiKey(String apiKey);
+
+    boolean verifyUserKey();
 }
 

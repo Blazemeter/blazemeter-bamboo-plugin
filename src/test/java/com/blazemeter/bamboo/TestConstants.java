@@ -25,6 +25,7 @@ public interface TestConstants {
     String MOCKED_USER_KEY_V2 ="mockedAPIKeyV2";
     String MOCKED_USER_KEY_6_TESTS ="mockedAPIKeyValid-1-tests";
     String MOCKED_USER_KEY_1_TEST ="mockedAPIKeyValid-1-test";
+    String MOCKED_USER_KEY_5_TESTS ="mockedAPIKeyValid-1-tests";
     String MOCKED_USER_KEY_0_TESTS ="mockedAPIKeyValid-0-tests";
     String MOCKED_USER_KEY_INVALID ="mockedAPIKeyInValid";
     String MOCKED_USER_KEY_EXCEPTION ="mockedAPIKeyException";
@@ -33,6 +34,7 @@ public interface TestConstants {
     String mockedApiUrl="http://127.0.0.1:"+mockedApiPort;
 
     String TEST_MASTER_ID ="testMasterId";
+    String TEST_MASTER_TUT_GY ="5270902";
     String TEST_MASTER_NOT_FOUND ="testMaster-not-found";
     String TEST_MASTER_0 ="testMaster-0";
     String TEST_MASTER_25 ="testMaster-25";
