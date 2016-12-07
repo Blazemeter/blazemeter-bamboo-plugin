@@ -27,12 +27,12 @@ import com.atlassian.bamboo.task.TaskState;
 import com.atlassian.util.concurrent.NotNull;
 import com.blazemeter.bamboo.plugin.api.Api;
 import com.blazemeter.bamboo.plugin.api.CIStatus;
-import com.blazemeter.bamboo.plugin.api.TestType;
 import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
 import com.blazemeter.bamboo.plugin.configuration.constants.JsonConstants;
 import com.blazemeter.bamboo.plugin.testresult.TestResult;
 import com.google.common.collect.LinkedHashMultimap;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -45,24 +45,26 @@ public class ServiceManager {
 	}
 
     public static String getReportUrl(Api api, String masterId, BuildLogger logger) {
-        JSONObject jo=null;
-        String publicToken="";
-        String reportUrl=null;
+        JSONObject jo = null;
+        String publicToken = "";
+        String reportUrl = null;
         try {
             jo = api.generatePublicToken(masterId);
-            if(jo.get(JsonConstants.ERROR).equals(JSONObject.NULL)){
-                JSONObject result=jo.getJSONObject(JsonConstants.RESULT);
-                publicToken=result.getString("publicToken");
-                reportUrl=api.getServerUrl()+"/app/?public-token="+publicToken+"#masters/"+masterId+"/summary";
-            }else{
-                logger.addErrorLogEntry("Problems with generating public-token for report URL: "+jo.get(JsonConstants.ERROR).toString());
-                logger.addErrorLogEntry("Problems with generating public-token for report URL: "+jo.get(JsonConstants.ERROR).toString());
-                reportUrl=api.getServerUrl()+"/app/#masters/"+masterId+"/summary";
+            if (jo.get(JsonConstants.ERROR).equals(JSONObject.NULL)) {
+                JSONObject result = jo.getJSONObject(JsonConstants.RESULT);
+                publicToken = result.getString("publicToken");
+            } else {
+                logger.addErrorLogEntry("Problems with generating public-token for report URL: " + jo.get(JsonConstants.ERROR).toString());
+                logger.addErrorLogEntry("Problems with generating public-token for report URL: " + jo.get(JsonConstants.ERROR).toString());
+                reportUrl = api.getServerUrl() + "/app/#masters/" + masterId + "/summary";
+            }
+            if (!StringUtils.isBlank(publicToken)) {
+                reportUrl = api.getServerUrl() + "/app/?public-token=" + publicToken + "#masters/" + masterId + "/summary";
             }
 
         } catch (Exception e){
-            logger.addErrorLogEntry("Problems with generating public-token for report URL");
-            logger.addErrorLogEntry("Problems with generating public-token for report URL",e);
+            logger.addErrorLogEntry("Problems with generating public-token for report URL: "+e.getMessage());
+            reportUrl = api.getServerUrl() + "/app/#masters/" + masterId + "/summary";
         }finally {
             return reportUrl;
         }
@@ -458,9 +460,9 @@ public class ServiceManager {
         LinkedHashMultimap tests = api.testsMultiMap();
         Set<Map.Entry> entries = tests.entries();
         for (Map.Entry e : entries) {
-            int point = ((String) e.getValue()).indexOf(".");
-            if (testId.contains(((String) e.getValue()).substring(0,point))) {
-                collection = (((String) e.getValue()).substring(point+1)).contains("multi");
+            int point = ((String) e.getKey()).indexOf(".");
+            if (testId.contains(((String) e.getKey()).substring(0,point))) {
+                collection = (((String) e.getKey()).substring(point+1)).contains("multi");
                 exists=true;
             }
             if (collection) {

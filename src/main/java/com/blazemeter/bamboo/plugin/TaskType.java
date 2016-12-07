@@ -65,7 +65,9 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
         String userKey = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
         String serverUrl = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
-        this.testId = configMap.get(Constants.SETTINGS_SELECTED_TEST_ID);
+        String testId=configMap.get(Constants.SETTINGS_SELECTED_TEST_ID);
+        int point=testId.indexOf(".");
+        this.testId = testId.substring(0,point);
         this.jmeterProps = configMap.get(Constants.SETTINGS_JMETER_PROPERTIES);
         this.jtlReport=configMap.getAsBoolean(Constants.SETTINGS_JTL_REPORT);
         this.junitReport=configMap.getAsBoolean(Constants.SETTINGS_JUNIT_REPORT);
@@ -85,7 +87,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         logger.addBuildLogEntry("Attempting to start test with id:" + testId);
         logger.addBuildLogEntry("Http log will be available at " + httpLog);
         try{
-            this.masterId = ServiceManager.startTest(api, testId, logger);
+            this.masterId = ServiceManager.startTest(api, this.testId, logger);
         }catch (NumberFormatException e){
             return resultBuilder.failed().build();
         }

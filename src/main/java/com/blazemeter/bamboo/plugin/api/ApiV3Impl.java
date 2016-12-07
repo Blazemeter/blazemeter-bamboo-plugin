@@ -18,7 +18,6 @@ import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
 import com.blazemeter.bamboo.plugin.configuration.constants.JsonConstants;
 import com.blazemeter.bamboo.plugin.TestStatus;
 import com.google.common.collect.LinkedHashMultimap;
-import com.blazemeter.bamboo.plugin.api.UrlManager;
 import okhttp3.*;
 import okhttp3.logging.HttpLoggingInterceptor;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -363,9 +362,8 @@ public class ApiV3Impl implements Api {
                                 if (en != null) {
                                     id = String.valueOf(en.get(JsonConstants.ID));
                                     name = en.has(JsonConstants.NAME) ? en.getString(JsonConstants.NAME).replaceAll("&", "&amp;") : "";
-
                                     String testType = en.has(JsonConstants.TYPE) ? en.getString(JsonConstants.TYPE) : Constants.UNKNOWN_TYPE;
-                                    testListOrdered.put(name, id + "." + testType);
+                                    testListOrdered.put(id + "." + testType,name);
 
                                 }
                             } catch (JSONException ie) {
