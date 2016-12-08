@@ -15,6 +15,7 @@
 package com.blazemeter.bamboo.plugin;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 
 import com.atlassian.bamboo.build.logger.BuildLogger;
@@ -29,6 +30,7 @@ import com.blazemeter.bamboo.plugin.configuration.constants.AdminServletConst;
 import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
 import com.blazemeter.bamboo.plugin.servlet.AdminServlet.Config;
 import com.blazemeter.bamboo.plugin.testresult.TestResult;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 
@@ -79,9 +81,16 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
             return resultBuilder.failed().build();
         }
         File dd=new File(context.getWorkingDirectory().getAbsolutePath()+"/build # "
-                +context.getBuildContext().getBuildNumber());
-        String httpLog=dd+File.separator+Constants.HTTP_LOG;
-        this.api = new ApiV3Impl(userKey, serverUrl);
+                + context.getBuildContext().getBuildNumber());
+        String httpLog = dd + File.separator + Constants.HTTP_LOG;
+        File httpLog_f = new File(httpLog);
+        try {
+            FileUtils.touch(httpLog_f);
+        } catch (IOException e) {
+            logger.addErrorLogEntry("Failed to create http-log file = " + httpLog + ": " + e.getMessage());
+        }
+
+        this.api = new ApiV3Impl(userKey, serverUrl,httpLog);
 
         rootDirectory = context.getRootDirectory();
         logger.addBuildLogEntry("Attempting to start test with id:" + testId);
