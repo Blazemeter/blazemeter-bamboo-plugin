@@ -69,7 +69,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         String serverUrl = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
         String testId=configMap.get(Constants.SETTINGS_SELECTED_TEST_ID);
         int point=testId.indexOf(".");
-        this.testId = testId.substring(0,point);
+        this.testId = point > 0 ? testId.substring(0, point) : testId;
         this.jmeterProps = configMap.get(Constants.SETTINGS_JMETER_PROPERTIES);
         this.jtlReport=configMap.getAsBoolean(Constants.SETTINGS_JTL_REPORT);
         this.junitReport=configMap.getAsBoolean(Constants.SETTINGS_JUNIT_REPORT);
