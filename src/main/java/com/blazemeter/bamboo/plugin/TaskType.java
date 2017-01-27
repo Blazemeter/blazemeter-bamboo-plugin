@@ -89,8 +89,8 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         } catch (IOException e) {
             logger.addErrorLogEntry("Failed to create http-log file = " + httpLog + ": " + e.getMessage());
         }
-
-        this.api = new ApiV3Impl(userKey, serverUrl,httpLog);
+        HttpLogger httpLogger = new HttpLogger(httpLog);
+        this.api = new ApiV3Impl(userKey, serverUrl,httpLogger);
 
         rootDirectory = context.getRootDirectory();
         logger.addBuildLogEntry("Attempting to start test with id:" + testId);
@@ -105,6 +105,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         String reportUrl=null;
         if (masterId==null||masterId.length() == 0) {
             logger.addErrorLogEntry("Failed to start test.");
+            ((HttpLogger)httpLogger).close();
             return resultBuilder.failed().build();
         } else {
             reportUrl= ServiceManager.getReportUrl(api,masterId,logger);
@@ -135,6 +136,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
                 logger.addBuildLogEntry("Check if the test is initialized...");
             } catch (Exception e) {
                 logger.addErrorLogEntry(e.getMessage());
+                ((HttpLogger)httpLogger).close();
                 return resultBuilder.failedWithError().build();
             }
             initTimeOutPassed = System.currentTimeMillis() > testInitStart + INIT_TEST_TIMEOUT;
@@ -142,6 +144,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
 
         if (status.equals(TestStatus.NotRunning)) {
             logger.addErrorLogEntry("Test was not initialized, marking build as failed.");
+            ((HttpLogger)httpLogger).close();
             return resultBuilder.failedWithError().build();
         }
         logger.addBuildLogEntry("Test was initialized on server, testId=" + testId);
@@ -165,6 +168,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
                 break;
             } else if (status.equals(TestStatus.NotFound)) {
                 logger.addErrorLogEntry("BlazeMeter test not found!");
+                ((HttpLogger)httpLogger).close();
                 return resultBuilder.failed().build();
             }
         }
@@ -217,6 +221,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         }
 
         TaskState ciStatus = ServiceManager.ciStatus(this.api, this.masterId, logger);
+        ((HttpLogger)httpLogger).close();
         switch (ciStatus) {
             case FAILED:
                 return resultBuilder.failed().build();

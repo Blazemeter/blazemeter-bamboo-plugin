@@ -52,7 +52,6 @@ public class ApiV3Impl implements Api {
     private String serverUrl;
     UrlManager urlManager;
     private OkHttpClient okhttp = null;
-    private String httpl = null;
 
 
     public ApiV3Impl() {
@@ -105,23 +104,21 @@ public class ApiV3Impl implements Api {
         this.urlManager = new UrlManagerV3Impl(this.serverUrl);
     }
 
-    public ApiV3Impl(String apiKey, String blazeMeterUrl, String httpl) {
+    public ApiV3Impl(String apiKey, String blazeMeterUrl, HttpLogger httpl) {
         this();
         this.apiKey = apiKey;
         this.serverUrl = blazeMeterUrl;
         this.urlManager = new UrlManagerV3Impl(this.serverUrl);
-        this.httpl = httpl;
         HttpLoggingInterceptor httpLog;
-        HttpLogger httpLogger = new HttpLogger(this.httpl);
-        httpLog = new HttpLoggingInterceptor(httpLogger);
+        httpLog = new HttpLoggingInterceptor(httpl);
         httpLog.setLevel(HttpLoggingInterceptor.Level.BODY);
         okhttp = new OkHttpClient.Builder()
-                .addInterceptor(new RetryInterceptor(this.logger))
-                .addInterceptor(httpLog)
-                .connectTimeout(10, TimeUnit.SECONDS)
-                .readTimeout(60, TimeUnit.SECONDS)
-                .proxy(this.proxy)
-                .proxyAuthenticator(this.auth).build();
+            .addInterceptor(new RetryInterceptor(this.logger))
+            .addInterceptor(httpLog)
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
+            .proxy(this.proxy)
+            .proxyAuthenticator(this.auth).build();
     }
 
 
