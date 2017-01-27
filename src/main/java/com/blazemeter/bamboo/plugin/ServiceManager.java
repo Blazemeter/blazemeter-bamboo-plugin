@@ -84,7 +84,7 @@ public class ServiceManager {
 	public String getDebugKey() {
 		return "Debug Key";
 	}
-	
+
 	/**
 	 * returns a hash map with test id as key and test name as value
 	 * @return
@@ -104,14 +104,13 @@ public class ServiceManager {
         }
     }
 
-
-    public static boolean notes(Api api, String masterId, String notes,BuildLogger logger){
-        boolean note=false;
+    public static boolean notes(Api api, String masterId, String notes, BuildLogger logger) throws InterruptedException {
+        boolean note = false;
         int n = 1;
         logger.addBuildLogEntry("Trying to PATCH notes to test report on server: masterId=" + masterId);
         while (!note && n < 6) {
+            Thread.sleep(DELAY);
             try {
-                Thread.sleep(DELAY);
                 int statusCode = api.getTestMasterStatusCode(masterId);
                 if (statusCode > 20) {
                     note = api.notes(notes, masterId);
@@ -121,7 +120,6 @@ public class ServiceManager {
             } finally {
                 n++;
             }
-
         }
         return note;
     }

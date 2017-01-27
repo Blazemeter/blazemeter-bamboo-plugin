@@ -113,7 +113,14 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
             reportUrls.put(context.getBuildContext().getBuildResultKey(),reportUrl);
             context.getBuildContext().getBuildResult().getCustomBuildData().put(Constants.REPORT_URL, reportUrl);
         }
-        ServiceManager.notes(this.api,masterId,this.notes,logger);
+        try {
+            ServiceManager.notes(this.api, masterId, this.notes, logger);
+        } catch (InterruptedException ie) {
+            logger.addErrorLogEntry("BlazeMeter Interrupted Exception: " + ie.getMessage());
+            logger.addBuildLogEntry("Stopping test...");
+            ServiceManager.stopTestMaster(this.api, this.masterId, logger);
+            return resultBuilder.failedWithError().build();
+        }
 
         TestStatus status;
         boolean initTimeOutPassed = false;
