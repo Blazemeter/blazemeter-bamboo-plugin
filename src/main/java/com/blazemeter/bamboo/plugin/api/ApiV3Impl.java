@@ -570,15 +570,14 @@ public class ApiV3Impl implements Api {
             try {
                 Request r = new Request.Builder().url(url).get().build();
                 JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
-                JSONArray result=(JSONArray)jo.get(JsonConstants.RESULT);
-                logger.info("Got result: "+result.toString());
-                if ((result).length() > 0) {
+                logger.info("Got response: " + jo.toString());
+                if (jo.get(JsonConstants.ERROR).equals(JSONObject.NULL)) {
                     return true;
                 } else {
                     return false;
                 }
             } catch (Exception e) {
-                logger.error("Got an exception while verifying userKey: "+e);
+                logger.error("Got an exception while verifying userKey: " + e);
                 return false;
             }
         }
