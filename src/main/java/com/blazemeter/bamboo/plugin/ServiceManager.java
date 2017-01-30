@@ -155,22 +155,20 @@ public class ServiceManager {
         return startTestResp.get(JsonConstants.ID);
     }
 
-
     public static TestResult getReport(Api api, String masterId, BuildLogger logger) {
         TestResult testResult = null;
         try {
-            logger.addBuildLogEntry("Trying to request aggregate report. UserKey="+api.getApiKey()+" masterId="+masterId);
-            JSONObject aggregate=api.testReport(masterId);
+            logger.addBuildLogEntry("Trying to request aggregate report. UserKey=" + api.getApiKey().substring(0, 4) + " masterId=" + masterId);
+            JSONObject aggregate = api.testReport(masterId);
             testResult = new TestResult(aggregate);
             logger.addBuildLogEntry(testResult.toString());
         } catch (JSONException e) {
             logger.addErrorLogEntry("Problems with getting aggregate test report - check test report on server");
         } catch (IOException e) {
             logger.addErrorLogEntry("Problems with getting aggregate test report - check test report on server");
-        } catch (NullPointerException e){
+        } catch (NullPointerException e) {
             logger.addErrorLogEntry("Problems with getting aggregate test report - check test report on server");
-        }
-        finally {
+        } finally {
             return testResult;
         }
     }
