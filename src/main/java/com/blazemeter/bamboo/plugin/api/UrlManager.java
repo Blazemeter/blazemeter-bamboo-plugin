@@ -16,7 +16,7 @@ package com.blazemeter.bamboo.plugin.api;
 import com.blazemeter.bamboo.plugin.ServiceManager;
 
 public interface UrlManager {
-    String CLIENT_IDENTIFICATION = "_clientId=CI_BAMBOO&_clientVersion="
+    String CLIENT_IDENTIFICATION = "&_clientId=CI_BAMBOO&_clientVersion="
             + ServiceManager.getVersion()+"&​";
     String LATEST="/api/latest";
     String TESTS="/tests";
