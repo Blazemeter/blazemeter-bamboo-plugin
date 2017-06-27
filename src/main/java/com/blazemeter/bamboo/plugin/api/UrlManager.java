@@ -34,10 +34,6 @@ public interface UrlManager {
 
     String activeTests(String appKey, String userKey);
 
-    String scriptUpload(String appKey, String userKey, String testId, String fileName);
-
-    String fileUpload(String appKey, String userKey, String testId, String fileName);
-
     String testStart(String appKey, String userKey, String testId);
 
     String collectionStart(String appKey, String userKey, String collectionId);
@@ -51,12 +47,6 @@ public interface UrlManager {
     String getUser(String appKey, String userKey);
 
     String ciStatus(String appKey, String userKey, String sessionId);
-
-    String getTestConfig(String appKey, String userKey, String testId);
-
-    String postJsonConfig(String appKey, String userKey, String testId);
-
-    String createTest(String appKey, String userKey);
 
     String retrieveJUNITXML(String appKey, String userKey, String sessionId);
 

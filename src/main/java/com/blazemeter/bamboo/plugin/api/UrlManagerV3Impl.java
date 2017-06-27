@@ -13,8 +13,6 @@
  */
 package com.blazemeter.bamboo.plugin.api;
 
-import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
@@ -56,16 +54,6 @@ public class UrlManagerV3Impl implements UrlManager {
         getTests= serverUrl +"/api/web/tests?api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
 
         return getTests;
-    }
-
-    @Override
-    public String scriptUpload(String appKey, String userKey, String testId, String fileName) {
-        return Constants.NOT_IMPLEMENTED;
-    }
-
-    @Override
-    public String fileUpload(String appKey, String userKey, String testId, String fileName) {
-        return Constants.NOT_IMPLEMENTED;
     }
 
     @Override
@@ -163,35 +151,6 @@ public class UrlManagerV3Impl implements UrlManager {
     }
 
     @Override
-    public String getTestConfig(String appKey, String userKey, String testId){
-        String getTestInfo=null;
-        try {
-            appKey = URLEncoder.encode(appKey, "UTF-8");
-            userKey = URLEncoder.encode(userKey, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        getTestInfo= serverUrl +"/api/latest/tests/"+testId+"?api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
-
-        return getTestInfo;
-    }
-
-    @Override
-    public String createTest(String appKey, String userKey) {
-        String createTest=null;
-        try {
-            appKey = URLEncoder.encode(appKey, "UTF-8");
-            userKey = URLEncoder.encode(userKey, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        createTest= serverUrl +"/api/latest/tests/custom?custom_test_type=yahoo&api_key="
-                +userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
-
-        return createTest;
-    }
-
-    @Override
     public String ciStatus(String appKey, String userKey, String masterId){
         String getTresholds=null;
         try {
@@ -230,20 +189,6 @@ public class UrlManagerV3Impl implements UrlManager {
     }
 
 
-
-    @Override
-    public String postJsonConfig(String appKey, String userKey, String testId) {
-        String getTestInfo=null;
-        try {
-            appKey = URLEncoder.encode(appKey, "UTF-8");
-            userKey = URLEncoder.encode(userKey, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        getTestInfo= serverUrl +"/api/latest/tests/"+testId+"/custom?custom_test_type=yahoo&api_key="+userKey+"&app_key="+appKey+ CLIENT_IDENTIFICATION;
-
-        return getTestInfo;
-    }
 
     @Override
     public String retrieveJTLZIP(String appKey, String userKey, String sessionId) {

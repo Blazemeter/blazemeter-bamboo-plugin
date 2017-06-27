@@ -16,7 +16,6 @@ package com.blazemeter.bamboo;
 
 import com.blazemeter.bamboo.plugin.api.UrlManager;
 import com.blazemeter.bamboo.plugin.api.UrlManagerV3Impl;
-import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -54,20 +53,6 @@ public class TestBmUrlManagerV3 {
             "&app_key="+appKey+UrlManager.CLIENT_IDENTIFICATION;
     String actGetTestsUrl=bmUrlManager.tests(appKey, userKey);
         Assert.assertEquals(expGetTestsUrl, actGetTestsUrl);
-    }
-
-    @Test
-    public void scriptUpload(){
-        String expScriptUpload= Constants.NOT_IMPLEMENTED;
-        String actScriptUpload=bmUrlManager.scriptUpload(appKey, userKey, testId, fileName);
-        Assert.assertEquals(expScriptUpload, actScriptUpload);
-    }
-
-    @Test
-    public void fileUpload(){
-        String expFileLoad=Constants.NOT_IMPLEMENTED;
-        String actFileLoad=bmUrlManager.scriptUpload(appKey, userKey, testId, fileName);
-        Assert.assertEquals(expFileLoad, actFileLoad);
     }
 
     @Test
@@ -112,30 +97,6 @@ public class TestBmUrlManagerV3 {
                 +userKey+"&app_key="+appKey+UrlManager.CLIENT_IDENTIFICATION;
         String actCIStatus=bmUrlManager.ciStatus(appKey, userKey, masterId);
         Assert.assertEquals(expCIStatus,actCIStatus);
-    }
-
-    @Test
-    public void getTestInfo(){
-        String expGetTestInfo=bmUrlManager.getServerUrl()+"/api/latest/tests/"+testId+"?api_key="+userKey+"&app_key="+appKey
-                +UrlManager.CLIENT_IDENTIFICATION;
-        String actGetTestInfo=bmUrlManager.getTestConfig(appKey, userKey, testId);
-        Assert.assertEquals(expGetTestInfo,actGetTestInfo);
-    }
-
-    @Test
-    public void postJsonConfig(){
-        String expPutTestInfo=bmUrlManager.getServerUrl()+"/api/latest/tests/"+testId+
-                "/custom?custom_test_type=yahoo&api_key="+userKey+"&app_key="+appKey+UrlManager.CLIENT_IDENTIFICATION;
-        String actPutTestInfo=bmUrlManager.postJsonConfig(appKey, userKey, testId);
-        Assert.assertEquals(expPutTestInfo,actPutTestInfo);
-    }
-
-    @Test
-    public void createTest(){
-        String expCreateTest=bmUrlManager.getServerUrl()+"/api/latest/tests/custom?custom_test_type=yahoo&api_key="
-                +userKey+"&app_key="+appKey+UrlManager.CLIENT_IDENTIFICATION;
-        String actCreateTest=bmUrlManager.createTest(appKey, userKey);
-        Assert.assertEquals(expCreateTest,actCreateTest);
     }
 
     @Test
