@@ -14,17 +14,17 @@
 
 package com.blazemeter.bamboo.plugin;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-
 import com.atlassian.bamboo.build.logger.BuildLogger;
 import com.atlassian.bamboo.configuration.ConfigurationMap;
 import com.atlassian.bamboo.process.ProcessService;
-import com.atlassian.bamboo.task.*;
-import com.atlassian.sal.api.pluginsettings.PluginSettings;
-import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
-import com.blazemeter.bamboo.plugin.api.*;
+import com.atlassian.bamboo.task.TaskContext;
+import com.atlassian.bamboo.task.TaskException;
+import com.atlassian.bamboo.task.TaskResult;
+import com.atlassian.bamboo.task.TaskResultBuilder;
+import com.atlassian.bamboo.task.TaskState;
+import com.blazemeter.bamboo.plugin.api.Api;
+import com.blazemeter.bamboo.plugin.api.ApiV3Impl;
+import com.blazemeter.bamboo.plugin.api.HttpLogger;
 import com.blazemeter.bamboo.plugin.configuration.StaticAccessor;
 import com.blazemeter.bamboo.plugin.configuration.constants.AdminServletConst;
 import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
@@ -33,9 +33,14 @@ import com.blazemeter.bamboo.plugin.testresult.TestResult;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
+import org.springframework.stereotype.Component;
 
+import java.io.File;
+import java.io.IOException;
+
+@Component
 public class TaskType implements com.atlassian.bamboo.task.TaskType {
-	private static final int CHECK_INTERVAL = 30000;
+    private static final int CHECK_INTERVAL = 30000;
     private static final int INIT_TEST_TIMEOUT = 600000;
 
     String testId;
@@ -45,42 +50,39 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
     String jtlPath;
     String junitPath;
     Api api;
-    boolean jtlReport=false;
-    boolean junitReport=false;
-	File rootDirectory;
+    boolean jtlReport = false;
+    boolean junitReport = false;
+    File rootDirectory;
 
-	ProcessService processService;
-	private final PluginSettingsFactory pluginSettingsFactory;
+    ProcessService processService;
 
-	public TaskType(final ProcessService processService, PluginSettingsFactory pluginSettingsFactory){
-		this.processService = processService;
-		this.pluginSettingsFactory = pluginSettingsFactory;
-	}
+    public TaskType(final ProcessService processService) {
+        this.processService = processService;
+    }
 
- 	@Override
-	public TaskResult execute(TaskContext context) throws TaskException {
+    @Override
+    public TaskResult execute(TaskContext context) throws TaskException {
         final BuildLogger logger = context.getBuildLogger();
         TaskResultBuilder resultBuilder = TaskResultBuilder.create(context);
         ConfigurationMap configMap = context.getConfigurationMap();
         logger.addBuildLogEntry("Executing BlazeMeter task...");
-        logger.addBuildLogEntry("BlazemeterBamboo plugin v."+ ServiceManager.getVersion());
-        PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
-        String userKey = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
-        String serverUrl = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
-        String testId=configMap.get(Constants.SETTINGS_SELECTED_TEST_ID);
-        int point=testId.indexOf(".");
+        logger.addBuildLogEntry("BlazemeterBamboo plugin v." + ServiceManager.getVersion());
+        String userKey = configMap.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
+        String serverUrl = configMap.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
+        String testId = configMap.get(Constants.SETTINGS_SELECTED_TEST_ID);
+        int point = testId.indexOf(".");
         this.testId = point > 0 ? testId.substring(0, point) : testId;
         this.jmeterProps = configMap.get(Constants.SETTINGS_JMETER_PROPERTIES);
-        this.jtlReport=configMap.getAsBoolean(Constants.SETTINGS_JTL_REPORT);
-        this.junitReport=configMap.getAsBoolean(Constants.SETTINGS_JUNIT_REPORT);
+        this.jtlReport = configMap.getAsBoolean(Constants.SETTINGS_JTL_REPORT);
+        this.junitReport = configMap.getAsBoolean(Constants.SETTINGS_JUNIT_REPORT);
         this.notes = configMap.get(Constants.SETTINGS_NOTES);
-        this.jtlPath=configMap.get(Constants.SETTINGS_JTL_PATH);
-        this.junitPath=configMap.get(Constants.SETTINGS_JUNIT_PATH);
+        this.jtlPath = configMap.get(Constants.SETTINGS_JTL_PATH);
+        this.junitPath = configMap.get(Constants.SETTINGS_JUNIT_PATH);
         if (StringUtils.isBlank(userKey)) {
             logger.addErrorLogEntry("BlazeMeter user key not defined!");
             return resultBuilder.failed().build();
         }
-        File dd=new File(context.getWorkingDirectory().getAbsolutePath()+"/build # "
+        File dd = new File(context.getWorkingDirectory().getAbsolutePath() + "/build # "
                 + context.getBuildContext().getBuildNumber());
         String httpLog = dd + File.separator + Constants.HTTP_LOG;
         File httpLog_f = new File(httpLog);
@@ -90,27 +92,28 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
             logger.addErrorLogEntry("Failed to create http-log file = " + httpLog + ": " + e.getMessage());
         }
         HttpLogger httpLogger = new HttpLogger(httpLog);
-        this.api = new ApiV3Impl(userKey, serverUrl,httpLogger);
+        this.api = new ApiV3Impl(userKey, serverUrl, httpLogger);
 
         rootDirectory = context.getRootDirectory();
         logger.addBuildLogEntry("Attempting to start test with id:" + testId);
         logger.addBuildLogEntry("Http log will be available at " + httpLog);
-        try{
+        try {
             this.masterId = ServiceManager.startTest(api, this.testId, logger);
-        }catch (NumberFormatException e){
+        } catch (NumberFormatException e) {
             return resultBuilder.failed().build();
         }
         long testInitStart = System.currentTimeMillis();
 
-        String reportUrl=null;
-        if (masterId==null||masterId.length() == 0) {
+        String reportUrl = null;
+        if (masterId == null || masterId.length() == 0) {
             logger.addErrorLogEntry("Failed to start test.");
-            ((HttpLogger)httpLogger).close();
+            ((HttpLogger) httpLogger).close();
             return resultBuilder.failed().build();
         } else {
-            reportUrl= ServiceManager.getReportUrl(api,masterId,logger);
-            HashMap<String,String> reportUrls= StaticAccessor.getReportUrls();
-            reportUrls.put(context.getBuildContext().getBuildResultKey(),reportUrl);
+            reportUrl = ServiceManager.getReportUrl(api, masterId, logger);
+            //TODO:
+//            HashMap<String, String> reportUrls = StaticAccessor.getReportUrls();
+//            reportUrls.put(context.getBuildContext().getBuildResultKey(), reportUrl);
             context.getBuildContext().getBuildResult().getCustomBuildData().put(Constants.REPORT_URL, reportUrl);
         }
         try {
@@ -124,9 +127,9 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
 
         TestStatus status;
         boolean initTimeOutPassed = false;
-        if(!StringUtils.isBlank(this.jmeterProps)){
-            JSONArray props=ServiceManager.prepareSessionProperties(this.jmeterProps,logger);
-            ServiceManager.properties(this.api,props,masterId,logger);
+        if (!StringUtils.isBlank(this.jmeterProps)) {
+            JSONArray props = ServiceManager.prepareSessionProperties(this.jmeterProps, logger);
+            ServiceManager.properties(this.api, props, masterId, logger);
         }
         do {
             status = this.api.masterStatus(masterId);
@@ -143,7 +146,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
                 logger.addBuildLogEntry("Check if the test is initialized...");
             } catch (Exception e) {
                 logger.addErrorLogEntry(e.getMessage());
-                ((HttpLogger)httpLogger).close();
+                ((HttpLogger) httpLogger).close();
                 return resultBuilder.failedWithError().build();
             }
             initTimeOutPassed = System.currentTimeMillis() > testInitStart + INIT_TEST_TIMEOUT;
@@ -151,7 +154,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
 
         if (status.equals(TestStatus.NotRunning)) {
             logger.addErrorLogEntry("Test was not initialized, marking build as failed.");
-            ((HttpLogger)httpLogger).close();
+            ((HttpLogger) httpLogger).close();
             return resultBuilder.failedWithError().build();
         }
         logger.addBuildLogEntry("Test was initialized on server, testId=" + testId);
@@ -175,14 +178,14 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
                 break;
             } else if (status.equals(TestStatus.NotFound)) {
                 logger.addErrorLogEntry("BlazeMeter test not found!");
-                ((HttpLogger)httpLogger).close();
+                ((HttpLogger) httpLogger).close();
                 return resultBuilder.failed().build();
             }
         }
 
-        boolean active=true;
-        int activeCheck=1;
-        while(active&&activeCheck<11){
+        boolean active = true;
+        int activeCheck = 1;
+        while (active && activeCheck < 11) {
             try {
                 Thread.currentThread().sleep(CHECK_INTERVAL);
             } catch (InterruptedException e) {
@@ -190,45 +193,45 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
                 logger.addErrorLogEntry("Received interrupted Exception: " + e.getMessage());
                 break;
             }
-            logger.addBuildLogEntry("Checking, if test is active, testId="+this.testId+", retry # "+activeCheck);
-            active=this.api.active(this.testId);
+            logger.addBuildLogEntry("Checking, if test is active, testId=" + this.testId + ", retry # " + activeCheck);
+            active = this.api.active(this.testId);
             activeCheck++;
         }
         //BlazeMeter test stopped due to user test duration setup reached
 
         TestResult result = ServiceManager.getReport(this.api, this.masterId, logger);
-        if(this.jtlReport){
-            File jtl=null;
+        if (this.jtlReport) {
+            File jtl = null;
             try {
-                jtl=ServiceManager.resolvePath(context,this.jtlPath,logger);
+                jtl = ServiceManager.resolvePath(context, this.jtlPath, logger);
             } catch (Exception e) {
                 logger.addBuildLogEntry("Failed to create directory for downloading jtl report.");
-                jtl=dd;
-                logger.addBuildLogEntry("Default directory "+jtl.getAbsolutePath()+" will be used.");
+                jtl = dd;
+                logger.addBuildLogEntry("Default directory " + jtl.getAbsolutePath() + " will be used.");
             }
-            logger.addBuildLogEntry("Requesting JTL report for test with masterId="+this.masterId);
-            ServiceManager.downloadJtlReports(this.api,this.masterId,jtl,logger);
-        }else {
-            logger.addBuildLogEntry("JTL report won't be requested for test with masterId="+this.masterId);
+            logger.addBuildLogEntry("Requesting JTL report for test with masterId=" + this.masterId);
+            ServiceManager.downloadJtlReports(this.api, this.masterId, jtl, logger);
+        } else {
+            logger.addBuildLogEntry("JTL report won't be requested for test with masterId=" + this.masterId);
         }
-        if(this.junitReport){
-            File junit=null;
-            logger.addBuildLogEntry("Requesting Junit report for test with masterId="+this.masterId);
+        if (this.junitReport) {
+            File junit = null;
+            logger.addBuildLogEntry("Requesting Junit report for test with masterId=" + this.masterId);
             try {
-                junit=ServiceManager.resolvePath(context,this.junitPath,logger);
+                junit = ServiceManager.resolvePath(context, this.junitPath, logger);
             } catch (Exception e) {
                 logger.addBuildLogEntry("Failed to create directory for downloading junit report.");
-                junit=dd;
-                logger.addBuildLogEntry("Default directory "+junit.getAbsolutePath()+" will be used.");
+                junit = dd;
+                logger.addBuildLogEntry("Default directory " + junit.getAbsolutePath() + " will be used.");
             }
-            logger.addBuildLogEntry("Requesting JTL report for test with masterId="+this.masterId);
-            ServiceManager.downloadJunitReport(this.api,this.masterId,junit,logger);
-        }else {
-            logger.addBuildLogEntry("Junit report won't be requested for test with masterId="+this.masterId);
+            logger.addBuildLogEntry("Requesting JTL report for test with masterId=" + this.masterId);
+            ServiceManager.downloadJunitReport(this.api, this.masterId, junit, logger);
+        } else {
+            logger.addBuildLogEntry("Junit report won't be requested for test with masterId=" + this.masterId);
         }
 
         TaskState ciStatus = ServiceManager.ciStatus(this.api, this.masterId, logger);
-        ((HttpLogger)httpLogger).close();
+        ((HttpLogger) httpLogger).close();
         switch (ciStatus) {
             case FAILED:
                 return resultBuilder.failed().build();

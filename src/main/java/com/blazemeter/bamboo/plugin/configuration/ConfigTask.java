@@ -13,16 +13,6 @@
  */
 package com.blazemeter.bamboo.plugin.configuration;
 
-import java.util.List;
-import java.util.Map;
-
-import com.blazemeter.bamboo.plugin.api.Api;
-import com.blazemeter.bamboo.plugin.api.ApiV3Impl;
-import com.blazemeter.bamboo.plugin.configuration.constants.AdminServletConst;
-import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
-import com.google.common.collect.LinkedHashMultimap;
-import org.apache.commons.lang.StringUtils;
-
 import com.atlassian.bamboo.collections.ActionParametersMap;
 import com.atlassian.bamboo.task.AbstractTaskConfigurator;
 import com.atlassian.bamboo.task.BuildTaskRequirementSupport;
@@ -31,113 +21,131 @@ import com.atlassian.bamboo.utils.error.ErrorCollection;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import com.blazemeter.bamboo.plugin.ServiceManager;
+import com.blazemeter.bamboo.plugin.api.Api;
+import com.blazemeter.bamboo.plugin.api.ApiV3Impl;
+import com.blazemeter.bamboo.plugin.configuration.constants.AdminServletConst;
+import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
 import com.blazemeter.bamboo.plugin.servlet.AdminServlet.Config;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.LinkedHashMultimap;
 import com.opensymphony.xwork.TextProvider;
+import org.apache.commons.lang.StringUtils;
 
-public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskRequirementSupport{
+import java.util.List;
+import java.util.Map;
 
-	private static final List<String> FIELDS_TO_COPY =
-			ImmutableList.of(Constants.SETTINGS_SELECTED_TEST_ID,
-					Constants.SETTINGS_JTL_REPORT,
-					Constants.SETTINGS_JUNIT_REPORT,
-					Constants.SETTINGS_JMETER_PROPERTIES,
-					Constants.SETTINGS_NOTES,
-					Constants.SETTINGS_JTL_PATH,
-					Constants.SETTINGS_JUNIT_PATH);
-	private Api api;
+public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskRequirementSupport {
 
-	private TextProvider textProvider;
-	
-	public ConfigTask() {
-		super();
-	}
+    private static final List<String> FIELDS_TO_COPY =
+            ImmutableList.of(Constants.SETTINGS_SELECTED_TEST_ID,
+                    Constants.SETTINGS_JTL_REPORT,
+                    Constants.SETTINGS_JUNIT_REPORT,
+                    Constants.SETTINGS_JMETER_PROPERTIES,
+                    Constants.SETTINGS_NOTES,
+                    Constants.SETTINGS_JTL_PATH,
+                    Constants.SETTINGS_JUNIT_PATH);
+    private Api api;
 
-	@Override
-	public void populateContextForCreate(Map<String, Object> context) {
-		super.populateContextForCreate(context);
-		PluginSettingsFactory pluginSettingsFactory=StaticAccessor.getSettingsFactory();
-        PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
-		String userKey = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
-		String serverUrl = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
-		context.put(AdminServletConst.URL, serverUrl);
-		this.api= new ApiV3Impl(userKey,serverUrl);
-		context.put(Constants.TEST_LIST, ServiceManager.getTestsAsMap(api));
-	}
+    private TextProvider textProvider;
 
-	@Override
-	public void populateContextForEdit(Map<String, Object> context, TaskDefinition taskDefinition) {
-		super.populateContextForEdit(context, taskDefinition);
-		taskConfiguratorHelper.populateContextWithConfiguration(context, taskDefinition, FIELDS_TO_COPY);
-        PluginSettingsFactory pluginSettingsFactory=StaticAccessor.getSettingsFactory();
-        PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
-		String userKey = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
-		String serverUrl = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
-		context.put(AdminServletConst.URL, serverUrl);
-		this.api= new ApiV3Impl(userKey,serverUrl);
-        try{
-			context.put(Constants.TEST_LIST, ServiceManager.getTestsAsMap(this.api));
-		}catch (Exception e){
-			LinkedHashMultimap<String,String> tests= LinkedHashMultimap.create();
-			tests.put("Check blazemeter & proxy-settings","");
-			context.put(Constants.TEST_LIST, tests);
-		}
-	}
+    PluginSettingsFactory pluginSettingsFactory;
 
-	@Override
-	public void populateContextForView(Map<String, Object> context, TaskDefinition taskDefinition) {
-		super.populateContextForView(context, taskDefinition);
-		taskConfiguratorHelper.populateContextWithConfiguration(context, taskDefinition, FIELDS_TO_COPY);
-	}
+    public ConfigTask(PluginSettingsFactory pluginSettingsFactory) {
+        this.pluginSettingsFactory = pluginSettingsFactory;
+    }
 
-	@Override
-	public void validate(ActionParametersMap params, ErrorCollection errorCollection) {
-		super.validate(params, errorCollection);
+    /**
+     * first create
+     */
+    public void populateContextForCreate(Map<String, Object> context) {
+        super.populateContextForCreate(context);
+        PluginSettings pluginSettings = this.pluginSettingsFactory.createGlobalSettings();
+        String userKey = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
+        String serverUrl = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
+        context.put(AdminServletConst.URL, serverUrl);
+        this.api = new ApiV3Impl(userKey, serverUrl);
+        context.put(Constants.TEST_LIST, ServiceManager.getTestsAsMap(api));
+    }
 
-		final String selectedTest = params.getString(Constants.SETTINGS_SELECTED_TEST_ID);
+    /**
+     * from backend to view
+     */
+    public void populateContextForEdit(Map<String, Object> context, TaskDefinition taskDefinition) {
+        super.populateContextForEdit(context, taskDefinition);
+        context.put(Config.class.getName() + AdminServletConst.DOT_USER_KEY,
+                taskDefinition.getConfiguration().get(Config.class.getName() + AdminServletConst.DOT_USER_KEY));
+        context.put(Config.class.getName() + AdminServletConst.DOT_SERVER_URL,
+                taskDefinition.getConfiguration().get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL));
+    }
+
+    @Override
+    public void populateContextForView(Map<String, Object> context, TaskDefinition taskDefinition) {
+        context.put(Config.class.getName() + AdminServletConst.DOT_USER_KEY,
+                taskDefinition.getConfiguration().get(Config.class.getName() + AdminServletConst.DOT_USER_KEY));
+        context.put(Config.class.getName() + AdminServletConst.DOT_SERVER_URL,
+                taskDefinition.getConfiguration().get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL));
+        super.populateContextForView(context, taskDefinition);
+    }
+
+    /**
+     * Validate gui form when Saving params
+     */
+    @Override
+    public void validate(ActionParametersMap params, ErrorCollection errorCollection) {
+        super.validate(params, errorCollection);
+
+        final String selectedTest = params.getString(Constants.SETTINGS_SELECTED_TEST_ID);
 
         if (StringUtils.isEmpty(this.api.getApiKey())) {
-			errorCollection.addErrorMessage("Cannot load tests from BlazeMeter server. Invalid user key!");
-		}
+            errorCollection.addErrorMessage("Cannot load tests from BlazeMeter server. Invalid user key!");
+        }
 
-		if (StringUtils.isEmpty(selectedTest)) {
-			errorCollection.addErrorMessage(textProvider.getText(Constants.BLAZEMETER_ERROR + Constants.SETTINGS_SELECTED_TEST_ID));
-		} else {
-			if (!this.api.verifyUserKey()){
-				errorCollection.addErrorMessage("Cannot load tests from BlazeMeter server. Invalid user key!");
-			} else {
-				//verify if the test still exists on BlazeMeter server
+        if (StringUtils.isEmpty(selectedTest)) {
+            errorCollection.addErrorMessage(textProvider.getText(Constants.BLAZEMETER_ERROR + Constants.SETTINGS_SELECTED_TEST_ID));
+        } else {
+            if (!this.api.verifyUserKey()) {
+                errorCollection.addErrorMessage("Cannot load tests from BlazeMeter server. Invalid user key!");
+            } else {
+                //verify if the test still exists on BlazeMeter server
                 LinkedHashMultimap<String, String> tests = ServiceManager.getTests(this.api);
-				if (tests != null){
-					if (!tests.keySet().contains(selectedTest)) {
-						errorCollection.addErrorMessage("Test '"+selectedTest+"' doesn't exits on BlazeMeter server.");
-					}
-				} else {
-					errorCollection.addErrorMessage("No tests defined on BlazeMeter server!");
-				}
-			}
-		}
-}
+                if (tests != null) {
+                    if (!tests.keySet().contains(selectedTest)) {
+                        errorCollection.addErrorMessage("Test '" + selectedTest + "' doesn't exits on BlazeMeter server.");
+                    }
+                } else {
+                    errorCollection.addErrorMessage("No tests defined on BlazeMeter server!");
+                }
+            }
+        }
+    }
 
 
-	
-	@Override
-	public Map<String, String> generateTaskConfigMap(ActionParametersMap params, TaskDefinition previousTaskDefinition) {
-		final Map<String, String> config = super.generateTaskConfigMap(params, previousTaskDefinition);
+    /**
+     * from gui to backend
+     */
+    @Override
+    public Map<String, String> generateTaskConfigMap(ActionParametersMap params, TaskDefinition previousTaskDefinition) {
+        final Map<String, String> config = super.generateTaskConfigMap(params, previousTaskDefinition);
 
-		config.put(Constants.SETTINGS_SELECTED_TEST_ID, params.getString(Constants.SETTINGS_SELECTED_TEST_ID).trim());
-		config.put(Constants.SETTINGS_JMETER_PROPERTIES, params.getString(Constants.SETTINGS_JMETER_PROPERTIES).trim());
-		config.put(Constants.SETTINGS_NOTES, params.getString(Constants.SETTINGS_NOTES).trim());
-		config.put(Constants.SETTINGS_JTL_PATH, params.getString(Constants.SETTINGS_JTL_PATH).trim());
-		config.put(Constants.SETTINGS_JUNIT_PATH, params.getString(Constants.SETTINGS_JUNIT_PATH).trim());
-		String jtlReport=params.getString(Constants.SETTINGS_JTL_REPORT)==null?"false":"true";
-		String junitReport=params.getString(Constants.SETTINGS_JUNIT_REPORT)==null?"false":"true";
-		config.put(Constants.SETTINGS_JTL_REPORT, jtlReport);
-		config.put(Constants.SETTINGS_JUNIT_REPORT, junitReport);
-		return config;
-	}
+        config.put(Constants.SETTINGS_SELECTED_TEST_ID, params.getString(Constants.SETTINGS_SELECTED_TEST_ID).trim());
+        config.put(Constants.SETTINGS_JMETER_PROPERTIES, params.getString(Constants.SETTINGS_JMETER_PROPERTIES).trim());
+        config.put(Constants.SETTINGS_NOTES, params.getString(Constants.SETTINGS_NOTES).trim());
+        config.put(Constants.SETTINGS_JTL_PATH, params.getString(Constants.SETTINGS_JTL_PATH).trim());
+        config.put(Constants.SETTINGS_JUNIT_PATH, params.getString(Constants.SETTINGS_JUNIT_PATH).trim());
+        String jtlReport = params.getString(Constants.SETTINGS_JTL_REPORT) == null ? "false" : "true";
+        String junitReport = params.getString(Constants.SETTINGS_JUNIT_REPORT) == null ? "false" : "true";
+        config.put(Constants.SETTINGS_JTL_REPORT, jtlReport);
+        config.put(Constants.SETTINGS_JUNIT_REPORT, junitReport);
 
-	public void setTextProvider(final TextProvider textProvider) {
-		this.textProvider = textProvider;
-	}
+        PluginSettings pluginSettings = this.pluginSettingsFactory.createGlobalSettings();
+        config.put(Config.class.getName() + AdminServletConst.DOT_USER_KEY,
+                (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY));
+        config.put(Config.class.getName() + AdminServletConst.DOT_SERVER_URL,
+                (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL));
+        return config;
+    }
+
+    public void setTextProvider(final TextProvider textProvider) {
+        this.textProvider = textProvider;
+    }
 }
