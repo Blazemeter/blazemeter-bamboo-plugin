@@ -72,10 +72,23 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
      */
     public void populateContextForEdit(Map<String, Object> context, TaskDefinition taskDefinition) {
         super.populateContextForEdit(context, taskDefinition);
-        context.put(Config.class.getName() + AdminServletConst.DOT_USER_KEY,
-                taskDefinition.getConfiguration().get(Config.class.getName() + AdminServletConst.DOT_USER_KEY));
-        context.put(Config.class.getName() + AdminServletConst.DOT_SERVER_URL,
-                taskDefinition.getConfiguration().get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL));
+        PluginSettings pluginSettings = this.pluginSettingsFactory.createGlobalSettings();
+        String psuk = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
+        String pssu = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
+        String tduk = taskDefinition.getConfiguration().get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
+        String tdsu = taskDefinition.getConfiguration().get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
+        String uk = StringUtils.isBlank(tduk) ? psuk : tduk;
+        String su = StringUtils.isBlank(tdsu) ? pssu : tdsu;
+        context.put(Config.class.getName() + AdminServletConst.DOT_USER_KEY, uk);
+        context.put(Config.class.getName() + AdminServletConst.DOT_SERVER_URL, su);
+        this.api = new ApiV3Impl(uk, su);
+        try {
+            context.put(Constants.TEST_LIST, ServiceManager.getTestsAsMap(this.api));
+        } catch (Exception e) {
+            LinkedHashMultimap<String, String> tests = LinkedHashMultimap.create();
+            tests.put("Check blazemeter & proxy-settings", "");
+            context.put(Constants.TEST_LIST, tests);
+        }
     }
 
     @Override
