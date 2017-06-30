@@ -18,6 +18,10 @@ import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 
 import java.util.HashMap;
 
+/**
+ * TODO -
+ * remove this class, it's redundant.
+ */
 public class StaticAccessor {
     private static PluginSettingsFactory settingsFactory;
     private static HashMap<String, String> reportUrls;
