@@ -75,12 +75,20 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         PluginSettings pluginSettings = this.pluginSettingsFactory.createGlobalSettings();
         String psuk = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
         String pssu = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
-        String tduk = taskDefinition.getConfiguration().get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
-        String tdsu = taskDefinition.getConfiguration().get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
+        Map<String,String> config=taskDefinition.getConfiguration();
+        String tduk = config.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
+        String tdsu = config.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
         String uk = StringUtils.isBlank(tduk) ? psuk : tduk;
         String su = StringUtils.isBlank(tdsu) ? pssu : tdsu;
         context.put(Config.class.getName() + AdminServletConst.DOT_USER_KEY, uk);
         context.put(Config.class.getName() + AdminServletConst.DOT_SERVER_URL, su);
+        context.put(Constants.SETTINGS_SELECTED_TEST_ID, config.get(Constants.SETTINGS_SELECTED_TEST_ID));
+        context.put(Constants.SETTINGS_NOTES, config.get(Constants.SETTINGS_NOTES));
+        context.put(Constants.SETTINGS_JUNIT_REPORT, config.get(Constants.SETTINGS_JUNIT_REPORT));
+        context.put(Constants.SETTINGS_JTL_REPORT, config.get(Constants.SETTINGS_JTL_REPORT));
+        context.put(Constants.SETTINGS_JMETER_PROPERTIES, config.get(Constants.SETTINGS_JMETER_PROPERTIES));
+        context.put(Constants.SETTINGS_JTL_PATH, config.get(Constants.SETTINGS_JTL_PATH));
+        context.put(Constants.SETTINGS_JUNIT_PATH, config.get(Constants.SETTINGS_JUNIT_PATH));
         this.api = new ApiV3Impl(uk, su);
         try {
             context.put(Constants.TEST_LIST, ServiceManager.getTestsAsMap(this.api));
