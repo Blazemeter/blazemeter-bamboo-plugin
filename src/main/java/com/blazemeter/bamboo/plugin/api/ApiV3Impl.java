@@ -360,7 +360,7 @@ public class ApiV3Impl implements Api {
                                     id = String.valueOf(en.get(JsonConstants.ID));
                                     name = en.has(JsonConstants.NAME) ? en.getString(JsonConstants.NAME).replaceAll("&", "&amp;") : "";
                                     String testType = en.has(JsonConstants.TYPE) ? en.getString(JsonConstants.TYPE) : Constants.UNKNOWN_TYPE;
-                                    testListOrdered.put(id + "." + testType,name);
+                                    testListOrdered.put(id + "." + testType,name+"("+id+"."+testType+")");
 
                                 }
                             } catch (JSONException ie) {
