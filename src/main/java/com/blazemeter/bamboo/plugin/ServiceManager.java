@@ -132,7 +132,7 @@ public class ServiceManager {
         int countStartRequests = 0;
         HashMap<String, String> startTestResp = new HashMap<String, String>();
         try {
-            logger.addBuildLogEntry("Trying to start test with testId="+testId+" for userKey="+api.getApiKey());
+            logger.addBuildLogEntry("Trying to start test with testId="+testId+" for userKey="+api.getApiKey().substring(0,4));
 
             do {
                 boolean collection = collection(testId, api);
