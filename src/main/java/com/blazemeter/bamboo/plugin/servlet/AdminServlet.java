@@ -52,7 +52,7 @@ public class AdminServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		Map<String, Object> context = new HashMap<String, Object>();
-		
+
 		resp.setContentType("text/html;charset=utf-8");
 
 		PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
@@ -81,7 +81,7 @@ public class AdminServlet extends HttpServlet {
 	protected void doPost(final HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		Map<String, Object> context = new HashMap<String, Object>();
 		resp.setContentType("text/html;charset=utf-8");
-		
+
 		String userKey = req.getParameter(AdminServletConst.USER_KEY).trim();
 		String url = req.getParameter(AdminServletConst.URL).trim();
 
@@ -92,15 +92,14 @@ public class AdminServlet extends HttpServlet {
 		if (api.verifyUserKey()){
 			transactionTemplate.execute(new TransactionCallback() {
 				public Object doInTransaction() {
-					PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();		
+					PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
 					pluginSettings.put(Config.class.getName() + AdminServletConst.DOT_USER_KEY, req.getParameter(AdminServletConst.USER_KEY).trim());
 					pluginSettings.put(Config.class.getName() + AdminServletConst.DOT_SERVER_URL, req.getParameter(AdminServletConst.URL).trim());
 					return null;
 				}
 			});
-			
-			context.put(AdminServletConst.USER_KEY_ERROR, "");
-			context.put(AdminServletConst.URL_ERROR, "");
+			context.put(AdminServletConst.USER_KEY_ERROR, "User settings are updated. Check that jobs are configured properly");
+			context.put(AdminServletConst.URL_ERROR, "User settings are updated. Check that jobs are configured properly");
 		} else {
 			context.put(AdminServletConst.USER_KEY_ERROR, "User key is not saved! Check user key "
                     + req.getParameter(AdminServletConst.USER_KEY).trim() + " and proxy settings.");
@@ -110,7 +109,7 @@ public class AdminServlet extends HttpServlet {
 		renderer.render(AdminServletConst.BLAZEMETER_ADMIN_VM, context, resp.getWriter());
 	}
 
-	
+
 	@XmlRootElement
 	@XmlAccessorType(XmlAccessType.FIELD)
 	public static final class Config {
