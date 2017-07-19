@@ -22,35 +22,33 @@ import com.atlassian.bamboo.buildqueue.manager.AgentManager;
 import com.atlassian.bamboo.chains.ChainResultsSummaryImpl;
 import com.atlassian.bamboo.chains.ChainStageResult;
 import com.atlassian.bamboo.resultsummary.BuildResultsSummary;
-import com.blazemeter.bamboo.plugin.configuration.StaticAccessor;
 
 public class ViewBlazeMeterReport extends PlanResultsAction {
  	private static final long serialVersionUID = 1L;
-	
-	
+
+
     private boolean isJob;
     private String reportUrl;
-    
+
     public String doExecute() throws Exception {
         String result = super.doExecute();
-        
+
         if ((this.buildNumber != null) && (this.buildNumber > 0)) {
             this.isJob = true;
-            
+
             String reportUrl = null;
             ChainResultsSummaryImpl chainResults = (ChainResultsSummaryImpl) this.getResultsSummary();
 
-            
+
             List<ChainStageResult> resultList = chainResults.getStageResults();
             for (ChainStageResult chainResult:resultList){
             	Set<BuildResultsSummary> resultSet = chainResult.getBuildResults();
             	Iterator<BuildResultsSummary> iter = resultSet.iterator();
             	while (iter.hasNext()){
             		BuildResultsSummary brs = iter.next();
-                    reportUrl= (String) StaticAccessor.getReportUrls().get(brs.getBuildResultKey());
             	}
             }
-            
+
             if (reportUrl != null){
             	reportUrl(reportUrl);
             } else {
@@ -60,10 +58,10 @@ public class ViewBlazeMeterReport extends PlanResultsAction {
         else {
             this.isJob = false;
         }
-        
+
         return result;
     }
-    
+
     public void setAgentManager(AgentManager agentManager) {
         this.agentManager = agentManager;
     }

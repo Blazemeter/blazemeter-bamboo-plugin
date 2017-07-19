@@ -87,9 +87,9 @@
 			location="templates/viewConfigTask.ftl" />
 		<resource type="download" name="icon" location="images/blazemeter.jpg" />
 	</taskType>
-	<component key="staticAccessor" class="com.blazemeter.bamboo.plugin.configuration.StaticAccessor" />
 
-	<!-- BlazeMeter Report Tab -->
+	<!-- TODO
+	BlazeMeter Report Tab -->
 	<!--<xwork key="blazeMeterReports" name="View BlazeMeter Reports">
 		<package name="blazemeterReportView" extends="buildResultView">
 			<action name="viewBlazeMeterReport"	class="com.blazemeter.bamboo.plugin.ui.ViewBlazeMeterReport">
@@ -98,7 +98,8 @@
 		</package>
 	</xwork>-->
 
-	<!-- Build Report -->
+	<!-- TODO
+	Build Report -->
 	<!--<web-item name="BlazemeterJobReportPage" i18n-name-key="blazemeterJobReport.label"
 		key="blazemeterJobReport" section="chainResults.subMenu/chainResults"
 		weight="80">
