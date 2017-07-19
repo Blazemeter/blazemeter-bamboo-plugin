@@ -150,7 +150,7 @@ public class ServiceManager {
             throw new NumberFormatException(startTestResp.get(JsonConstants.ID));
         }catch (Exception e) {
             logger.addErrorLogEntry("Error while starting BlazeMeter Test [" + e.getMessage() + "]");
-            logger.addErrorLogEntry("Check server & proxy settings");
+            logger.addErrorLogEntry("Check server,userKey,testId & proxy settings");
         }
         return startTestResp.get(JsonConstants.ID);
     }

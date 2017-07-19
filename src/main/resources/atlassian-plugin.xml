@@ -21,10 +21,10 @@
 		<param name="plugin-icon">images/pluginIcon.png</param>
 		<param name="plugin-logo">images/blazemeter.jpg</param>
 	</plugin-info>
-	
+
 	<!-- add our i18n resource -->
 	<resource type="i18n" name="i18n" location="BlazeMeterBamboo" />
-	
+
 	<!-- add our web resources -->
 	<web-resource key="BlazeMeterResources" name="BlazeMeterResources">
 		<dependency>com.atlassian.auiplugin:ajs</dependency>
@@ -53,7 +53,7 @@
 	<template-context-item key="applicationPropertiesContextItem"
 		component-ref="applicationProperties" context-key="applicationProperties"
 		name="Application Properties Context Item" />
-    
+
 	<web-section name="BlazeMeterAdministration" i18n-name-key="blaze-meter-administration.name"
 		key="blaze-meter-administration" location="system.admin" weight="10">
 		<description key="blaze-meter-administration.description">The BlazeMeter Administration Plugin
@@ -68,8 +68,10 @@
 		<label key="user-key-settingspage.label"></label>
 		<link linkId="user-key-settingspage-link">/plugins/servlet/blazemeter/admin</link>
 	</web-item>
-	
-   
+	<preJobAction key="settingsProcessor" class="com.blazemeter.bamboo.plugin.SettingsProcessor">
+		<description>Checks if user credential are still valid for the job</description>
+	</preJobAction>
+
 	<!-- Definition for BlazeMeter task plugin -->
 	<taskType key="blazemeter" name="BlazeMeter Test"
 		class="com.blazemeter.bamboo.plugin.TaskType">
@@ -95,7 +97,7 @@
 			</action>
 		</package>
 	</xwork>-->
-	
+
 	<!-- Build Report -->
 	<!--<web-item name="BlazemeterJobReportPage" i18n-name-key="blazemeterJobReport.label"
 		key="blazemeterJobReport" section="chainResults.subMenu/chainResults"

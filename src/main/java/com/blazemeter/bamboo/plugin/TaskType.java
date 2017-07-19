@@ -18,18 +18,21 @@ import com.atlassian.bamboo.build.logger.BuildLogger;
 import com.atlassian.bamboo.configuration.ConfigurationMap;
 import com.atlassian.bamboo.process.ProcessService;
 import com.atlassian.bamboo.task.TaskContext;
+import com.atlassian.bamboo.task.TaskDefinition;
 import com.atlassian.bamboo.task.TaskException;
 import com.atlassian.bamboo.task.TaskResult;
 import com.atlassian.bamboo.task.TaskResultBuilder;
 import com.atlassian.bamboo.task.TaskState;
+import com.atlassian.bamboo.v2.build.BuildContext;
 import com.blazemeter.bamboo.plugin.api.Api;
 import com.blazemeter.bamboo.plugin.api.ApiV3Impl;
 import com.blazemeter.bamboo.plugin.api.HttpLogger;
-import com.blazemeter.bamboo.plugin.configuration.StaticAccessor;
 import com.blazemeter.bamboo.plugin.configuration.constants.AdminServletConst;
 import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
-import com.blazemeter.bamboo.plugin.servlet.AdminServlet.Config;
+import com.blazemeter.bamboo.plugin.servlet.AdminServlet;
 import com.blazemeter.bamboo.plugin.testresult.TestResult;
+import java.util.List;
+import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
@@ -65,11 +68,21 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         final BuildLogger logger = context.getBuildLogger();
         TaskResultBuilder resultBuilder = TaskResultBuilder.create(context);
         ConfigurationMap configMap = context.getConfigurationMap();
+        String userKey=null;
+        String serverUrl=null;
+        BuildContext buildContext = context.getBuildContext();
+        buildContext.getBuildDefinition().getTaskDefinitions().get(0).getPluginKey();
+        List<TaskDefinition> tds = buildContext.getBuildDefinition().getTaskDefinitions();
+        for (TaskDefinition d : tds) {
+            if (d.getPluginKey().equals(Constants.PLUGIN_KEY)) {
+                Map<String, String> conf = d.getConfiguration();
+                userKey = conf.get(AdminServlet.Config.class.getName() + AdminServletConst.DOT_USER_KEY);
+                serverUrl = conf.get(AdminServlet.Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
+            }
+        }
+        String testId = configMap.get(Constants.SETTINGS_SELECTED_TEST_ID);
         logger.addBuildLogEntry("Executing BlazeMeter task...");
         logger.addBuildLogEntry("BlazemeterBamboo plugin v." + ServiceManager.getVersion());
-        String userKey = configMap.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
-        String serverUrl = configMap.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
-        String testId = configMap.get(Constants.SETTINGS_SELECTED_TEST_ID);
         int point = testId.indexOf(".");
         this.testId = point > 0 ? testId.substring(0, point) : testId;
         this.jmeterProps = configMap.get(Constants.SETTINGS_JMETER_PROPERTIES);
@@ -82,6 +95,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
             logger.addErrorLogEntry("BlazeMeter user key not defined!");
             return resultBuilder.failed().build();
         }
+
         File dd = new File(context.getWorkingDirectory().getAbsolutePath() + "/build # "
                 + context.getBuildContext().getBuildNumber());
         String httpLog = dd + File.separator + Constants.HTTP_LOG;
@@ -111,9 +125,6 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
             return resultBuilder.failed().build();
         } else {
             reportUrl = ServiceManager.getReportUrl(api, masterId, logger);
-            //TODO:
-//            HashMap<String, String> reportUrls = StaticAccessor.getReportUrls();
-//            reportUrls.put(context.getBuildContext().getBuildResultKey(), reportUrl);
             context.getBuildContext().getBuildResult().getCustomBuildData().put(Constants.REPORT_URL, reportUrl);
         }
         try {
