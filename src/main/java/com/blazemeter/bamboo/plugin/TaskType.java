@@ -130,9 +130,9 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         try {
             ServiceManager.notes(this.api, masterId, this.notes, logger);
         } catch (InterruptedException ie) {
-            logger.addErrorLogEntry("BlazeMeter Interrupted Exception: " + ie.getMessage());
-            logger.addBuildLogEntry("Stopping test...");
+            logger.addErrorLogEntry("BlazeMeter test with id =  " + this.testId + " was interrupted from Bamboo");
             ServiceManager.stopTestMaster(this.api, this.masterId, logger);
+            logger.addErrorLogEntry("masterId = " + this.masterId + " was finished");
             return resultBuilder.failedWithError().build();
         }
 
@@ -147,9 +147,9 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
             try {
                 Thread.currentThread().sleep(CHECK_INTERVAL);
             } catch (InterruptedException e) {
-                logger.addErrorLogEntry("BlazeMeter Interrupted Exception: " + e.getMessage());
-                logger.addBuildLogEntry("Stopping test...");
+                logger.addErrorLogEntry("BlazeMeter test with id =  " + this.testId + " was interrupted from Bamboo");
                 ServiceManager.stopTestMaster(this.api, this.masterId, logger);
+                logger.addErrorLogEntry("masterId = " + this.masterId + " was finalized.");
                 break;
             }
             try {
@@ -176,9 +176,9 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
             try {
                 Thread.currentThread().sleep(CHECK_INTERVAL);
             } catch (InterruptedException e) {
-                logger.addErrorLogEntry("Received interrupted Exception: " + e.getMessage());
-                logger.addBuildLogEntry("Stopping test...");
+                logger.addErrorLogEntry("BlazeMeter test with id =  " + this.testId + " was interrupted from Bamboo");
                 ServiceManager.stopTestMaster(this.api, this.masterId, logger);
+                logger.addErrorLogEntry("masterId = " + this.masterId + " was finalized.");
                 break;
             }
 
@@ -200,11 +200,10 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
             try {
                 Thread.currentThread().sleep(CHECK_INTERVAL);
             } catch (InterruptedException e) {
-                logger.addErrorLogEntry("Thread was interrupted during sleep()");
-                logger.addErrorLogEntry("Received interrupted Exception: " + e.getMessage());
+                logger.addErrorLogEntry("BlazeMeter test = " + this.testId + " was interrupted during active check");
                 break;
             }
-            logger.addBuildLogEntry("Checking, if test is active, testId=" + this.testId + ", retry # " + activeCheck);
+            logger.addBuildLogEntry("Checking, if test is active, testId = " + this.testId + ", retry # " + activeCheck);
             active = this.api.active(this.testId);
             activeCheck++;
         }
@@ -220,14 +219,14 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
                 jtl = dd;
                 logger.addBuildLogEntry("Default directory " + jtl.getAbsolutePath() + " will be used.");
             }
-            logger.addBuildLogEntry("Requesting JTL report for test with masterId=" + this.masterId);
+            logger.addBuildLogEntry("Requesting JTL report for test with masterId = " + this.masterId);
             ServiceManager.downloadJtlReports(this.api, this.masterId, jtl, logger);
         } else {
-            logger.addBuildLogEntry("JTL report won't be requested for test with masterId=" + this.masterId);
+            logger.addBuildLogEntry("JTL report won't be requested for test with masterId = " + this.masterId);
         }
         if (this.junitReport) {
             File junit = null;
-            logger.addBuildLogEntry("Requesting Junit report for test with masterId=" + this.masterId);
+            logger.addBuildLogEntry("Requesting Junit report for test with masterId = " + this.masterId);
             try {
                 junit = ServiceManager.resolvePath(context, this.junitPath, logger);
             } catch (Exception e) {
@@ -235,10 +234,10 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
                 junit = dd;
                 logger.addBuildLogEntry("Default directory " + junit.getAbsolutePath() + " will be used.");
             }
-            logger.addBuildLogEntry("Requesting JTL report for test with masterId=" + this.masterId);
+            logger.addBuildLogEntry("Requesting JTL report for test with masterId = " + this.masterId);
             ServiceManager.downloadJunitReport(this.api, this.masterId, junit, logger);
         } else {
-            logger.addBuildLogEntry("Junit report won't be requested for test with masterId=" + this.masterId);
+            logger.addBuildLogEntry("Junit report won't be requested for test with masterId = " + this.masterId);
         }
 
         TaskState ciStatus = ServiceManager.ciStatus(this.api, this.masterId, logger);
