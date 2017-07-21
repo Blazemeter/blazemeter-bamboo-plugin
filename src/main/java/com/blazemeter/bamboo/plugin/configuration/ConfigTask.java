@@ -118,7 +118,7 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         }
 
         if (StringUtils.isEmpty(selectedTest)) {
-            errorCollection.addErrorMessage(textProvider.getText(Constants.BLAZEMETER_ERROR + Constants.SETTINGS_SELECTED_TEST_ID));
+            errorCollection.addErrorMessage("Check that user has tests in account");
         } else {
             if (!this.api.verifyUserKey()) {
                 errorCollection.addErrorMessage("Cannot load tests from BlazeMeter server. Invalid user key!");
