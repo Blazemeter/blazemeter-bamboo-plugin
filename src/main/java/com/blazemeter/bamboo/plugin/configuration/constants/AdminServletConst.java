@@ -15,10 +15,12 @@ package com.blazemeter.bamboo.plugin.configuration.constants;
 
 public interface AdminServletConst {
     //Admin page constants
-    String USER_KEY ="userkey";
-    String USER_KEY_ERROR ="userkey_error";
-
-    String DOT_USER_KEY =".userkey";
+    String API_ID_ERROR ="api_id_error";
+    String API_SECRET_ERROR ="api_secret_error";
+    String API_ID = "id";
+    String API_SECRET = "secret";
+    String DOT_API_ID = ".id";
+    String DOT_API_SECRET = ".secret";
     String DOT_SERVER_URL =".url";
 
     String URL ="url";

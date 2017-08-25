@@ -60,10 +60,11 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
     public void populateContextForCreate(Map<String, Object> context) {
         super.populateContextForCreate(context);
         PluginSettings pluginSettings = this.pluginSettingsFactory.createGlobalSettings();
-        String userKey = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
+        String api_id = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_API_ID);
+        String api_secret = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_API_SECRET);
         String serverUrl = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
         context.put(AdminServletConst.URL, serverUrl);
-        this.api = new ApiV3Impl(userKey, serverUrl);
+        this.api = new ApiV3Impl(api_id, serverUrl);
         context.put(Constants.TEST_LIST, ServiceManager.getTestsAsMap(api));
     }
 
@@ -73,11 +74,12 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
     public void populateContextForEdit(Map<String, Object> context, TaskDefinition taskDefinition) {
         super.populateContextForEdit(context, taskDefinition);
         PluginSettings pluginSettings = this.pluginSettingsFactory.createGlobalSettings();
-        String psuk = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY);
+        String psai = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_API_ID);
+        String psas = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_API_SECRET);
         String pssu = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
         Map<String, String> config = taskDefinition.getConfiguration();
-        context.put(Config.class.getName() + AdminServletConst.DOT_USER_KEY, psuk);
-        context.put(Config.class.getName() + AdminServletConst.DOT_SERVER_URL, psuk);
+        context.put(Config.class.getName() + AdminServletConst.DOT_API_ID, psai);
+        context.put(Config.class.getName() + AdminServletConst.DOT_SERVER_URL, psai);
         context.put(Constants.SETTINGS_SELECTED_TEST_ID, config.get(Constants.SETTINGS_SELECTED_TEST_ID));
         context.put(Constants.SETTINGS_NOTES, config.get(Constants.SETTINGS_NOTES));
         context.put(Constants.SETTINGS_JUNIT_REPORT, config.get(Constants.SETTINGS_JUNIT_REPORT));
@@ -85,7 +87,7 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         context.put(Constants.SETTINGS_JMETER_PROPERTIES, config.get(Constants.SETTINGS_JMETER_PROPERTIES));
         context.put(Constants.SETTINGS_JTL_PATH, config.get(Constants.SETTINGS_JTL_PATH));
         context.put(Constants.SETTINGS_JUNIT_PATH, config.get(Constants.SETTINGS_JUNIT_PATH));
-        this.api = new ApiV3Impl(psuk, pssu);
+        this.api = new ApiV3Impl(psai, pssu);
         try {
             context.put(Constants.TEST_LIST, ServiceManager.getTestsAsMap(this.api));
         } catch (Exception e) {
@@ -97,8 +99,8 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
 
     @Override
     public void populateContextForView(Map<String, Object> context, TaskDefinition taskDefinition) {
-        context.put(Config.class.getName() + AdminServletConst.DOT_USER_KEY,
-                taskDefinition.getConfiguration().get(Config.class.getName() + AdminServletConst.DOT_USER_KEY));
+        context.put(Config.class.getName() + AdminServletConst.DOT_API_ID,
+                taskDefinition.getConfiguration().get(Config.class.getName() + AdminServletConst.DOT_API_ID));
         context.put(Config.class.getName() + AdminServletConst.DOT_SERVER_URL,
                 taskDefinition.getConfiguration().get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL));
         super.populateContextForView(context, taskDefinition);
@@ -155,8 +157,8 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         config.put(Constants.SETTINGS_JUNIT_REPORT, junitReport);
 
         PluginSettings pluginSettings = this.pluginSettingsFactory.createGlobalSettings();
-        config.put(Config.class.getName() + AdminServletConst.DOT_USER_KEY,
-                (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_USER_KEY));
+        config.put(Config.class.getName() + AdminServletConst.DOT_API_ID,
+                (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_API_ID));
         config.put(Config.class.getName() + AdminServletConst.DOT_SERVER_URL,
                 (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL));
         return config;

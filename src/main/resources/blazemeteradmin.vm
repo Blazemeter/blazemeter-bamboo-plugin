@@ -20,12 +20,17 @@
   <body>
     <form id="blazemeteradmin" class="aui" method="POST">
       <div class="field-group">
-        <label for="name">${i18n.getText("blazemeter.admin.userkey")}</label>
-        <input type="text" id="userkey" name="userkey" class="text" value="${userkey}">
+        <label for="name">${i18n.getText("blazemeter.admin.id")}</label>
+        <input type="text" id="id" name="id" class="text" value="${id}">
         <br />
-        <span class="errorText">${userkey_error}</span>
-
-     </div>
+        <span class="errorText">${api_id_error}</span>
+        <br />
+        <label for="name">${i18n.getText("blazemeter.admin.secret")}</label>
+        <input type="text" id="secret" name="secret" class="text" value="${secret}">
+        <br />
+        <span class="errorText">${api_secret_error}</span>
+        <br />
+        </div>
         <div class="field-group">
             <label for="name">${i18n.getText("blazemeter.admin.url")}</label>
             <input type="text" id="url" name="url" class="text" value="${url}">

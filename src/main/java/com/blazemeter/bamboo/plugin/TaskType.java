@@ -68,7 +68,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         final BuildLogger logger = context.getBuildLogger();
         TaskResultBuilder resultBuilder = TaskResultBuilder.create(context);
         ConfigurationMap configMap = context.getConfigurationMap();
-        String userKey=null;
+        String api_id=null;
         String serverUrl=null;
         BuildContext buildContext = context.getBuildContext();
         buildContext.getBuildDefinition().getTaskDefinitions().get(0).getPluginKey();
@@ -76,7 +76,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         for (TaskDefinition d : tds) {
             if (d.getPluginKey().equals(Constants.PLUGIN_KEY)) {
                 Map<String, String> conf = d.getConfiguration();
-                userKey = conf.get(AdminServlet.Config.class.getName() + AdminServletConst.DOT_USER_KEY);
+                api_id = conf.get(AdminServlet.Config.class.getName() + AdminServletConst.DOT_API_ID);
                 serverUrl = conf.get(AdminServlet.Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
             }
         }
@@ -91,7 +91,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         this.notes = configMap.get(Constants.SETTINGS_NOTES);
         this.jtlPath = configMap.get(Constants.SETTINGS_JTL_PATH);
         this.junitPath = configMap.get(Constants.SETTINGS_JUNIT_PATH);
-        if (StringUtils.isBlank(userKey)) {
+        if (StringUtils.isBlank(api_id)) {
             logger.addErrorLogEntry("BlazeMeter user key not defined!");
             return resultBuilder.failed().build();
         }
@@ -106,7 +106,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
             logger.addErrorLogEntry("Failed to create http-log file = " + httpLog + ": " + e.getMessage());
         }
         HttpLogger httpLogger = new HttpLogger(httpLog);
-        this.api = new ApiV3Impl(userKey, serverUrl, httpLogger);
+        this.api = new ApiV3Impl(api_id, serverUrl, httpLogger);
 
         rootDirectory = context.getRootDirectory();
         logger.addBuildLogEntry("Attempting to start test with id:" + testId);

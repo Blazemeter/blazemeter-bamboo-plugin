@@ -37,14 +37,15 @@ public class SettingsProcessor implements PreJobAction {
     @Override
     public void execute(@NotNull final StageExecution stageExecution, @NotNull final BuildContext buildContext) {
         PluginSettings pluginSettings = this.pluginSettingsFactory.createGlobalSettings();
-        String userKey = (String) pluginSettings.get(AdminServlet.Config.class.getName() + AdminServletConst.DOT_USER_KEY);
+        String api_id = (String) pluginSettings.get(AdminServlet.Config.class.getName() + AdminServletConst.DOT_API_ID);
         String serverUrl = (String) pluginSettings.get(AdminServlet.Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
         buildContext.getBuildDefinition().getTaskDefinitions().get(0).getPluginKey();
         List<TaskDefinition> tds = buildContext.getBuildDefinition().getTaskDefinitions();
         for (TaskDefinition d : tds) {
             if (d.getPluginKey().equals(Constants.PLUGIN_KEY)) {
                 Map<String, String> conf = d.getConfiguration();
-                conf.put(AdminServlet.Config.class.getName() + AdminServletConst.DOT_USER_KEY, userKey);
+                conf.put(AdminServlet.Config.class.getName() + AdminServletConst.DOT_API_ID, api_id);
+                conf.put(AdminServlet.Config.class.getName() + AdminServletConst.DOT_API_ID, api_id);
                 conf.put(AdminServlet.Config.class.getName() + AdminServletConst.DOT_SERVER_URL, serverUrl);
             }
         }
