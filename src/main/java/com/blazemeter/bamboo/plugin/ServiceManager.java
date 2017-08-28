@@ -132,14 +132,14 @@ public class ServiceManager {
         int countStartRequests = 0;
         HashMap<String, String> startTestResp = new HashMap<String, String>();
         try {
-            logger.addBuildLogEntry("Trying to start test with testId="+testId+" for userKey="+api.getApiKey().substring(0,4));
+            logger.addBuildLogEntry("Trying to start test with testId="+testId);
 
             do {
                 boolean collection = collection(testId, api);
                 startTestResp=api.startTest(testId,collection);
                 countStartRequests++;
                 if (countStartRequests > 5) {
-                    logger.addErrorLogEntry("Could not start BlazeMeter Test with userKey=" + api.getApiKey() + " testId=" + testId);
+                    logger.addErrorLogEntry("Could not start BlazeMeter Test with testId=" + testId);
                     return startTestResp.get(JsonConstants.ID);
                 }
             } while (startTestResp.get(JsonConstants.ID).length()==0);
@@ -158,7 +158,7 @@ public class ServiceManager {
     public static TestResult getReport(Api api, String masterId, BuildLogger logger) {
         TestResult testResult = null;
         try {
-            logger.addBuildLogEntry("Trying to request aggregate report. UserKey=" + api.getApiKey().substring(0, 4) + " masterId=" + masterId);
+            logger.addBuildLogEntry("Trying to request aggregate report. MasterId=" + masterId);
             JSONObject aggregate = api.testReport(masterId);
             testResult = new TestResult(aggregate);
             logger.addBuildLogEntry(testResult.toString());

@@ -18,7 +18,7 @@ import com.blazemeter.bamboo.plugin.ServiceManager;
 public interface UrlManager {
     String CLIENT_IDENTIFICATION = "&_clientId=CI_BAMBOO&_clientVersion="
             + ServiceManager.getVersion()+"&​";
-    String LATEST="/api/latest";
+    String V4 ="/api/v4";
     String TESTS="/tests";
     String MASTERS="/masters";
     String WEB="/web";
@@ -28,40 +28,40 @@ public interface UrlManager {
 
     void setServerUrl(String serverUrl);
 
-    String masterStatus(String appKey, String userKey, String testId);
+    String masterStatus(String appKey, String testId);
 
-    String tests(String appKey, String userKey);
+    String tests(String appKey);
 
-    String activeTests(String appKey, String userKey);
+    String activeTests(String appKey);
 
-    String testStart(String appKey, String userKey, String testId);
+    String testStart(String appKey, String testId);
 
-    String collectionStart(String appKey, String userKey, String collectionId);
+    String collectionStart(String appKey, String collectionId);
 
-    String masterStop(String appKey, String userKey, String testId);
+    String masterStop(String appKey, String testId);
 
-    String testTerminate(String appKey, String userKey, String testId);
+    String testTerminate(String appKey, String testId);
 
-    String testReport(String appKey, String userKey, String reportId);
+    String testReport(String appKey, String reportId);
 
-    String getUser(String appKey, String userKey);
+    String getUser(String appKey);
 
-    String ciStatus(String appKey, String userKey, String sessionId);
+    String ciStatus(String appKey, String sessionId);
 
-    String retrieveJUNITXML(String appKey, String userKey, String sessionId);
+    String retrieveJUNITXML(String appKey, String sessionId);
 
-    String retrieveJTLZIP(String appKey, String userKey, String sessionId);
+    String retrieveJTLZIP(String appKey, String sessionId);
 
-    String generatePublicToken(String appKey, String userKey, String sessionId);
+    String generatePublicToken(String appKey, String sessionId);
 
-    String listOfSessionIds(String appKey, String userKey, String masterId);
+    String listOfSessionIds(String appKey, String masterId);
 
-    String properties(String appKey, String userKey, String sessionId);
+    String properties(String appKey, String sessionId);
 
-    String masterId(String appKey,String userKey, String masterId);
+    String masterId(String appKey,String masterId);
 
     String version(String appKey);
 
-    String testConfig(String appKey, String userKey, String testId);
+    String testConfig(String appKey, String testId);
 
     }

@@ -48,7 +48,7 @@ public class ApiV3Impl implements Api {
 
     private Proxy proxy = Proxy.NO_PROXY;
     private Authenticator auth = Authenticator.NONE;
-    private String apiKey;
+    private String credentials;
     private String serverUrl;
     UrlManager urlManager;
     private OkHttpClient okhttp = null;
@@ -101,16 +101,16 @@ public class ApiV3Impl implements Api {
 
     }
 
-    public ApiV3Impl(String apiKey, String blazeMeterUrl) {
+    public ApiV3Impl(String credentials, String blazeMeterUrl) {
         this();
-        this.apiKey = apiKey;
+        this.credentials=credentials;
         this.serverUrl = blazeMeterUrl;
         this.urlManager = new UrlManagerV3Impl(this.serverUrl);
     }
 
-    public ApiV3Impl(String apiKey, String blazeMeterUrl, HttpLogger httpl) {
+    public ApiV3Impl(String credentials, String blazeMeterUrl, HttpLogger httpl) {
         this();
-        this.apiKey = apiKey;
+        this.credentials=credentials;
         this.serverUrl = blazeMeterUrl;
         this.urlManager = new UrlManagerV3Impl(this.serverUrl);
         HttpLoggingInterceptor httpLog;
@@ -129,12 +129,10 @@ public class ApiV3Impl implements Api {
     @Override
     public int getTestMasterStatusCode(String id) {
         int statusCode = 0;
-        if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(id)) {
-            return statusCode;
-        }
         try {
-            String url = this.urlManager.masterStatus(APP_KEY, apiKey, id);
-            Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON).
+            String url = this.urlManager.masterStatus(APP_KEY, id);
+            Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON)
+            .addHeader(AUTHORIZATION,this.credentials).
                     addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
             JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
             JSONObject result = (JSONObject) jo.get(JsonConstants.RESULT);
@@ -152,16 +150,12 @@ public class ApiV3Impl implements Api {
     public TestStatus masterStatus(String id) {
         TestStatus testStatus = null;
 
-        if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(id)) {
-            testStatus = TestStatus.NotFound;
-            return testStatus;
-        }
-
         try {
-            String url = this.urlManager.masterStatus(APP_KEY, apiKey, id);
+            String url = this.urlManager.masterStatus(APP_KEY, id);
             Request r = new Request.Builder().url(url).get()
-                    .addHeader(ACCEPT, APP_JSON).
-                            addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
+                    .addHeader(ACCEPT, APP_JSON)
+                .addHeader(AUTHORIZATION,this.credentials).
+                    addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
             JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
             JSONObject result = (JSONObject) jo.get(JsonConstants.RESULT);
             if (result.has(JsonConstants.DATA_URL) && result.get(JsonConstants.DATA_URL) == null) {
@@ -189,17 +183,17 @@ public class ApiV3Impl implements Api {
     @Override
     public synchronized HashMap<String, String> startTest(String testId, boolean collection) throws JSONException,
             IOException {
-        if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(testId)) return null;
         String url = "";
         HashMap<String, String> startResp = new HashMap<String, String>();
         if (collection) {
-            url = this.urlManager.collectionStart(APP_KEY, apiKey, testId);
+            url = this.urlManager.collectionStart(APP_KEY, testId);
         } else {
-            url = this.urlManager.testStart(APP_KEY, apiKey, testId);
+            url = this.urlManager.testStart(APP_KEY, testId);
         }
         RequestBody emptyBody = RequestBody.create(null, new byte[0]);
-        Request r = new Request.Builder().url(url).post(emptyBody).addHeader(ACCEPT, APP_JSON).
-                addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
+        Request r = new Request.Builder().url(url).post(emptyBody).addHeader(ACCEPT, APP_JSON)
+        .addHeader(AUTHORIZATION,this.credentials).
+            addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
         JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
         if (jo == null) {
             if (this.logger.isDebugEnabled())
@@ -247,11 +241,11 @@ public class ApiV3Impl implements Api {
 
     @Override
     public int getTestCount() throws JSONException, IOException, ServletException {
-        if (StringUtils.isBlank(apiKey)) return 0;
-        String url = this.urlManager.tests(APP_KEY, apiKey);
+        String url = this.urlManager.tests(APP_KEY);
 
         try {
-            Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON).
+            Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON)
+            .addHeader(AUTHORIZATION,this.credentials).
                     addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
             JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
             if (jo == null) {
@@ -271,10 +265,10 @@ public class ApiV3Impl implements Api {
 
     @Override
     public JSONObject stopTest(String testId) throws IOException, JSONException {
-        if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(testId)) return null;
-        String url = this.urlManager.masterStop(APP_KEY, apiKey, testId);
+        String url = this.urlManager.masterStop(APP_KEY, testId);
         RequestBody emptyBody = RequestBody.create(null, new byte[0]);
-        Request r = new Request.Builder().url(url).post(emptyBody).addHeader(ACCEPT, APP_JSON).
+        Request r = new Request.Builder().url(url).post(emptyBody).addHeader(ACCEPT, APP_JSON)
+        .addHeader(AUTHORIZATION,this.credentials).
                 addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
         JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
         return jo;
@@ -282,8 +276,7 @@ public class ApiV3Impl implements Api {
 
     @Override
     public void terminateTest(String testId) throws IOException {
-        if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(testId)) return;
-        String url = this.urlManager.testTerminate(APP_KEY, apiKey, testId);
+        String url = this.urlManager.testTerminate(APP_KEY, testId);
         RequestBody emptyBody = RequestBody.create(null, new byte[0]);
         Request r = new Request.Builder().url(url).post(emptyBody).addHeader(ACCEPT, APP_JSON).
                 addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
@@ -294,13 +287,13 @@ public class ApiV3Impl implements Api {
 
     @Override
     public JSONObject testReport(String reportId) {
-        if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(reportId)) return null;
 
-        String url = this.urlManager.testReport(APP_KEY, apiKey, reportId);
+        String url = this.urlManager.testReport(APP_KEY, reportId);
         JSONObject summary = null;
         JSONObject result = null;
         try {
-            Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON).
+            Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON)
+            .addHeader(AUTHORIZATION,this.credentials).
                     addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
             result = new JSONObject(okhttp.newCall(r).execute().body().string()).getJSONObject(JsonConstants.RESULT);
             summary = (JSONObject) result.getJSONArray("summary")
@@ -326,13 +319,11 @@ public class ApiV3Impl implements Api {
     public LinkedHashMultimap<String, String> testsMultiMap() throws IOException, MessagingException {
 
         LinkedHashMultimap<String, String> testListOrdered = null;
-        if (StringUtils.isBlank(apiKey)) {
-            return null;
-        } else {
-            String url = this.urlManager.tests(APP_KEY, apiKey);
+            String url = this.urlManager.tests(APP_KEY);
             this.logger.info("Getting tests: " + url.substring(0, url.indexOf("?") + 14));
             try {
-                Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON).
+                Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON)
+                .addHeader(AUTHORIZATION,this.credentials).
                         addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
                 JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
                 this.logger.info("Received json: " + jo.toString());
@@ -385,23 +376,23 @@ public class ApiV3Impl implements Api {
             }
 
         }
-    }
+
 
     @Override
     public JSONObject getUser() throws IOException, JSONException {
-        if (StringUtils.isBlank(apiKey)) return null;
-        String url = this.urlManager.getUser(APP_KEY, apiKey);
-        Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON).build();
+        String url = this.urlManager.getUser(APP_KEY);
+        Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON)
+        .addHeader(AUTHORIZATION,this.credentials).build();
         JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
         return jo;
     }
 
     @Override
     public JSONObject getCIStatus(String sessionId) throws JSONException, NullPointerException, IOException {
-        if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(sessionId)) return null;
         this.logger.info("Trying to get jtl url for the sessionId = " + sessionId);
-        String url = this.urlManager.ciStatus(APP_KEY, apiKey, sessionId);
-        Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON).
+        String url = this.urlManager.ciStatus(APP_KEY, sessionId);
+        Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON)
+        .addHeader(AUTHORIZATION,this.credentials).
                 addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
         JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string()).getJSONObject(JsonConstants.RESULT);
         return jo;
@@ -410,9 +401,9 @@ public class ApiV3Impl implements Api {
 
     @Override
     public String retrieveJUNITXML(String sessionId) throws IOException {
-        if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(sessionId)) return null;
-        String url = this.urlManager.retrieveJUNITXML(APP_KEY, apiKey, sessionId);
-        Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON).
+        String url = this.urlManager.retrieveJUNITXML(APP_KEY, sessionId);
+        Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON)
+        .addHeader(AUTHORIZATION,this.credentials).
                 addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
         String xmlJunit = okhttp.newCall(r).execute().body().string();
         return xmlJunit;
@@ -420,11 +411,11 @@ public class ApiV3Impl implements Api {
 
     @Override
     public JSONObject retrieveJtlZip(String sessionId) throws IOException, JSONException {
-        if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(sessionId)) return null;
         this.logger.info("Trying to get jtl url for the sessionId=" + sessionId);
-        String url = this.urlManager.retrieveJTLZIP(APP_KEY, apiKey, sessionId);
+        String url = this.urlManager.retrieveJTLZIP(APP_KEY, sessionId);
         this.logger.info("Trying to retrieve jtl json for the sessionId = " + sessionId);
-        Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON).
+        Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON)
+        .addHeader(AUTHORIZATION,this.credentials).
                 addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
         JSONObject jtlzip = new JSONObject(okhttp.newCall(r).execute().body().string());
         return jtlzip;
@@ -432,11 +423,11 @@ public class ApiV3Impl implements Api {
 
     @Override
     public JSONObject generatePublicToken(String sessionId) throws IOException, JSONException {
-        if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(sessionId)) return null;
 
-        String url = this.urlManager.generatePublicToken(APP_KEY, apiKey, sessionId);
+        String url = this.urlManager.generatePublicToken(APP_KEY, sessionId);
         RequestBody emptyBody = RequestBody.create(null, new byte[0]);
-        Request r = new Request.Builder().url(url).post(emptyBody).addHeader(ACCEPT, APP_JSON).
+        Request r = new Request.Builder().url(url).post(emptyBody).addHeader(ACCEPT, APP_JSON)
+        .addHeader(AUTHORIZATION,this.credentials).
                 addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
         JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
         return jo;
@@ -445,8 +436,9 @@ public class ApiV3Impl implements Api {
     @Override
     public List<String> getListOfSessionIds(String masterId) throws IOException, JSONException {
         List<String> sessionsIds = new ArrayList<String>();
-        String url = this.urlManager.listOfSessionIds(APP_KEY, apiKey, masterId);
-        Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON).
+        String url = this.urlManager.listOfSessionIds(APP_KEY, masterId);
+        Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON)
+        .addHeader(AUTHORIZATION,this.credentials).
                 addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
         JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
         try {
@@ -467,10 +459,11 @@ public class ApiV3Impl implements Api {
     @Override
     public boolean active(String testId) {
         boolean isActive = false;
-        String url = this.urlManager.activeTests(APP_KEY, apiKey);
+        String url = this.urlManager.activeTests(APP_KEY);
         JSONObject jo = null;
         try {
-            Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON).
+            Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON)
+            .addHeader(AUTHORIZATION,this.credentials).
                     addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
             jo = new JSONObject(okhttp.newCall(r).execute().body().string());
             JSONObject result = null;
@@ -507,7 +500,9 @@ public class ApiV3Impl implements Api {
         JSONObject jo = null;
         boolean ping = false;
         try {
-            Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON).build();
+            Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON)
+            .addHeader(AUTHORIZATION,this.credentials).
+                build();
             jo = new JSONObject(okhttp.newCall(r).execute().body().string());
             ping = jo.isNull(JsonConstants.ERROR);
         } catch (Exception e) {
@@ -519,12 +514,11 @@ public class ApiV3Impl implements Api {
 
     @Override
     public boolean notes(String note, String masterId) throws Exception {
-        if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(masterId)) return false;
         String noteEsc = StringEscapeUtils.escapeJson("{'" + JsonConstants.NOTE + "':'" + note + "'}");
-        String url = this.urlManager.masterId(APP_KEY, apiKey, masterId);
+        String url = this.urlManager.masterId(APP_KEY, masterId);
         JSONObject noteJson = new JSONObject(noteEsc);
         RequestBody body = RequestBody.create(TEXT, noteJson.toString());
-        Request r = new Request.Builder().url(url).patch(body).build();
+        Request r = new Request.Builder().url(url).patch(body).addHeader(AUTHORIZATION,this.credentials).build();
         JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
         try {
             if (jo.get(JsonConstants.ERROR).equals(JSONObject.NULL)) {
@@ -538,8 +532,7 @@ public class ApiV3Impl implements Api {
 
     @Override
     public boolean properties(JSONArray properties, String sessionId) throws Exception {
-        if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(sessionId)) return false;
-        String url = this.urlManager.properties(APP_KEY, apiKey, sessionId);
+        String url = this.urlManager.properties(APP_KEY, sessionId);
         RequestBody body = RequestBody.create(JSON, properties.toString());
         Request r = new Request.Builder().url(url).post(body).build();
         JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
@@ -555,24 +548,21 @@ public class ApiV3Impl implements Api {
 
     @Override
     public JSONObject testConfig(String testId) throws IOException, JSONException {
-        if (StringUtils.isBlank(apiKey) & StringUtils.isBlank(testId)) return null;
-        String url = this.urlManager.testConfig(APP_KEY, apiKey, testId);
-        Request r = new Request.Builder().url(url).get().build();
+        String url = this.urlManager.testConfig(APP_KEY, testId);
+        Request r = new Request.Builder().url(url).get().addHeader(AUTHORIZATION,this.credentials).build();
         JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
         return jo;
     }
 
 
     @Override
-    public boolean verifyUserKey() {
+    public boolean verifyCredentials() {
 
-        if (apiKey == null || apiKey.trim().isEmpty()) {
-            return false;
-        } else {
+
             logger.info("Verifying userKey...");
-            String url = this.urlManager.tests(APP_KEY, apiKey);
+            String url = this.urlManager.tests(APP_KEY);
             try {
-                Request r = new Request.Builder().url(url).get().build();
+                Request r = new Request.Builder().url(url).get().addHeader(AUTHORIZATION,this.credentials).build();
                 JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
                 logger.info("Got response: " + jo.toString());
                 if (jo.get(JsonConstants.ERROR).equals(JSONObject.NULL)) {
@@ -585,18 +575,6 @@ public class ApiV3Impl implements Api {
                 return false;
             }
         }
-    }
-
-
-    @Override
-    public String getApiKey() {
-        return apiKey;
-    }
-
-    @Override
-    public void setApiKey(String apiKey) {
-        this.apiKey = apiKey;
-    }
 
 
     @Override

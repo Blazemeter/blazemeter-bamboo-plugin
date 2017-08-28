@@ -13,6 +13,9 @@
  */
 package com.blazemeter.bamboo.plugin.servlet;
 
+import com.atlassian.sal.api.transaction.TransactionCallback;
+import com.blazemeter.bamboo.plugin.api.Api;
+import com.blazemeter.bamboo.plugin.api.ApiV3Impl;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,6 +34,7 @@ import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import com.atlassian.templaterenderer.TemplateRenderer;
 import com.atlassian.sal.api.transaction.TransactionTemplate;
 import com.blazemeter.bamboo.plugin.configuration.constants.AdminServletConst;
+import okhttp3.Credentials;
 
 public class AdminServlet extends HttpServlet {
     private final TransactionTemplate transactionTemplate;
@@ -95,25 +99,29 @@ public class AdminServlet extends HttpServlet {
         context.put(AdminServletConst.API_ID, api_id);
         context.put(AdminServletConst.API_SECRET, api_secret);
         context.put(AdminServletConst.URL, url);
-/*     TODO
-       Api api= new ApiV3Impl(userKey, url);
-		if (api.verifyUserKey()){
+       String credentials = Credentials.basic(api_id,api_secret);
+       Api api= new ApiV3Impl(credentials, url);
+		if (api.verifyCredentials()){
 			transactionTemplate.execute(new TransactionCallback() {
 				public Object doInTransaction() {
 					PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
-					pluginSettings.put(Config.class.getName() + AdminServletConst.DOT_USER_KEY, req.getParameter(AdminServletConst.USER_KEY).trim());
+					pluginSettings.put(Config.class.getName() + AdminServletConst.DOT_API_ID, req.getParameter(AdminServletConst.API_ID).trim());
+					pluginSettings.put(Config.class.getName() + AdminServletConst.DOT_API_SECRET, req.getParameter(AdminServletConst.API_SECRET).trim());
 					pluginSettings.put(Config.class.getName() + AdminServletConst.DOT_SERVER_URL, req.getParameter(AdminServletConst.URL).trim());
 					return null;
 				}
 			});
 			context.put(AdminServletConst.API_ID_ERROR, "User settings are updated. Check that jobs are configured properly");
+			context.put(AdminServletConst.API_SECRET_ERROR, "User settings are updated. Check that jobs are configured properly");
 			context.put(AdminServletConst.URL_ERROR, "User settings are updated. Check that jobs are configured properly");
 		} else {
-			context.put(AdminServletConst.API_ID_ERROR, "User key is not saved! Check user key "
-                    + req.getParameter(AdminServletConst.USER_KEY).trim() + " and proxy settings.");
+			context.put(AdminServletConst.API_ID_ERROR, "User key is not saved! Check credentials with ID = "
+                    + req.getParameter(AdminServletConst.API_ID).trim() + " and proxy settings.");
+            context.put(AdminServletConst.API_SECRET_ERROR, "User key is not saved! Check credentials with ID = "
+                    + req.getParameter(AdminServletConst.API_ID).trim() + " and proxy settings.");
             context.put(AdminServletConst.URL_ERROR, "Server url is not saved! Check server url "
                     + req.getParameter(AdminServletConst.URL).trim() + " and proxy settings.");
-        }*/
+        }
         renderer.render(AdminServletConst.BLAZEMETER_ADMIN_VM, context, resp.getWriter());
     }
 
