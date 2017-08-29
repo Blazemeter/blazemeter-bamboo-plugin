@@ -57,7 +57,7 @@ public class AdminServlet extends HttpServlet {
         resp.setContentType("text/html;charset=utf-8");
 
         PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
-        String api_id = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_API_ID);
+        String api_id = (String) pluginSettings.get(AdminServletConst.API_ID);
         if (api_id != null) {
             context.put(AdminServletConst.API_ID, api_id.trim());
             context.put(AdminServletConst.API_ID_ERROR, "");
@@ -66,7 +66,7 @@ public class AdminServlet extends HttpServlet {
             context.put(AdminServletConst.API_ID_ERROR, "Please set the BlazeMeter api credentials!");
         }
 
-        String api_secret = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_API_SECRET);
+        String api_secret = (String) pluginSettings.get(AdminServletConst.API_SECRET);
         if (api_secret != null) {
             context.put(AdminServletConst.API_SECRET, api_id.trim());
             context.put(AdminServletConst.API_SECRET_ERROR, "");
@@ -75,7 +75,7 @@ public class AdminServlet extends HttpServlet {
             context.put(AdminServletConst.API_SECRET_ERROR, "Please set the BlazeMeter api credentials!");
         }
 
-        String url = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
+        String url = (String) pluginSettings.get(AdminServletConst.URL);
         if (url != null) {
             context.put(AdminServletConst.URL, url);
             context.put(AdminServletConst.URL_ERROR, "");
@@ -105,9 +105,9 @@ public class AdminServlet extends HttpServlet {
 			transactionTemplate.execute(new TransactionCallback() {
 				public Object doInTransaction() {
 					PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
-					pluginSettings.put(Config.class.getName() + AdminServletConst.DOT_API_ID, req.getParameter(AdminServletConst.API_ID).trim());
-					pluginSettings.put(Config.class.getName() + AdminServletConst.DOT_API_SECRET, req.getParameter(AdminServletConst.API_SECRET).trim());
-					pluginSettings.put(Config.class.getName() + AdminServletConst.DOT_SERVER_URL, req.getParameter(AdminServletConst.URL).trim());
+					pluginSettings.put(AdminServletConst.API_ID, req.getParameter(AdminServletConst.API_ID).trim());
+					pluginSettings.put(AdminServletConst.API_SECRET, req.getParameter(AdminServletConst.API_SECRET).trim());
+					pluginSettings.put(AdminServletConst.URL, req.getParameter(AdminServletConst.URL).trim());
 					return null;
 				}
 			});
@@ -123,20 +123,5 @@ public class AdminServlet extends HttpServlet {
                     + req.getParameter(AdminServletConst.URL).trim() + " and proxy settings.");
         }
         renderer.render(AdminServletConst.BLAZEMETER_ADMIN_VM, context, resp.getWriter());
-    }
-
-    @XmlRootElement
-    @XmlAccessorType(XmlAccessType.FIELD)
-    public static final class Config {
-        @XmlElement
-        private String userkey;
-
-        public String getUserkey() {
-            return userkey;
-        }
-
-        public void setUserkey(String userkey) {
-            this.userkey = userkey;
-        }
     }
 }

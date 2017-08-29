@@ -19,12 +19,7 @@ public interface AdminServletConst {
     String API_SECRET_ERROR ="api_secret_error";
     String API_ID = "id";
     String API_SECRET = "secret";
-    String DOT_API_ID = ".id";
-    String DOT_API_SECRET = ".secret";
-    String DOT_SERVER_URL =".url";
-
     String URL ="url";
     String URL_ERROR ="url_error";
     String BLAZEMETER_ADMIN_VM ="blazemeteradmin.vm";
-
 }

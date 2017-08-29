@@ -571,7 +571,7 @@ public class ApiV3Impl implements Api {
                     return false;
                 }
             } catch (Exception e) {
-                logger.error("Got an exception while verifying userKey: " + e);
+                logger.error("Got an exception while verifying credentials: " + e);
                 return false;
             }
         }

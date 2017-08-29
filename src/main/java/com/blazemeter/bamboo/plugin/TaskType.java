@@ -76,8 +76,8 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         for (TaskDefinition d : tds) {
             if (d.getPluginKey().equals(Constants.PLUGIN_KEY)) {
                 Map<String, String> conf = d.getConfiguration();
-                api_id = conf.get(AdminServlet.Config.class.getName() + AdminServletConst.DOT_API_ID);
-                serverUrl = conf.get(AdminServlet.Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
+                api_id = conf.get(AdminServletConst.API_ID);
+                serverUrl = conf.get(AdminServletConst.URL);
             }
         }
         String testId = configMap.get(Constants.SETTINGS_SELECTED_TEST_ID);

@@ -25,7 +25,6 @@ import com.blazemeter.bamboo.plugin.api.Api;
 import com.blazemeter.bamboo.plugin.api.ApiV3Impl;
 import com.blazemeter.bamboo.plugin.configuration.constants.AdminServletConst;
 import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
-import com.blazemeter.bamboo.plugin.servlet.AdminServlet.Config;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.LinkedHashMultimap;
 import com.opensymphony.xwork.TextProvider;
@@ -60,9 +59,9 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
     public void populateContextForCreate(Map<String, Object> context) {
         super.populateContextForCreate(context);
         PluginSettings pluginSettings = this.pluginSettingsFactory.createGlobalSettings();
-        String api_id = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_API_ID);
-        String api_secret = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_API_SECRET);
-        String serverUrl = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
+        String api_id = (String) pluginSettings.get(AdminServletConst.API_ID);
+        String api_secret = (String) pluginSettings.get(AdminServletConst.API_SECRET);
+        String serverUrl = (String) pluginSettings.get(AdminServletConst.URL);
         context.put(AdminServletConst.URL, serverUrl);
         this.api = new ApiV3Impl(api_id, serverUrl);
         context.put(Constants.TEST_LIST, ServiceManager.getTestsAsMap(api));
@@ -74,12 +73,12 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
     public void populateContextForEdit(Map<String, Object> context, TaskDefinition taskDefinition) {
         super.populateContextForEdit(context, taskDefinition);
         PluginSettings pluginSettings = this.pluginSettingsFactory.createGlobalSettings();
-        String psai = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_API_ID);
-        String psas = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_API_SECRET);
-        String pssu = (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL);
+        String psai = (String) pluginSettings.get(AdminServletConst.API_ID);
+        String psas = (String) pluginSettings.get(AdminServletConst.API_SECRET);
+        String pssu = (String) pluginSettings.get(AdminServletConst.URL);
         Map<String, String> config = taskDefinition.getConfiguration();
-        context.put(Config.class.getName() + AdminServletConst.DOT_API_ID, psai);
-        context.put(Config.class.getName() + AdminServletConst.DOT_SERVER_URL, psai);
+        context.put(AdminServletConst.API_ID, psai);
+        context.put(AdminServletConst.URL, psai);
         context.put(Constants.SETTINGS_SELECTED_TEST_ID, config.get(Constants.SETTINGS_SELECTED_TEST_ID));
         context.put(Constants.SETTINGS_NOTES, config.get(Constants.SETTINGS_NOTES));
         context.put(Constants.SETTINGS_JUNIT_REPORT, config.get(Constants.SETTINGS_JUNIT_REPORT));
@@ -99,10 +98,10 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
 
     @Override
     public void populateContextForView(Map<String, Object> context, TaskDefinition taskDefinition) {
-        context.put(Config.class.getName() + AdminServletConst.DOT_API_ID,
-                taskDefinition.getConfiguration().get(Config.class.getName() + AdminServletConst.DOT_API_ID));
-        context.put(Config.class.getName() + AdminServletConst.DOT_SERVER_URL,
-                taskDefinition.getConfiguration().get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL));
+        context.put(AdminServletConst.API_ID,
+                taskDefinition.getConfiguration().get(AdminServletConst.API_ID));
+        context.put(AdminServletConst.URL,
+                taskDefinition.getConfiguration().get(AdminServletConst.URL));
         super.populateContextForView(context, taskDefinition);
     }
 
@@ -153,10 +152,10 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         config.put(Constants.SETTINGS_JUNIT_REPORT, junitReport);
 
         PluginSettings pluginSettings = this.pluginSettingsFactory.createGlobalSettings();
-        config.put(Config.class.getName() + AdminServletConst.DOT_API_ID,
-                (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_API_ID));
-        config.put(Config.class.getName() + AdminServletConst.DOT_SERVER_URL,
-                (String) pluginSettings.get(Config.class.getName() + AdminServletConst.DOT_SERVER_URL));
+        config.put(AdminServletConst.API_ID,
+                (String) pluginSettings.get(AdminServletConst.API_ID));
+        config.put(AdminServletConst.URL,
+                (String) pluginSettings.get(AdminServletConst.URL));
         return config;
     }
 
