@@ -1,15 +1,15 @@
 /**
- Copyright 2016 BlazeMeter Inc.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
- http://www.apache.org/licenses/LICENSE-2.0
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
+ * Copyright 2016 BlazeMeter Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.blazemeter.bamboo.plugin.configuration;
 
@@ -28,6 +28,7 @@ import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.LinkedHashMultimap;
 import com.opensymphony.xwork.TextProvider;
+import okhttp3.Credentials;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.List;
@@ -36,13 +37,13 @@ import java.util.Map;
 public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskRequirementSupport {
 
     private static final List<String> FIELDS_TO_COPY =
-            ImmutableList.of(Constants.SETTINGS_SELECTED_TEST_ID,
-                    Constants.SETTINGS_JTL_REPORT,
-                    Constants.SETTINGS_JUNIT_REPORT,
-                    Constants.SETTINGS_JMETER_PROPERTIES,
-                    Constants.SETTINGS_NOTES,
-                    Constants.SETTINGS_JTL_PATH,
-                    Constants.SETTINGS_JUNIT_PATH);
+        ImmutableList.of(Constants.SETTINGS_SELECTED_TEST_ID,
+            Constants.SETTINGS_JTL_REPORT,
+            Constants.SETTINGS_JUNIT_REPORT,
+            Constants.SETTINGS_JMETER_PROPERTIES,
+            Constants.SETTINGS_NOTES,
+            Constants.SETTINGS_JTL_PATH,
+            Constants.SETTINGS_JUNIT_PATH);
     private Api api;
 
     private TextProvider textProvider;
@@ -63,7 +64,8 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         String api_secret = (String) pluginSettings.get(AdminServletConst.API_SECRET);
         String serverUrl = (String) pluginSettings.get(AdminServletConst.URL);
         context.put(AdminServletConst.URL, serverUrl);
-        this.api = new ApiV3Impl(api_id, serverUrl);
+        String credentials = Credentials.basic(api_id,api_secret);
+        this.api = new ApiV3Impl(credentials, serverUrl);
         context.put(Constants.TEST_LIST, ServiceManager.getTestsAsMap(api));
     }
 
@@ -78,6 +80,7 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         String pssu = (String) pluginSettings.get(AdminServletConst.URL);
         Map<String, String> config = taskDefinition.getConfiguration();
         context.put(AdminServletConst.API_ID, psai);
+        context.put(AdminServletConst.API_SECRET, psas);
         context.put(AdminServletConst.URL, psai);
         context.put(Constants.SETTINGS_SELECTED_TEST_ID, config.get(Constants.SETTINGS_SELECTED_TEST_ID));
         context.put(Constants.SETTINGS_NOTES, config.get(Constants.SETTINGS_NOTES));
@@ -86,7 +89,8 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         context.put(Constants.SETTINGS_JMETER_PROPERTIES, config.get(Constants.SETTINGS_JMETER_PROPERTIES));
         context.put(Constants.SETTINGS_JTL_PATH, config.get(Constants.SETTINGS_JTL_PATH));
         context.put(Constants.SETTINGS_JUNIT_PATH, config.get(Constants.SETTINGS_JUNIT_PATH));
-        this.api = new ApiV3Impl(psai, pssu);
+        String credentials = Credentials.basic(psai, psas);
+        this.api = new ApiV3Impl(credentials, pssu);
         try {
             context.put(Constants.TEST_LIST, ServiceManager.getTestsAsMap(this.api));
         } catch (Exception e) {
@@ -99,9 +103,11 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
     @Override
     public void populateContextForView(Map<String, Object> context, TaskDefinition taskDefinition) {
         context.put(AdminServletConst.API_ID,
-                taskDefinition.getConfiguration().get(AdminServletConst.API_ID));
+            taskDefinition.getConfiguration().get(AdminServletConst.API_ID));
+        context.put(AdminServletConst.API_SECRET,
+            taskDefinition.getConfiguration().get(AdminServletConst.API_SECRET));
         context.put(AdminServletConst.URL,
-                taskDefinition.getConfiguration().get(AdminServletConst.URL));
+            taskDefinition.getConfiguration().get(AdminServletConst.URL));
         super.populateContextForView(context, taskDefinition);
     }
 
@@ -133,7 +139,6 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         }
     }
 
-
     /**
      * from gui to backend
      */
@@ -153,9 +158,11 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
 
         PluginSettings pluginSettings = this.pluginSettingsFactory.createGlobalSettings();
         config.put(AdminServletConst.API_ID,
-                (String) pluginSettings.get(AdminServletConst.API_ID));
+            (String) pluginSettings.get(AdminServletConst.API_ID));
+        config.put(AdminServletConst.API_SECRET,
+            (String) pluginSettings.get(AdminServletConst.API_SECRET));
         config.put(AdminServletConst.URL,
-                (String) pluginSettings.get(AdminServletConst.URL));
+            (String) pluginSettings.get(AdminServletConst.URL));
         return config;
     }
 

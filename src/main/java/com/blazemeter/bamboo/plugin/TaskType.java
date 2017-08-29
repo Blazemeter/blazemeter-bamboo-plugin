@@ -29,10 +29,10 @@ import com.blazemeter.bamboo.plugin.api.ApiV3Impl;
 import com.blazemeter.bamboo.plugin.api.HttpLogger;
 import com.blazemeter.bamboo.plugin.configuration.constants.AdminServletConst;
 import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
-import com.blazemeter.bamboo.plugin.servlet.AdminServlet;
 import com.blazemeter.bamboo.plugin.testresult.TestResult;
 import java.util.List;
 import java.util.Map;
+import okhttp3.Credentials;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
@@ -69,6 +69,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         TaskResultBuilder resultBuilder = TaskResultBuilder.create(context);
         ConfigurationMap configMap = context.getConfigurationMap();
         String api_id=null;
+        String api_secret=null;
         String serverUrl=null;
         BuildContext buildContext = context.getBuildContext();
         buildContext.getBuildDefinition().getTaskDefinitions().get(0).getPluginKey();
@@ -77,6 +78,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
             if (d.getPluginKey().equals(Constants.PLUGIN_KEY)) {
                 Map<String, String> conf = d.getConfiguration();
                 api_id = conf.get(AdminServletConst.API_ID);
+                api_secret = conf.get(AdminServletConst.API_SECRET);
                 serverUrl = conf.get(AdminServletConst.URL);
             }
         }
@@ -106,7 +108,8 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
             logger.addErrorLogEntry("Failed to create http-log file = " + httpLog + ": " + e.getMessage());
         }
         HttpLogger httpLogger = new HttpLogger(httpLog);
-        this.api = new ApiV3Impl(api_id, serverUrl, httpLogger);
+        String credentials = Credentials.basic(api_id,api_secret);
+        this.api = new ApiV3Impl(credentials, serverUrl, httpLogger);
 
         rootDirectory = context.getRootDirectory();
         logger.addBuildLogEntry("Attempting to start test with id:" + testId);
