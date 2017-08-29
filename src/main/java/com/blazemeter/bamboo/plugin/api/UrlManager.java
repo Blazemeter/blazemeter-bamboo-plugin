@@ -60,8 +60,5 @@ public interface UrlManager {
 
     String masterId(String appKey,String masterId);
 
-    String version(String appKey);
-
     String testConfig(String appKey, String testId);
-
     }

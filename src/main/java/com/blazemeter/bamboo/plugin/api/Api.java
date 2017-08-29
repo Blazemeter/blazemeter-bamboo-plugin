@@ -74,8 +74,6 @@ public interface Api {
 
     void setServerUrl(String serverUrl);
 
-    boolean ping() throws Exception;
-
     boolean notes(String note,String masterId)throws Exception;
 
     boolean properties(JSONArray properties, String sessionId) throws Exception;

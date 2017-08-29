@@ -201,7 +201,7 @@ public class UrlManagerV3Impl implements UrlManager {
             e.printStackTrace();
         }
         generatePublicToken= serverUrl +V4+"/masters/"+masterId+
-                "/publicToken?app_key="+appKey+ CLIENT_IDENTIFICATION;
+                "/public-token?app_key="+appKey+ CLIENT_IDENTIFICATION;
 
         return generatePublicToken;
     }
@@ -252,17 +252,6 @@ public class UrlManagerV3Impl implements UrlManager {
             e.printStackTrace();
         }
         return masterIdUrl= serverUrl + V4 +"/masters/"+masterId+"?app_key="+appKey+ CLIENT_IDENTIFICATION;
-    }
-
-    @Override
-    public String version(String appKey) {
-        String version=null;
-        try {
-            appKey = URLEncoder.encode(appKey, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return version= serverUrl + V4 +WEB+"/version?app_key="+appKey+ CLIENT_IDENTIFICATION;
     }
 
     @Override

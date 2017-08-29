@@ -495,24 +495,6 @@ public class ApiV3Impl implements Api {
     }
 
     @Override
-    public boolean ping() throws Exception {
-        String url = this.urlManager.version(APP_KEY);
-        JSONObject jo = null;
-        boolean ping = false;
-        try {
-            Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON)
-            .addHeader(AUTHORIZATION,this.credentials).
-                build();
-            jo = new JSONObject(okhttp.newCall(r).execute().body().string());
-            ping = jo.isNull(JsonConstants.ERROR);
-        } catch (Exception e) {
-            this.logger.info("Failed to ping server: " + jo, e);
-            throw e;
-        }
-        return ping;
-    }
-
-    @Override
     public boolean notes(String note, String masterId) throws Exception {
         String noteEsc = StringEscapeUtils.escapeJson("{'" + JsonConstants.NOTE + "':'" + note + "'}");
         String url = this.urlManager.masterId(APP_KEY, masterId);
