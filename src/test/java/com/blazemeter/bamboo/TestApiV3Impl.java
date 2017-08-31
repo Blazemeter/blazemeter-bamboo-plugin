@@ -91,16 +91,18 @@ public class TestApiV3Impl {
                 "15105877");
     }
 
-    /*
-TODO
     @Test
     public void getTestList_5_5() throws IOException, JSONException, ServletException, MessagingException {
-        blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_5_TESTS, TestConstants.mockedApiUrl);
+        String c = Credentials.basic(TestConstants.TEST_API_ID_5_TESTS,TestConstants.TEST_API_SECRET_5_TESTS);
+        blazemeterApiV3 = new ApiV3Impl(c, TestConstants.mockedApiUrl);
         LinkedHashMultimap<String, String> testList = blazemeterApiV3.testsMultiMap();
         Assert.assertTrue(testList.asMap().size() == 5);
         Assert.assertTrue(testList.size() == 5);
 
     }
+
+    /*
+TODO
 
     @Test
     public void getTestReport() {

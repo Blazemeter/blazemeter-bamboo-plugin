@@ -22,7 +22,7 @@ public interface UrlManager {
     String TESTS="/tests";
     String MASTERS="/masters";
     String WEB="/web";
-
+    String API_WEB="/api/web";
 
     String getServerUrl();
 

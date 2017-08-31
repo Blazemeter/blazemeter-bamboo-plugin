@@ -320,7 +320,7 @@ public class ApiV3Impl implements Api {
 
         LinkedHashMultimap<String, String> testListOrdered = null;
             String url = this.urlManager.tests(APP_KEY);
-            this.logger.info("Getting tests: " + url.substring(0, url.indexOf("?") + 14));
+            this.logger.info("Getting tests: " + url);
             try {
                 Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON)
                 .addHeader(AUTHORIZATION,this.credentials).

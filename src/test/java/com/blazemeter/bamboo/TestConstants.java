@@ -27,8 +27,8 @@ public interface TestConstants {
     String TEST_API_SECRET_0_TESTS="0testsSecret";
     String TEST_API_ID_1_TEST="1testId";
     String TEST_API_SECRET_1_TEST="1testSecret";
-    String TEST_API_ID_6_TESTS="6testsId";
-    String TEST_API_SECRET_6_TESTS="6testsSecret";
+    String TEST_API_ID_5_TESTS="5testsId";
+    String TEST_API_SECRET_5_TESTS="5testsSecret";
 
     int mockedApiPort=1234;
     String proxyPort="2345";

@@ -304,14 +304,13 @@ TODO
 }
 
     public static void getTests() throws IOException{
-        String expectedPath="/api/web/tests";
         File jsonFile = new File(TestConstants.RESOURCES + "/getTests_10.json");
         String getTests= FileUtils.readFileToString(jsonFile);
         String c = Credentials.basic(TestConstants.TEST_API_ID_VALID,TestConstants.TEST_API_SECRET_VALID);
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath(expectedPath)
+                        .withPath(UrlManager.API_WEB+UrlManager.TESTS)
                         .withHeader(Api.ACCEPT, Api.APP_JSON)
                         .withHeader(Api.AUTHORIZATION, c),
                 unlimited()
@@ -326,7 +325,7 @@ TODO
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath(expectedPath)
+                        .withPath(UrlManager.API_WEB+UrlManager.TESTS)
                         .withHeader(Api.ACCEPT, Api.APP_JSON)
                         .withHeader(Api.AUTHORIZATION,c),
                 unlimited()
@@ -342,7 +341,7 @@ TODO
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath(expectedPath)
+                        .withPath(UrlManager.API_WEB+UrlManager.TESTS)
                         .withHeader(Api.ACCEPT, Api.APP_JSON)
                         .withHeader(Api.AUTHORIZATION, c),
                 unlimited()
@@ -353,11 +352,11 @@ TODO
 
         jsonFile = new File(TestConstants.RESOURCES + "/getTests_5.json");
         getTests= FileUtils.readFileToString(jsonFile);
-        c = Credentials.basic(TestConstants.TEST_API_ID_6_TESTS,TestConstants.TEST_API_SECRET_6_TESTS);
+        c = Credentials.basic(TestConstants.TEST_API_ID_5_TESTS,TestConstants.TEST_API_SECRET_5_TESTS);
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath(expectedPath)
+                        .withPath(UrlManager.API_WEB+UrlManager.TESTS)
                         .withHeader(Api.ACCEPT, Api.APP_JSON)
                         .withHeader(Api.AUTHORIZATION, c),
             unlimited()
