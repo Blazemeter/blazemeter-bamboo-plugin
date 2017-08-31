@@ -68,7 +68,7 @@ public class AdminServlet extends HttpServlet {
 
         String api_secret = (String) pluginSettings.get(AdminServletConst.API_SECRET);
         if (api_secret != null) {
-            context.put(AdminServletConst.API_SECRET, api_id.trim());
+            context.put(AdminServletConst.API_SECRET, api_secret.trim());
             context.put(AdminServletConst.API_SECRET_ERROR, "");
         } else {
             context.put(AdminServletConst.API_SECRET, "");

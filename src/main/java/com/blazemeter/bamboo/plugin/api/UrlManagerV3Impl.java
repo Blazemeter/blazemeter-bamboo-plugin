@@ -48,7 +48,11 @@ public class UrlManagerV3Impl implements UrlManager {
             appKey = URLEncoder.encode(appKey, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
-        }
+        }/*
+        TODO
+        workspace id is required
+        */
+//        getTests= serverUrl +V4+"/tests?&app_key="+appKey+ CLIENT_IDENTIFICATION;
         getTests= serverUrl +"/api/web/tests?&app_key="+appKey+ CLIENT_IDENTIFICATION;
 
         return getTests;
