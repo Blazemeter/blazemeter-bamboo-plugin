@@ -42,7 +42,8 @@ public class TestServiceManager {
         MockedAPI.startTest();
         MockedAPI.userProfile();
         MockedAPI.stopTestSession();
-        MockedAPI.getMasterStatus();
+//        TODO
+// MockedAPI.getMasterStatus();
         MockedAPI.getCIStatus();
         MockedAPI.getReportUrl();
         MockedAPI.getTestConfig();
@@ -53,7 +54,8 @@ public class TestServiceManager {
     public static void tearDown()throws IOException{
         MockedAPI.stopAPI();
     }
-
+/*
+TODO
 
     @Test
     public void getTests(){
@@ -124,6 +126,7 @@ public class TestServiceManager {
             terminate = ServiceManager.stopTestMaster(api, TestConstants.TEST_MASTER_140, log);
             Assert.assertEquals(terminate, false);
     }
+*/
 
     @Test
     public void getVersion() throws IOException,JSONException {

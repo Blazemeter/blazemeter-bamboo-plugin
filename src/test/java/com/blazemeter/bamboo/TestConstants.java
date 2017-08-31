@@ -17,18 +17,19 @@ package com.blazemeter.bamboo;
 public interface TestConstants {
     String RESOURCES = System.getProperty("user.dir")+"/src/test/java/com/blazemeter/bamboo/resources";
 
+    String TEST_API_ID_VALID="validId";
+    String TEST_API_SECRET_VALID="validSecret";
+    String TEST_API_ID_INVALID="invalidId";
+    String TEST_API_SECRET_INVALID="invalidSecret";
+    String TEST_API_ID_EXCEPTION="exceptionId";
+    String TEST_API_SECRET_EXCEPTION="exceptionSecret";
+    String TEST_API_ID_0_TESTS="0testsId";
+    String TEST_API_SECRET_0_TESTS="0testsSecret";
+    String TEST_API_ID_1_TEST="1testId";
+    String TEST_API_SECRET_1_TEST="1testSecret";
+    String TEST_API_ID_6_TESTS="6testsId";
+    String TEST_API_SECRET_6_TESTS="6testsSecret";
 
-    // Mocked API constants
-    String MOCKED_USER_KEY_VALID ="mockedAPIKeyValid";
-    String MOCKED_USER_KEY_RETRIES ="mockedAPIKeyRetries";
-    String MOCKED_USER_KEY_TEST_TYPE ="mockedAPIKeyTestType";
-    String MOCKED_USER_KEY_V2 ="mockedAPIKeyV2";
-    String MOCKED_USER_KEY_6_TESTS ="mockedAPIKeyValid-1-tests";
-    String MOCKED_USER_KEY_1_TEST ="mockedAPIKeyValid-1-test";
-    String MOCKED_USER_KEY_5_TESTS ="mockedAPIKeyValid-1-tests";
-    String MOCKED_USER_KEY_0_TESTS ="mockedAPIKeyValid-0-tests";
-    String MOCKED_USER_KEY_INVALID ="mockedAPIKeyInValid";
-    String MOCKED_USER_KEY_EXCEPTION ="mockedAPIKeyException";
     int mockedApiPort=1234;
     String proxyPort="2345";
     String mockedApiUrl="http://127.0.0.1:"+mockedApiPort;
@@ -43,10 +44,7 @@ public interface TestConstants {
     String TEST_MASTER_140 ="testMaster-140";
     String TEST_MASTER_SUCCESS ="testMasterSuccess";
     String TEST_MASTER_FAILURE ="testMasterFailure";
-    String TEST_MASTER_ERROR ="testMasterError";
     String TEST_MASTER_ERROR_61700 ="testMasterError_61700";
     String TEST_MASTER_ERROR_0 ="testMasterError_0";
     String TEST_MASTER_ERROR_70404 ="testMasterError_70404";
-
-    String YAHOO="yahoo";
 }

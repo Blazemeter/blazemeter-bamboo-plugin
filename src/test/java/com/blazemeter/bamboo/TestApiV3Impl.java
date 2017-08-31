@@ -19,6 +19,7 @@ import com.blazemeter.bamboo.plugin.api.*;
 import com.blazemeter.bamboo.plugin.configuration.constants.JsonConstants;
 import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
 import com.google.common.collect.LinkedHashMultimap;
+import okhttp3.Credentials;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.AfterClass;
@@ -44,11 +45,10 @@ public class TestApiV3Impl {
         MockedAPI.getTestReport();
         MockedAPI.startTest();
         MockedAPI.active();
-        MockedAPI.ping();
     }
 
     @AfterClass
-    public static void tearDown() throws IOException {
+    public static void tearDown(){
         MockedAPI.stopAPI();
     }
 
@@ -56,16 +56,16 @@ public class TestApiV3Impl {
 
     @Test
     public void getTestStatus_Running() {
-        blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID,
-                TestConstants.mockedApiUrl);
+        String c = Credentials.basic(TestConstants.TEST_API_ID_VALID,TestConstants.TEST_API_SECRET_VALID);
+        blazemeterApiV3 = new ApiV3Impl(c,TestConstants.mockedApiUrl);
         TestStatus testStatus = blazemeterApiV3.masterStatus(TestConstants.TEST_MASTER_100);
         Assert.assertEquals(testStatus, TestStatus.Running);
     }
 
     @Test
     public void getTestInfo_NotRunning() {
-        blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID,
-                TestConstants.mockedApiUrl);
+        String c = Credentials.basic(TestConstants.TEST_API_ID_VALID,TestConstants.TEST_API_SECRET_VALID);
+        blazemeterApiV3 = new ApiV3Impl(c,TestConstants.mockedApiUrl);
         TestStatus testStatus = blazemeterApiV3.masterStatus(TestConstants.TEST_MASTER_140);
         Assert.assertEquals(testStatus, TestStatus.NotRunning);
     }
@@ -73,52 +73,26 @@ public class TestApiV3Impl {
 
     @Test
     public void getTestInfo_Error() {
-        blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID,
-                TestConstants.mockedApiUrl);
+        String c = Credentials.basic(TestConstants.TEST_API_ID_VALID,TestConstants.TEST_API_SECRET_VALID);
+        blazemeterApiV3 = new ApiV3Impl(c,TestConstants.mockedApiUrl);
         TestStatus testStatus = blazemeterApiV3.masterStatus(TestConstants.TEST_MASTER_NOT_FOUND);
         Assert.assertEquals(testStatus, TestStatus.Error);
     }
 
-    @Test
-    public void getTestInfo_NotFound() {
-        blazemeterApiV3 = new ApiV3Impl("",TestConstants.mockedApiUrl);
-        TestStatus testStatus = blazemeterApiV3.masterStatus("");
-        Assert.assertEquals(testStatus, TestStatus.NotFound);
-    }
-
-
-    @Test
-    public void getTestCount_zero() {
-        try {
-            blazemeterApiV3 = new ApiV3Impl(null, TestConstants.mockedApiUrl);
-            Assert.assertEquals(blazemeterApiV3.getTestCount(), 0);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ServletException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
 
 
 
 
     @Test
     public void startTest_multi() throws JSONException,IOException {
-        blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID,
-                TestConstants.mockedApiUrl);
+        String c = Credentials.basic(TestConstants.TEST_API_ID_VALID,TestConstants.TEST_API_SECRET_VALID);
+        blazemeterApiV3 = new ApiV3Impl(c,TestConstants.mockedApiUrl);
         Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_MASTER_ID, true).get(JsonConstants.ID),
                 "15105877");
     }
 
-
-    @Test
-    public void getTestRunStatus_notFound() {
-        blazemeterApiV3 = new ApiV3Impl(null, TestConstants.mockedApiUrl);
-        Assert.assertEquals(blazemeterApiV3.masterStatus(null), TestStatus.NotFound);
-    }
-
+    /*
+TODO
     @Test
     public void getTestList_5_5() throws IOException, JSONException, ServletException, MessagingException {
         blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_5_TESTS, TestConstants.mockedApiUrl);
@@ -224,28 +198,6 @@ public class TestApiV3Impl {
         boolean active = blazemeterApiV3.active("51338483");
         Assert.assertFalse(active);
     }
+*/
 
-
-    @Test
-    public void ping_true() {
-        blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
-        boolean ping = false;
-        try {
-            ping = blazemeterApiV3.ping();
-        } catch (Exception e) {
-            Assert.fail();
-        }
-        Assert.assertTrue(ping);
-    }
-
-    @Test
-    public void ping_false() {
-        blazemeterApiV3 = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
-        boolean ping = false;
-        try {
-            ping = blazemeterApiV3.ping();
-        } catch (Exception e) {
-            Assert.assertFalse(ping);
-        }
-    }
 }

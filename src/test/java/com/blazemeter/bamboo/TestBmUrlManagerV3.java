@@ -107,7 +107,7 @@ public class TestBmUrlManagerV3 {
     @Test
     public void generatePublicToken_masters(){
         String expGenPublicToken=bmUrlManager.getServerUrl()+UrlManager.V4+"/masters/"+ masterId +
-                "/publicToken?&app_key="+appKey+UrlManager.CLIENT_IDENTIFICATION;
+                "/public-token?app_key="+appKey+UrlManager.CLIENT_IDENTIFICATION;
         String actGenPublicToken=bmUrlManager.generatePublicToken(appKey, masterId);
         Assert.assertEquals(expGenPublicToken,actGenPublicToken);
     }
@@ -115,7 +115,7 @@ public class TestBmUrlManagerV3 {
     @Test
     public void listOfSessions(){
         String expListOfSessionIds=bmUrlManager.getServerUrl()+UrlManager.V4+"/masters/"+ masterId +
-                "/sessions?&app_key="+appKey+UrlManager.CLIENT_IDENTIFICATION;
+                "/sessions?app_key="+appKey+UrlManager.CLIENT_IDENTIFICATION;
         String actListOfSessionsIds=bmUrlManager.listOfSessionIds(appKey, masterId);
         Assert.assertEquals(expListOfSessionIds,actListOfSessionsIds);
     }
