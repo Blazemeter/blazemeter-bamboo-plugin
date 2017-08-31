@@ -233,6 +233,10 @@ public class UrlManagerV3Impl implements UrlManager {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
+        /*
+        TODO
+        /api/v4/masters?workspaceId=<>&active=true
+         */
         return activeTests= serverUrl +V4+"/web/active?app_key="+appKey+ CLIENT_IDENTIFICATION;
 
     }
