@@ -428,25 +428,6 @@ public class MockedAPI {
     }
 
 
-    public static void active() throws IOException{
-        String expectedPath="/api/latest/web/active";
-        File jsonFile = new File(TestConstants.RESOURCES + "/active.json");
-        String active= FileUtils.readFileToString(jsonFile);
-        String c = Credentials.basic(TestConstants.TEST_API_ID_VALID, TestConstants.TEST_API_SECRET_VALID);
-        mockServer.when(
-                request()
-                        .withMethod("GET")
-                        .withPath(expectedPath)
-                        .withHeader(Api.ACCEPT, Api.APP_JSON)
-                        .withHeader(Api.AUTHORIZATION, c),
-                unlimited()
-        )
-                .respond(
-                        response().withHeader( Api.APP_JSON)
-                                .withStatusCode(200).withBody(active));
-    }
-
-
     public static void stopAPI(){
         mockServer.reset();
         mockServer.stop();

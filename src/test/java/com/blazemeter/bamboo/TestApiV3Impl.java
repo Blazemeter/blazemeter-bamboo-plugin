@@ -17,7 +17,6 @@ package com.blazemeter.bamboo;
 import com.blazemeter.bamboo.plugin.TestStatus;
 import com.blazemeter.bamboo.plugin.api.*;
 import com.blazemeter.bamboo.plugin.configuration.constants.JsonConstants;
-import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
 import com.google.common.collect.LinkedHashMultimap;
 import okhttp3.Credentials;
 import org.json.JSONException;
@@ -42,7 +41,6 @@ public class TestApiV3Impl {
         MockedAPI.getTests();
         MockedAPI.getTestReport();
         MockedAPI.startTest();
-        MockedAPI.active();
     }
 
     @AfterClass
