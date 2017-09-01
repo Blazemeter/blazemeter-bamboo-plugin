@@ -27,7 +27,6 @@ import com.blazemeter.bamboo.plugin.configuration.constants.AdminServletConst;
 import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.LinkedHashMultimap;
-import com.opensymphony.xwork.TextProvider;
 import okhttp3.Credentials;
 import org.apache.commons.lang.StringUtils;
 
@@ -46,7 +45,7 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
             Constants.SETTINGS_JUNIT_PATH);
     private Api api;
 
-    private TextProvider textProvider;
+//    private TextProvider textProvider;
 
     PluginSettingsFactory pluginSettingsFactory;
 
@@ -164,9 +163,5 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         config.put(AdminServletConst.URL,
             (String) pluginSettings.get(AdminServletConst.URL));
         return config;
-    }
-
-    public void setTextProvider(final TextProvider textProvider) {
-        this.textProvider = textProvider;
     }
 }

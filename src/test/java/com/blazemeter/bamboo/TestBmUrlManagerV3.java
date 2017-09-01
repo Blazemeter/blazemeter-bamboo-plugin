@@ -107,7 +107,7 @@ public class TestBmUrlManagerV3 {
     public void generatePublicToken_masters(){
         String expGenPublicToken=bmUrlManager.getServerUrl()+UrlManager.V4+Constants.MASTERS
             + masterId +
-                "/public-token?app_key="+appKey+UrlManager.CLIENT_IDENTIFICATION;
+                "/"+Constants.PUBLIC_TOKEN+"?app_key="+appKey+UrlManager.CLIENT_IDENTIFICATION;
         String actGenPublicToken=bmUrlManager.generatePublicToken(appKey, masterId);
         Assert.assertEquals(expGenPublicToken,actGenPublicToken);
     }

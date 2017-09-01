@@ -45,4 +45,5 @@ public interface Constants {
     String PROXY_PASS="http.proxyPassword";
 
     String MASTERS="/masters/";
+    String PUBLIC_TOKEN="public-token";
 }

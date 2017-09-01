@@ -19,6 +19,7 @@ import com.atlassian.bamboo.task.TaskState;
 import com.blazemeter.bamboo.plugin.ServiceManager;
 import com.blazemeter.bamboo.plugin.api.Api;
 import com.blazemeter.bamboo.plugin.api.ApiV3Impl;
+import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
 import com.google.common.collect.LinkedHashMultimap;
 import okhttp3.Credentials;
 import org.apache.commons.io.FileUtils;
@@ -72,7 +73,7 @@ public class TestServiceManager {
     @Test
     public void getReportUrl(){
         String c = Credentials.basic(TestConstants.TEST_API_ID_VALID,TestConstants.TEST_API_SECRET_VALID);
-        String expectedReportUrl=TestConstants.mockedApiUrl+"/app/?public-token=ohImO6c8xstG4qBFqgRnsMSAluCBambtrqsTvAEYEXItmrCfgO#masters/testMasterId/summary";
+        String expectedReportUrl=TestConstants.mockedApiUrl+"/app/?"+Constants.PUBLIC_TOKEN+"=ohImO6c8xstG4qBFqgRnsMSAluCBambtrqsTvAEYEXItmrCfgO#masters/testMasterId/summary";
         Api api = new ApiV3Impl(c, TestConstants.mockedApiUrl);
         String actReportUrl=ServiceManager.getReportUrl(api, TestConstants.TEST_MASTER_ID,log);
         Assert.assertEquals(expectedReportUrl,actReportUrl);

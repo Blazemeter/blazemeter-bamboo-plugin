@@ -54,15 +54,15 @@ public class ServiceManager {
                 JSONObject result = jo.getJSONObject(JsonConstants.RESULT);
                 publicToken = result.getString("publicToken");
             } else {
-                logger.addErrorLogEntry("Problems with generating public-token for report URL: " + jo.get(JsonConstants.ERROR).toString());
+                logger.addErrorLogEntry("Problems with generating "+Constants.PUBLIC_TOKEN+" for report URL: " + jo.get(JsonConstants.ERROR).toString());
                 reportUrl = api.getServerUrl() + "/app/#masters/" + masterId + "/summary";
             }
             if (!StringUtils.isBlank(publicToken)) {
-                reportUrl = api.getServerUrl() + "/app/?public-token=" + publicToken + "#masters/" + masterId + "/summary";
+                reportUrl = api.getServerUrl() + "/app/?"+Constants.PUBLIC_TOKEN+"=" + publicToken + "#masters/" + masterId + "/summary";
             }
 
         } catch (Exception e){
-            logger.addErrorLogEntry("Problems with generating public-token for report URL: "+e.getMessage());
+            logger.addErrorLogEntry("Problems with generating "+Constants.PUBLIC_TOKEN+" for report URL: "+e.getMessage());
             reportUrl = api.getServerUrl() + "/app/#masters/" + masterId + "/summary";
         }finally {
             return reportUrl;

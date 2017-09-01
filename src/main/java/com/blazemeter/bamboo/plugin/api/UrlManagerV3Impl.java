@@ -163,7 +163,7 @@ public class UrlManagerV3Impl implements UrlManager {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        return serverUrl + V4 + Constants.MASTERS + masterId + "/public-token?app_key=" + appKey + CLIENT_IDENTIFICATION;
+        return serverUrl + V4 + Constants.MASTERS + masterId + "/"+Constants.PUBLIC_TOKEN+"?app_key=" + appKey + CLIENT_IDENTIFICATION;
     }
 
     @Override
