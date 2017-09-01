@@ -19,8 +19,8 @@ import com.atlassian.bamboo.task.TaskState;
 import com.blazemeter.bamboo.plugin.ServiceManager;
 import com.blazemeter.bamboo.plugin.api.Api;
 import com.blazemeter.bamboo.plugin.api.ApiV3Impl;
-import com.blazemeter.bamboo.plugin.api.CIStatus;
 import com.google.common.collect.LinkedHashMultimap;
+import okhttp3.Credentials;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,93 +40,100 @@ public class TestServiceManager {
         MockedAPI.startAPI();
         MockedAPI.getTests();
         MockedAPI.startTest();
-        MockedAPI.userProfile();
         MockedAPI.stopTestSession();
-//        TODO
-// MockedAPI.getMasterStatus();
+        MockedAPI.getMasterStatus();
         MockedAPI.getCIStatus();
         MockedAPI.getReportUrl();
-        MockedAPI.getTestConfig();
-        MockedAPI.putTestInfo();
     }
 
     @AfterClass
-    public static void tearDown()throws IOException{
+    public static void tearDown(){
         MockedAPI.stopAPI();
     }
-/*
-TODO
+
 
     @Test
     public void getTests(){
-        Api api = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        String c = Credentials.basic(TestConstants.TEST_API_ID_VALID,TestConstants.TEST_API_SECRET_VALID);
+        Api api = new ApiV3Impl(c, TestConstants.mockedApiUrl);
         LinkedHashMultimap<String,String> tests=ServiceManager.getTests(api);
         Assert.assertTrue(tests.size()==4);
     }
 
+
     @Test
     public void startTest(){
-        Api api = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        String c = Credentials.basic(TestConstants.TEST_API_ID_VALID,TestConstants.TEST_API_SECRET_VALID);
+        Api api = new ApiV3Impl(c, TestConstants.mockedApiUrl);
         String testId=ServiceManager.startTest(api,TestConstants.TEST_MASTER_TUT_GY,log);
         Assert.assertEquals("15102806",testId);
     }
 
     @Test
     public void getReportUrl(){
+        String c = Credentials.basic(TestConstants.TEST_API_ID_VALID,TestConstants.TEST_API_SECRET_VALID);
         String expectedReportUrl=TestConstants.mockedApiUrl+"/app/?public-token=ohImO6c8xstG4qBFqgRnsMSAluCBambtrqsTvAEYEXItmrCfgO#masters/testMasterId/summary";
-        Api api = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        Api api = new ApiV3Impl(c, TestConstants.mockedApiUrl);
         String actReportUrl=ServiceManager.getReportUrl(api, TestConstants.TEST_MASTER_ID,log);
         Assert.assertEquals(expectedReportUrl,actReportUrl);
     }
 
+
+
     @Test
     public void getCIStatus_success(){
-        Api api = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        String c = Credentials.basic(TestConstants.TEST_API_ID_VALID,TestConstants.TEST_API_SECRET_VALID);
+        Api api = new ApiV3Impl(c, TestConstants.mockedApiUrl);
         TaskState state= ServiceManager.ciStatus(api, TestConstants.TEST_MASTER_SUCCESS, log);
         Assert.assertEquals(TaskState.SUCCESS,state);
     }
 
     @Test
     public void getCIStatus_failure(){
-        Api api = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        String c = Credentials.basic(TestConstants.TEST_API_ID_VALID,TestConstants.TEST_API_SECRET_VALID);
+        Api api = new ApiV3Impl(c, TestConstants.mockedApiUrl);
         TaskState state= ServiceManager.ciStatus(api, TestConstants.TEST_MASTER_FAILURE, log);
         Assert.assertEquals(TaskState.FAILED,state);
     }
 
     @Test
     public void getCIStatus_error_61700(){
-        Api api = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        String c = Credentials.basic(TestConstants.TEST_API_ID_VALID,TestConstants.TEST_API_SECRET_VALID);
+        Api api = new ApiV3Impl(c, TestConstants.mockedApiUrl);
         TaskState state = ServiceManager.ciStatus(api, TestConstants.TEST_MASTER_ERROR_61700, log);
         Assert.assertEquals(TaskState.ERROR,state);
     }
 
+
     @Test
     public void getCIStatus_error_0(){
-        Api api = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        String c = Credentials.basic(TestConstants.TEST_API_ID_VALID,TestConstants.TEST_API_SECRET_VALID);
+        Api api = new ApiV3Impl(c, TestConstants.mockedApiUrl);
         TaskState state = ServiceManager.ciStatus(api, TestConstants.TEST_MASTER_ERROR_0, log);
         Assert.assertEquals(TaskState.FAILED,state);
     }
 
     @Test
     public void getCIStatus_error_70404(){
-        Api api = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
+        String c = Credentials.basic(TestConstants.TEST_API_ID_VALID,TestConstants.TEST_API_SECRET_VALID);
+        Api api = new ApiV3Impl(c, TestConstants.mockedApiUrl);
         TaskState state= ServiceManager.ciStatus(api, TestConstants.TEST_MASTER_ERROR_70404,log);
         Assert.assertEquals(TaskState.FAILED,state);
     }
 
     @Test
     public void stopTestMaster(){
-            Api api = new ApiV3Impl(TestConstants.MOCKED_USER_KEY_VALID, TestConstants.mockedApiUrl);
-            boolean terminate = ServiceManager.stopTestMaster(api, TestConstants.TEST_MASTER_25, log);
-            Assert.assertEquals(terminate, true);
-            terminate = ServiceManager.stopTestMaster(api, TestConstants.TEST_MASTER_70, log);
-            Assert.assertEquals(terminate, true);
-            terminate = ServiceManager.stopTestMaster(api, TestConstants.TEST_MASTER_100, log);
-            Assert.assertEquals(terminate, false);
-            terminate = ServiceManager.stopTestMaster(api, TestConstants.TEST_MASTER_140, log);
-            Assert.assertEquals(terminate, false);
+        String c = Credentials.basic(TestConstants.TEST_API_ID_VALID,TestConstants.TEST_API_SECRET_VALID);
+        Api api = new ApiV3Impl(c, TestConstants.mockedApiUrl);
+        boolean terminate = ServiceManager.stopTestMaster(api, TestConstants.TEST_MASTER_25, log);
+        Assert.assertEquals(terminate, true);
+        terminate = ServiceManager.stopTestMaster(api, TestConstants.TEST_MASTER_70, log);
+        Assert.assertEquals(terminate, true);
+        terminate = ServiceManager.stopTestMaster(api, TestConstants.TEST_MASTER_100, log);
+        Assert.assertEquals(terminate, false);
+        terminate = ServiceManager.stopTestMaster(api, TestConstants.TEST_MASTER_140, log);
+        Assert.assertEquals(terminate, false);
     }
-*/
 
     @Test
     public void getVersion() throws IOException,JSONException {

@@ -55,7 +55,6 @@ public class ServiceManager {
                 publicToken = result.getString("publicToken");
             } else {
                 logger.addErrorLogEntry("Problems with generating public-token for report URL: " + jo.get(JsonConstants.ERROR).toString());
-                logger.addErrorLogEntry("Problems with generating public-token for report URL: " + jo.get(JsonConstants.ERROR).toString());
                 reportUrl = api.getServerUrl() + "/app/#masters/" + masterId + "/summary";
             }
             if (!StringUtils.isBlank(publicToken)) {
