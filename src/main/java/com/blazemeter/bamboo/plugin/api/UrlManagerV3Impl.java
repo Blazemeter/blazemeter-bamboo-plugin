@@ -13,6 +13,7 @@
  */
 package com.blazemeter.bamboo.plugin.api;
 
+import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
@@ -32,18 +33,18 @@ public class UrlManagerV3Impl implements UrlManager {
     @Override
     public String masterStatus(String appKey, String masterId) {
         try {
-            appKey = URLEncoder.encode(appKey, "UTF-8");
+            appKey = URLEncoder.encode(appKey, UrlManager.UTF_8);
             masterId = URLEncoder.encode(masterId, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        return serverUrl + V4 + "/masters/" + masterId + "/status?events=false&app_key=" + appKey + CLIENT_IDENTIFICATION;
+        return serverUrl + V4 + Constants.MASTERS + masterId + "/status?events=false&app_key=" + appKey + CLIENT_IDENTIFICATION;
     }
 
     @Override
     public String tests(String appKey) {
         try {
-            appKey = URLEncoder.encode(appKey, "UTF-8");
+            appKey = URLEncoder.encode(appKey, UrlManager.UTF_8);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }/*
@@ -57,8 +58,8 @@ public class UrlManagerV3Impl implements UrlManager {
     @Override
     public String testStart(String appKey, String testId) {
         try {
-            appKey = URLEncoder.encode(appKey, "UTF-8");
-            testId = URLEncoder.encode(testId, "UTF-8");
+            appKey = URLEncoder.encode(appKey, UrlManager.UTF_8);
+            testId = URLEncoder.encode(testId, UrlManager.UTF_8);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -68,8 +69,8 @@ public class UrlManagerV3Impl implements UrlManager {
     @Override
     public String collectionStart(String appKey, String collectionId) {
         try {
-            appKey = URLEncoder.encode(appKey, "UTF-8");
-            collectionId = URLEncoder.encode(collectionId, "UTF-8");
+            appKey = URLEncoder.encode(appKey, UrlManager.UTF_8);
+            collectionId = URLEncoder.encode(collectionId, UrlManager.UTF_8);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -79,40 +80,40 @@ public class UrlManagerV3Impl implements UrlManager {
     @Override
     public String masterStop(String appKey, String masterId) {
         try {
-            appKey = URLEncoder.encode(appKey, "UTF-8");
-            masterId = URLEncoder.encode(masterId, "UTF-8");
+            appKey = URLEncoder.encode(appKey, UrlManager.UTF_8);
+            masterId = URLEncoder.encode(masterId, UrlManager.UTF_8);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        return serverUrl + V4 + "/masters/" + masterId + "/stop?app_key=" + appKey + CLIENT_IDENTIFICATION;
+        return serverUrl + V4 + Constants.MASTERS + masterId + "/stop?app_key=" + appKey + CLIENT_IDENTIFICATION;
     }
 
     @Override
     public String testTerminate(String appKey, String masterId) {
         try {
-            appKey = URLEncoder.encode(appKey, "UTF-8");
-            masterId = URLEncoder.encode(masterId, "UTF-8");
+            appKey = URLEncoder.encode(appKey, UrlManager.UTF_8);
+            masterId = URLEncoder.encode(masterId, UrlManager.UTF_8);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        return serverUrl + V4 + "/masters/" + masterId + "/terminate?app_key=" + appKey + CLIENT_IDENTIFICATION;
+        return serverUrl + V4 + Constants.MASTERS + masterId + "/terminate?app_key=" + appKey + CLIENT_IDENTIFICATION;
     }
 
     @Override
     public String testReport(String appKey, String masterId) {
         try {
-            appKey = URLEncoder.encode(appKey, "UTF-8");
-            masterId = URLEncoder.encode(masterId, "UTF-8");
+            appKey = URLEncoder.encode(appKey, UrlManager.UTF_8);
+            masterId = URLEncoder.encode(masterId, UrlManager.UTF_8);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        return serverUrl + V4 + "/masters/" + masterId + "/reports/main/summary?app_key=" + appKey + CLIENT_IDENTIFICATION;
+        return serverUrl + V4 + Constants.MASTERS + masterId + "/reports/main/summary?app_key=" + appKey + CLIENT_IDENTIFICATION;
     }
 
     @Override
     public String getUser(String appKey) {
         try {
-            appKey = URLEncoder.encode(appKey, "UTF-8");
+            appKey = URLEncoder.encode(appKey, UrlManager.UTF_8);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -122,11 +123,11 @@ public class UrlManagerV3Impl implements UrlManager {
     @Override
     public String ciStatus(String appKey, String masterId) {
         try {
-            appKey = URLEncoder.encode(appKey, "UTF-8");
+            appKey = URLEncoder.encode(appKey, UrlManager.UTF_8);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        return serverUrl + V4 + "/masters/" + masterId + "/ci-status?app_key=" + appKey + CLIENT_IDENTIFICATION;
+        return serverUrl + V4 + Constants.MASTERS + masterId + "/ci-status?app_key=" + appKey + CLIENT_IDENTIFICATION;
 
     }
 
@@ -138,17 +139,17 @@ public class UrlManagerV3Impl implements UrlManager {
     @Override
     public String retrieveJUNITXML(String appKey, String masterId) {
         try {
-            appKey = URLEncoder.encode(appKey, "UTF-8");
+            appKey = URLEncoder.encode(appKey, UrlManager.UTF_8);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        return serverUrl + V4 + "/masters/" + masterId + "/reports/thresholds?format=junit&app_key=" + appKey + CLIENT_IDENTIFICATION;
+        return serverUrl + V4 + Constants.MASTERS + masterId + "/reports/thresholds?format=junit&app_key=" + appKey + CLIENT_IDENTIFICATION;
     }
 
     @Override
     public String retrieveJTLZIP(String appKey, String sessionId) {
         try {
-            appKey = URLEncoder.encode(appKey, "UTF-8");
+            appKey = URLEncoder.encode(appKey, UrlManager.UTF_8);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -158,27 +159,27 @@ public class UrlManagerV3Impl implements UrlManager {
     @Override
     public String generatePublicToken(String appKey, String masterId) {
         try {
-            appKey = URLEncoder.encode(appKey, "UTF-8");
+            appKey = URLEncoder.encode(appKey, UrlManager.UTF_8);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        return serverUrl + V4 + "/masters/" + masterId + "/public-token?app_key=" + appKey + CLIENT_IDENTIFICATION;
+        return serverUrl + V4 + Constants.MASTERS + masterId + "/public-token?app_key=" + appKey + CLIENT_IDENTIFICATION;
     }
 
     @Override
     public String listOfSessionIds(String appKey, String masterId) {
         try {
-            appKey = URLEncoder.encode(appKey, "UTF-8");
+            appKey = URLEncoder.encode(appKey, UrlManager.UTF_8);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        return serverUrl + V4 + "/masters/" + masterId + "/sessions?app_key=" + appKey + CLIENT_IDENTIFICATION;
+        return serverUrl + V4 + Constants.MASTERS + masterId + "/sessions?app_key=" + appKey + CLIENT_IDENTIFICATION;
     }
 
     @Override
     public String activeTests(String appKey) {
         try {
-            appKey = URLEncoder.encode(appKey, "UTF-8");
+            appKey = URLEncoder.encode(appKey, UrlManager.UTF_8);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -193,7 +194,7 @@ public class UrlManagerV3Impl implements UrlManager {
     @Override
     public String properties(String appKey, String sessionId) {
         try {
-            appKey = URLEncoder.encode(appKey, "UTF-8");
+            appKey = URLEncoder.encode(appKey, UrlManager.UTF_8);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -203,17 +204,17 @@ public class UrlManagerV3Impl implements UrlManager {
     @Override
     public String masterId(String appKey, String masterId) {
         try {
-            appKey = URLEncoder.encode(appKey, "UTF-8");
+            appKey = URLEncoder.encode(appKey, UrlManager.UTF_8);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        return serverUrl + V4 + "/masters/" + masterId + "?app_key=" + appKey + CLIENT_IDENTIFICATION;
+        return serverUrl + V4 + Constants.MASTERS + masterId + "?app_key=" + appKey + CLIENT_IDENTIFICATION;
     }
 
     @Override
     public String testConfig(String appKey, String testId) {
         try {
-            appKey = URLEncoder.encode(appKey, "UTF-8");
+            appKey = URLEncoder.encode(appKey, UrlManager.UTF_8);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }

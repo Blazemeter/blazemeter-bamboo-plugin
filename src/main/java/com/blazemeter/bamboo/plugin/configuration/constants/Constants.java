@@ -15,12 +15,10 @@ package com.blazemeter.bamboo.plugin.configuration.constants;
 
 public interface Constants {
 
-    String BZM_HTTP_LOG="BZM-HTTP-LOG";
     String HTTP_LOG="http-log";
     String BM_TRESHOLDS="bm-thresholds.xml";
     String THREE_DOTS ="...";
     String PLUGIN_KEY="com.blazemeter.bamboo.plugin.BlazeMeterBamboo:blazemeter";
-//	 String SETTINGS_API_VERSION = "api_version";
 
     //settings properties
      String SETTINGS_SELECTED_TEST_ID = "selectedtest";
@@ -31,13 +29,11 @@ public interface Constants {
      String SETTINGS_JTL_PATH="jtl.path";
      String SETTINGS_JUNIT_PATH="junit.path";
 
-     String NOT_IMPLEMENTED="This call is not implemented.";
      String UNKNOWN_TYPE="unknown_type";
 
 
     //BlazeMeterConfigTask
      String TEST_LIST ="testlist";
-     String BLAZEMETER_ERROR ="blazemeter.error.";
      String REPORT_URL ="reportUrl";
      String BM_KPIS="bm-kpis.jtl";
      String BM_ARTEFACTS="bm-artefacts.zip";
@@ -47,5 +43,6 @@ public interface Constants {
     String PROXY_PORT="http.proxyPort";
     String PROXY_USER="http.proxyUser";
     String PROXY_PASS="http.proxyPassword";
-    String USE_PROXY="http.useProxy";
+
+    String MASTERS="/masters/";
 }

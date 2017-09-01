@@ -16,6 +16,7 @@ package com.blazemeter.bamboo;
 
 import com.blazemeter.bamboo.plugin.api.Api;
 import com.blazemeter.bamboo.plugin.api.UrlManager;
+import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
 import okhttp3.Credentials;
 import org.apache.commons.io.FileUtils;
 import org.mockserver.integration.ClientAndProxy;
@@ -33,6 +34,7 @@ import static org.mockserver.model.HttpResponse.response;
 public class MockedAPI {
     private static ClientAndServer mockServer;
     private static ClientAndProxy proxy;
+    private static String status = "/status";
     private MockedAPI(){}
 
     public static void startAPI(){
@@ -43,14 +45,14 @@ public class MockedAPI {
 
     public static void getMasterStatus() throws IOException{
 
-
+        String ms="/masterStatus_";
         String c = Credentials.basic(TestConstants.TEST_API_ID_VALID,TestConstants.TEST_API_SECRET_VALID);
-        File jsonFile = new File(TestConstants.RESOURCES + "/masterStatus_100.json");
+        File jsonFile = new File(TestConstants.RESOURCES + ms+"100.json");
         String testStatus= FileUtils.readFileToString(jsonFile);
         mockServer.when(
             request()
                 .withMethod("GET")
-                .withPath(UrlManager.V4+"/masters/"+TestConstants.TEST_MASTER_100 +"/status")
+                .withPath(UrlManager.V4+ Constants.MASTERS+TestConstants.TEST_MASTER_100 +status)
                 .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION,c),
             unlimited()
@@ -60,13 +62,13 @@ public class MockedAPI {
             .withStatusCode(200).withBody(testStatus));
 
 
-        jsonFile = new File(TestConstants.RESOURCES + "/masterStatus_140.json");
+        jsonFile = new File(TestConstants.RESOURCES + ms+"140.json");
         c = Credentials.basic(TestConstants.TEST_API_ID_VALID,TestConstants.TEST_API_SECRET_VALID);
         testStatus= FileUtils.readFileToString(jsonFile);
         mockServer.when(
             request()
                 .withMethod("GET")
-                .withPath(UrlManager.V4+"/masters/"+TestConstants.TEST_MASTER_140 +"/status")
+                .withPath(UrlManager.V4+Constants.MASTERS+TestConstants.TEST_MASTER_140 +status)
                 .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION,c),
             unlimited()
@@ -81,7 +83,7 @@ public class MockedAPI {
         mockServer.when(
             request()
                 .withMethod("GET")
-                .withPath(UrlManager.V4+"/masters/"+TestConstants.TEST_MASTER_NOT_FOUND +"/status")
+                .withPath(UrlManager.V4+Constants.MASTERS+TestConstants.TEST_MASTER_NOT_FOUND +status)
                 .withHeader(Api.ACCEPT, Api.APP_JSON)
             ,
             unlimited()
@@ -90,13 +92,13 @@ public class MockedAPI {
                 response().withHeader( Api.APP_JSON)
             .withStatusCode(200).withBody(testStatus));
 
-        jsonFile = new File(TestConstants.RESOURCES + "/masterStatus_25.json");
+        jsonFile = new File(TestConstants.RESOURCES + ms+"25.json");
         testStatus= FileUtils.readFileToString(jsonFile);
 
         mockServer.when(
             request()
                 .withMethod("GET")
-                .withPath(UrlManager.V4+"/masters/"+TestConstants.TEST_MASTER_25 +"/status")
+                .withPath(UrlManager.V4+Constants.MASTERS+TestConstants.TEST_MASTER_25 +status)
                 .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, c),unlimited()
         )
@@ -105,12 +107,12 @@ public class MockedAPI {
             .withStatusCode(200).withBody(testStatus));
 
 
-        jsonFile = new File(TestConstants.RESOURCES + "/masterStatus_70.json");
+        jsonFile = new File(TestConstants.RESOURCES + ms+"70.json");
         testStatus= FileUtils.readFileToString(jsonFile);
         mockServer.when(
             request()
                 .withMethod("GET")
-                .withPath(UrlManager.V4+"/masters/"+TestConstants.TEST_MASTER_70 +"/status")
+                .withPath(UrlManager.V4+Constants.MASTERS+TestConstants.TEST_MASTER_70 +status)
                 .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, c),unlimited()
         )
@@ -119,13 +121,13 @@ public class MockedAPI {
             .withStatusCode(200).withBody(testStatus));
 
 
-        jsonFile = new File(TestConstants.RESOURCES + "/masterStatus_0.json");
+        jsonFile = new File(TestConstants.RESOURCES + ms+"0.json");
         testStatus= FileUtils.readFileToString(jsonFile);
         c = Credentials.basic(TestConstants.TEST_API_ID_EXCEPTION,TestConstants.TEST_API_SECRET_EXCEPTION);
         mockServer.when(
             request()
                 .withMethod("GET")
-                .withPath(UrlManager.V4+"/masters/" + TestConstants.TEST_MASTER_0 + "/status")
+                .withPath(UrlManager.V4+Constants.MASTERS + TestConstants.TEST_MASTER_0 + status)
                 .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, c),
             unlimited()
@@ -145,7 +147,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("POST")
-                        .withPath(UrlManager.V4+"/masters/"+TestConstants.TEST_MASTER_25 +t)
+                        .withPath(UrlManager.V4+Constants.MASTERS+TestConstants.TEST_MASTER_25 +t)
                         .withHeader(Api.ACCEPT, Api.APP_JSON)
                         .withHeader(Api.AUTHORIZATION,c),
                 unlimited()
@@ -156,7 +158,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("POST")
-                        .withPath(UrlManager.V4+"/masters/"+TestConstants.TEST_MASTER_70 +t)
+                        .withPath(UrlManager.V4+Constants.MASTERS+TestConstants.TEST_MASTER_70 +t)
                         .withHeader(Api.ACCEPT, Api.APP_JSON)
                         .withHeader(Api.AUTHORIZATION,c),
                 unlimited()
@@ -172,7 +174,7 @@ public class MockedAPI {
         mockServer.when(
             request()
                 .withMethod("POST")
-                .withPath(UrlManager.V4+"/masters/" + TestConstants.TEST_MASTER_100 + s)
+                .withPath(UrlManager.V4+Constants.MASTERS + TestConstants.TEST_MASTER_100 + s)
                 .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, c),
             unlimited()
@@ -183,7 +185,7 @@ public class MockedAPI {
         mockServer.when(
             request()
                 .withMethod("POST")
-                .withPath(UrlManager.V4+"/masters/" + TestConstants.TEST_MASTER_140 + s)
+                .withPath(UrlManager.V4+Constants.MASTERS + TestConstants.TEST_MASTER_140 + s)
                 .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, c),
             unlimited()
@@ -195,14 +197,14 @@ public class MockedAPI {
     }
 
     public static void startTest() throws IOException{
-
-        File jsonFile = new File(TestConstants.RESOURCES + "/startTest.json");
+        String s = "/start";
+        File jsonFile = new File(TestConstants.RESOURCES + s+"Test.json");
         String startTest= FileUtils.readFileToString(jsonFile);
         String c = Credentials.basic(TestConstants.TEST_API_ID_VALID,TestConstants.TEST_API_SECRET_VALID);
         mockServer.when(
                 request()
                         .withMethod("POST")
-                        .withPath("/api/v4/tests/"+TestConstants.TEST_MASTER_TUT_GY +"/start")
+                        .withPath(UrlManager.V4+"/tests/"+TestConstants.TEST_MASTER_TUT_GY +s)
                         .withHeader(Api.ACCEPT, Api.APP_JSON)
                     .withHeader(Api.AUTHORIZATION,c),
                 unlimited()
@@ -211,12 +213,12 @@ public class MockedAPI {
                         response().withHeader( Api.APP_JSON)
                                 .withStatusCode(200).withBody(startTest));
 
-        jsonFile = new File(TestConstants.RESOURCES + "/startCollection.json");
+        jsonFile = new File(TestConstants.RESOURCES + s+"Collection.json");
         String startCollection= FileUtils.readFileToString(jsonFile);
         mockServer.when(
                 request()
                         .withMethod("POST")
-                        .withPath(UrlManager.V4+"/collections/"+TestConstants.TEST_MASTER_ID +"/start")
+                        .withPath(UrlManager.V4+"/collections/"+TestConstants.TEST_MASTER_ID +s)
                         .withHeader(Api.ACCEPT, Api.APP_JSON)
                     .withHeader(Api.AUTHORIZATION,c),
                 unlimited()
@@ -227,7 +229,8 @@ public class MockedAPI {
 }
 
     public static void getTests() throws IOException{
-        File jsonFile = new File(TestConstants.RESOURCES + "/getTests_10.json");
+        String gt="/getTests";
+        File jsonFile = new File(TestConstants.RESOURCES + gt+"_10.json");
         String getTests= FileUtils.readFileToString(jsonFile);
         String c = Credentials.basic(TestConstants.TEST_API_ID_VALID,TestConstants.TEST_API_SECRET_VALID);
         mockServer.when(
@@ -242,7 +245,7 @@ public class MockedAPI {
                         response().withHeader( Api.APP_JSON)
                                 .withStatusCode(200).withBody(getTests));
 
-        jsonFile = new File(TestConstants.RESOURCES + "/getTests_1.json");
+        jsonFile = new File(TestConstants.RESOURCES + gt+"_1.json");
         getTests= FileUtils.readFileToString(jsonFile);
         c = Credentials.basic(TestConstants.TEST_API_ID_1_TEST,TestConstants.TEST_API_SECRET_1_TEST);
         mockServer.when(
@@ -258,7 +261,7 @@ public class MockedAPI {
                                 .withStatusCode(200).withBody(getTests));
 
 
-        jsonFile = new File(TestConstants.RESOURCES + "/getTests_0.json");
+        jsonFile = new File(TestConstants.RESOURCES + gt+"_0.json");
         getTests= FileUtils.readFileToString(jsonFile);
         c = Credentials.basic(TestConstants.TEST_API_ID_0_TESTS,TestConstants.TEST_API_SECRET_0_TESTS);
         mockServer.when(
@@ -273,7 +276,7 @@ public class MockedAPI {
                         response().withHeader( Api.APP_JSON)
                                 .withStatusCode(200).withBody(getTests));
 
-        jsonFile = new File(TestConstants.RESOURCES + "/getTests_5.json");
+        jsonFile = new File(TestConstants.RESOURCES + gt+"_5.json");
         getTests= FileUtils.readFileToString(jsonFile);
         c = Credentials.basic(TestConstants.TEST_API_ID_5_TESTS,TestConstants.TEST_API_SECRET_5_TESTS);
         mockServer.when(
@@ -299,7 +302,7 @@ public class MockedAPI {
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath(UrlManager.V4+"/masters/"+TestConstants.TEST_MASTER_ID +"/reports/main/summary")
+                        .withPath(UrlManager.V4+Constants.MASTERS+TestConstants.TEST_MASTER_ID +"/reports/main/summary")
                         .withHeader(Api.ACCEPT, Api.APP_JSON)
                         .withHeader(Api.AUTHORIZATION, c),
                 unlimited()
@@ -316,13 +319,14 @@ public class MockedAPI {
 
     public static void getCIStatus()  throws IOException{
         String cs="/ci-status";
-        File returnFile=new File(TestConstants.RESOURCES+"/getCIStatus_failure.json");
+        String gcs="/getCIStatus";
+        File returnFile=new File(TestConstants.RESOURCES+gcs+"_failure.json");
         String returnStr=FileUtils.readFileToString(returnFile);
         String c = Credentials.basic(TestConstants.TEST_API_ID_VALID, TestConstants.TEST_API_SECRET_VALID);
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath(UrlManager.V4+"/masters/" + TestConstants.TEST_MASTER_FAILURE +cs)
+                        .withPath(UrlManager.V4+Constants.MASTERS + TestConstants.TEST_MASTER_FAILURE +cs)
                         .withHeader(Api.ACCEPT, Api.APP_JSON)
                         .withHeader(Api.AUTHORIZATION, c),
                 unlimited()
@@ -331,12 +335,12 @@ public class MockedAPI {
                         response().withHeader( Api.APP_JSON)
                                 .withStatusCode(200).withBody(returnStr));
 
-        returnFile=new File(TestConstants.RESOURCES+"/getCIStatus_success.json");
+        returnFile=new File(TestConstants.RESOURCES+gcs+"_success.json");
         returnStr=FileUtils.readFileToString(returnFile);
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath(UrlManager.V4+"/masters/" + TestConstants.TEST_MASTER_SUCCESS +cs)
+                        .withPath(UrlManager.V4+Constants.MASTERS + TestConstants.TEST_MASTER_SUCCESS +cs)
                         .withHeader(Api.ACCEPT, Api.APP_JSON)
                         .withHeader(Api.AUTHORIZATION, c),
                 unlimited()
@@ -346,12 +350,12 @@ public class MockedAPI {
                                 .withStatusCode(200).withBody(returnStr));
 
 
-        returnFile=new File(TestConstants.RESOURCES+"/getCIStatus_error_61700.json");
+        returnFile=new File(TestConstants.RESOURCES+gcs+"_error_61700.json");
         returnStr=FileUtils.readFileToString(returnFile);
         mockServer.when(
             request()
                 .withMethod("GET")
-                .withPath(UrlManager.V4+"/masters/" + TestConstants.TEST_MASTER_ERROR_61700 + cs)
+                .withPath(UrlManager.V4+Constants.MASTERS + TestConstants.TEST_MASTER_ERROR_61700 + cs)
                 .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, c),
             unlimited()
@@ -360,12 +364,12 @@ public class MockedAPI {
                         response().withHeader( Api.APP_JSON)
                                 .withStatusCode(200).withBody(returnStr));
 
-        returnFile=new File(TestConstants.RESOURCES+"/getCIStatus_error_0.json");
+        returnFile=new File(TestConstants.RESOURCES+gcs+"_error_0.json");
         returnStr=FileUtils.readFileToString(returnFile);
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath(UrlManager.V4+"/masters/" + TestConstants.TEST_MASTER_ERROR_0 +cs)
+                        .withPath(UrlManager.V4+Constants.MASTERS + TestConstants.TEST_MASTER_ERROR_0 +cs)
                         .withHeader(Api.ACCEPT, Api.APP_JSON)
                         .withHeader(Api.AUTHORIZATION, c),
                 unlimited()
@@ -374,13 +378,13 @@ public class MockedAPI {
                         response().withHeader( Api.APP_JSON)
                                 .withStatusCode(200).withBody(returnStr));
 
-        returnFile=new File(TestConstants.RESOURCES+"/getCIStatus_error_70404.json");
+        returnFile=new File(TestConstants.RESOURCES+gcs+"_error_70404.json");
         returnStr = FileUtils.readFileToString(returnFile);
 
         mockServer.when(
             request()
                 .withMethod("GET")
-                .withPath(UrlManager.V4+"/masters/" + TestConstants.TEST_MASTER_ERROR_70404 + cs)
+                .withPath(UrlManager.V4+Constants.MASTERS + TestConstants.TEST_MASTER_ERROR_70404 + cs)
                 .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, c),
             unlimited()
@@ -393,7 +397,7 @@ public class MockedAPI {
 
 
     public static void getReportUrl() throws IOException{
-        String expectedPath=UrlManager.V4+"/masters/"+TestConstants.TEST_MASTER_ID +"/public-token";
+        String expectedPath=UrlManager.V4+Constants.MASTERS+TestConstants.TEST_MASTER_ID +"/public-token";
         File jsonFile = new File(TestConstants.RESOURCES + "/getReportUrl_pos.json");
         String getReportUrl= FileUtils.readFileToString(jsonFile);
         String c = Credentials.basic(TestConstants.TEST_API_ID_VALID, TestConstants.TEST_API_SECRET_VALID);
