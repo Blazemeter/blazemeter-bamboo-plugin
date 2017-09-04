@@ -39,7 +39,7 @@ public interface Api {
     String CONTENT_TYPE="Content-type";
     String APP_JSON="application/json";
     String APP_JSON_UTF_8="application/json; charset=UTF-8";
-
+    String PROXY_AUTHORIZATION="Proxy-Authorization";
     String APP_KEY = "jnk100x987c06f4e10c4";
 
     TestStatus masterStatus(String id);
@@ -79,7 +79,7 @@ public interface Api {
     boolean verifyCredentials();
 
     int accountId();
-    List<Integer> workspaces();
+    HashMap<String,Integer> workspaces();
     public Map<String, Collection<String>> getTestsMultiMap();
 }
 

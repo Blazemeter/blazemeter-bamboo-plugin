@@ -77,12 +77,12 @@ public class ApiImpl implements Api {
                     @Override
                     public Request authenticate(Route route, Response response) throws IOException {
                         String credential = Credentials.basic(proxyUser, proxyPass);
-                        if (response.request().header("Proxy-Authorization") != null) {
+                        if (response.request().header(PROXY_AUTHORIZATION) != null) {
                             return null; // Give up, we've already attempted to authenticate.
                         }
 
                         return response.request().newBuilder()
-                                .header("Proxy-Authorization", credential)
+                                .header(PROXY_AUTHORIZATION, credential)
                                 .build();
                     }
                 };
@@ -291,15 +291,17 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public LinkedHashMultimap<String, String> testsMultiMap(){
-        LinkedHashMultimap<String, String> testListOrdered = null;
-        List<Integer> ws=this.workspaces();
+    public LinkedHashMultimap<String, String> testsMultiMap() {
+        LinkedHashMultimap<String, String> testListOrdered = LinkedHashMultimap.create();
+        HashMap<String, Integer> ws = this.workspaces();
         logger.info("Getting tests...");
-        for(Integer s:ws){
-            String url = this.urlManager.tests(APP_KEY,s);
-            try{
+        Set<String> wsk = ws.keySet();
+        for (String k : wsk) {
+            int wsid = ws.get(k);
+            String url = this.urlManager.tests(APP_KEY, wsid);
+            try {
                 Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON)
-                    .addHeader(AUTHORIZATION,this.credentials).
+                    .addHeader(AUTHORIZATION, this.credentials).
                         addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
                 JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
                 JSONArray result = null;
@@ -311,47 +313,40 @@ public class ApiImpl implements Api {
                 if (jo.has(JsonConstants.RESULT) && (!jo.get(JsonConstants.RESULT).equals(JSONObject.NULL))) {
                     result = (JSONArray) jo.get(JsonConstants.RESULT);
                 }
-                if (result != null) {
-                    if (result.length() > 0) {
-
-                        testListOrdered = LinkedHashMultimap.create(result.length(), result.length());
-                        testListOrdered.put("","======== WORKSPACE "+s);
-                        for (int i = 0; i < result.length(); i++) {
-                            JSONObject en = null;
-                            try {
-                                en = result.getJSONObject(i);
-                            } catch (JSONException e) {
-                                this.logger.warn("JSONException while getting tests: " + e);
-                            }
-                            String id;
-                            String name;
-                            try {
-                                if (en != null) {
-                                    id = String.valueOf(en.get(JsonConstants.ID));
-                                    name = en.has(JsonConstants.NAME) ? en.getString(JsonConstants.NAME).replaceAll("&", "&amp;") : "";
-                                    String testType = en.has(JsonConstants.TYPE) ? en.getString(JsonConstants.TYPE) : Constants.UNKNOWN_TYPE;
-                                    testListOrdered.put(id + "." + testType,name+"("+id+"."+testType+")");
-
-                                }
-                            } catch (JSONException ie) {
-                                this.logger.warn("JSONException while getting tests: " + ie);
-                            }
+                if (result != null && result.length() > 0) {
+                    testListOrdered.put(String.valueOf(wsid), "========" + k + "(" + wsid + ")========");
+                    for (int i = 0; i < result.length(); i++) {
+                        JSONObject entry = null;
+                        try {
+                            entry = result.getJSONObject(i);
+                        } catch (JSONException e) {
+                            this.logger.warn("JSONException while getting tests: " + e);
                         }
+                        String id;
+                        String name;
+                        try {
+                            if (entry != null) {
+                                id = String.valueOf(entry.get(JsonConstants.ID));
+                                name = entry.has(JsonConstants.NAME) ? entry.getString(JsonConstants.NAME).replaceAll("&", "&amp;") : "";
+//                                String testType = entry.has(JsonConstants.TYPE) ? entry.getString(JsonConstants.TYPE) : Constants.UNKNOWN_TYPE;
+                                testListOrdered.put(id + "." /*+ TODO testType*/, name + "(" + id + "." + /*TODO testType +*/ ")");
 
-                    } else {
-                        testListOrdered = LinkedHashMultimap.create(0, 0);
+                            }
+                        } catch (JSONException ie) {
+                            this.logger.warn("JSONException while getting tests: " + ie);
+                        }
                     }
+                } else {
+                    testListOrdered = LinkedHashMultimap.create(0, 0);
                 }
-
-
-            }catch (Exception e) {
+            } catch (Exception e) {
                 this.logger.warn("Exception while getting tests: ", e);
                 this.logger.warn("Check connection/proxy settings");
-                testListOrdered.put(Constants.CHECK_SETTINGS,Constants.CHECK_SETTINGS);
+                testListOrdered.put(Constants.CHECK_SETTINGS, Constants.CHECK_SETTINGS);
             }
         }
-             return testListOrdered;
-        }
+        return testListOrdered;
+    }
 
 
     @Override
@@ -567,14 +562,14 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public List<Integer> workspaces() {
+    public HashMap<String, Integer> workspaces() {
         int ai = this.accountId();
         String url = this.urlManager.workspaces(APP_KEY, ai);
         Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON)
             .addHeader(AUTHORIZATION, this.credentials).build();
         JSONObject jo = null;
         JSONArray result = null;
-        List<Integer> ws = new ArrayList<>();
+        HashMap<String, Integer> ws = new HashMap<>();
         try {
             jo = new JSONObject(okhttp.newCall(r).execute().body().string());
         } catch (IOException ioe) {
@@ -588,8 +583,10 @@ public class ApiImpl implements Api {
             return ws;
         }
         try {
+
             for (int i = 0; i < result.length(); i++) {
-                ws.add(result.getJSONObject(i).getInt(JsonConstants.ID));
+                JSONObject s = result.getJSONObject(i);
+                ws.put(s.getString(JsonConstants.NAME), s.getInt(JsonConstants.ID));
             }
         } catch (Exception e) {
             logger.error("Failed to get workspaces: " + e);
