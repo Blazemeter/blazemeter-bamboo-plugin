@@ -42,17 +42,13 @@ public class UrlManagerV3Impl implements UrlManager {
     }
 
     @Override
-    public String tests(String appKey) {
+    public String tests(String appKey,int workspaceId) {
         try {
             appKey = URLEncoder.encode(appKey, UrlManager.UTF_8);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
-        }/*
-        TODO
-        workspace id is required
-        */
-//        getTests= serverUrl +V4+"/tests?&app_key="+appKey+ CLIENT_IDENTIFICATION;
-        return serverUrl + "/api/web/tests?app_key=" + appKey + CLIENT_IDENTIFICATION;
+        }
+        return serverUrl + V4+"/tests?workspaceId="+workspaceId+"&app_key=" + appKey + CLIENT_IDENTIFICATION;
     }
 
     @Override
@@ -111,7 +107,7 @@ public class UrlManagerV3Impl implements UrlManager {
     }
 
     @Override
-    public String getUser(String appKey) {
+    public String user(String appKey) {
         try {
             appKey = URLEncoder.encode(appKey, UrlManager.UTF_8);
         } catch (UnsupportedEncodingException e) {
@@ -212,13 +208,12 @@ public class UrlManagerV3Impl implements UrlManager {
     }
 
     @Override
-    public String testConfig(String appKey, String testId) {
+    public String workspaces(String appKey,int accountId){
         try {
             appKey = URLEncoder.encode(appKey, UrlManager.UTF_8);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        return serverUrl + V4 + "/tests/" + testId + "?app_key=" + appKey + CLIENT_IDENTIFICATION;
+        return serverUrl + V4 + "/workspaces?app_key=" + appKey + "&"+"accountId="+accountId+CLIENT_IDENTIFICATION;
     }
-
 }

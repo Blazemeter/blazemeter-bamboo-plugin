@@ -15,7 +15,7 @@ package com.blazemeter.bamboo.plugin.servlet;
 
 import com.atlassian.sal.api.transaction.TransactionCallback;
 import com.blazemeter.bamboo.plugin.api.Api;
-import com.blazemeter.bamboo.plugin.api.ApiV3Impl;
+import com.blazemeter.bamboo.plugin.api.ApiImpl;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -96,7 +96,7 @@ public class AdminServlet extends HttpServlet {
         context.put(AdminServletConst.API_SECRET, api_secret);
         context.put(AdminServletConst.URL, url);
        String credentials = Credentials.basic(api_id,api_secret);
-       Api api= new ApiV3Impl(credentials, url);
+       Api api= new ApiImpl(credentials, url);
 		if (api.verifyCredentials()){
 			transactionTemplate.execute(new TransactionCallback() {
 				public Object doInTransaction() {

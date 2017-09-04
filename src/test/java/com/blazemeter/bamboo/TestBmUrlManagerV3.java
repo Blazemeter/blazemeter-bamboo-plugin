@@ -46,12 +46,14 @@ public class TestBmUrlManagerV3 {
         Assert.assertEquals(expTestGetStatus, actTestGetStatus);
     }
 
+    /*
+    TODO
     @Test
     public void getTests(){
     String expGetTestsUrl=bmUrlManager.getServerUrl()+"/api/web/tests?app_key="+appKey+UrlManager.CLIENT_IDENTIFICATION;
     String actGetTestsUrl=bmUrlManager.tests(appKey);
         Assert.assertEquals(expGetTestsUrl, actGetTestsUrl);
-    }
+    }*/
 
     @Test
     public void testStop_masters(){
@@ -83,7 +85,7 @@ public class TestBmUrlManagerV3 {
     @Test
     public void getUser(){
         String expGetUser=bmUrlManager.getServerUrl()+UrlManager.V4+"/user?app_key="+appKey+UrlManager.CLIENT_IDENTIFICATION;
-        String actGetUser=bmUrlManager.getUser(appKey);
+        String actGetUser=bmUrlManager.user(appKey);
         Assert.assertEquals(expGetUser,actGetUser);
     }
 
@@ -135,6 +137,11 @@ public class TestBmUrlManagerV3 {
                 UrlManager.CLIENT_IDENTIFICATION;
         String actProperties=bmUrlManager.properties(appKey,sessionId);
         Assert.assertEquals(expProperties,actProperties);
+    }
+
+    @Test
+    public void workspaces(){
+        Assert.fail();
     }
 
 }

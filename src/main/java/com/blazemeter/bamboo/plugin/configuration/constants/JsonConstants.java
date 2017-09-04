@@ -21,18 +21,16 @@ public interface JsonConstants {
     String RESULT = "result";
     String DATA_URL="dataUrl";
     String COLLECTIONS="collections";
-    String PROGRESS="progress";
     String ERRORS="errors";
     String FAILURES = "failures";
     String ERROR = "error";
     String NOTE="note";
-    String SESSIONS="sessions";
     String CODE="code";
     String STATUS="status";
     String ID="id";
     String TEST_COLLECTION_ID="testCollectionId";
     String TEST_ID="testId";
-
-
+    String DEFAULT_PROJECT ="defaultProject";
+    String ACCOUNT_ID="accountId";
 
 }

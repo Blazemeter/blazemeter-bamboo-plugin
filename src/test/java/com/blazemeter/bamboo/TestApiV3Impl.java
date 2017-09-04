@@ -31,7 +31,7 @@ import javax.servlet.ServletException;
 import java.io.IOException;
 
 public class TestApiV3Impl {
-    private ApiV3Impl blazemeterApiV3 = null;
+    private ApiImpl blazemeterApiV3 = null;
 
 
     @BeforeClass
@@ -53,7 +53,7 @@ public class TestApiV3Impl {
     @Test
     public void getTestStatus_Running() {
         String c = Credentials.basic(TestConstants.TEST_API_ID_VALID,TestConstants.TEST_API_SECRET_VALID);
-        blazemeterApiV3 = new ApiV3Impl(c,TestConstants.mockedApiUrl);
+        blazemeterApiV3 = new ApiImpl(c,TestConstants.mockedApiUrl);
         TestStatus testStatus = blazemeterApiV3.masterStatus(TestConstants.TEST_MASTER_100);
         Assert.assertEquals(testStatus, TestStatus.Running);
     }
@@ -61,7 +61,7 @@ public class TestApiV3Impl {
     @Test
     public void getTestInfo_NotRunning() {
         String c = Credentials.basic(TestConstants.TEST_API_ID_VALID,TestConstants.TEST_API_SECRET_VALID);
-        blazemeterApiV3 = new ApiV3Impl(c,TestConstants.mockedApiUrl);
+        blazemeterApiV3 = new ApiImpl(c,TestConstants.mockedApiUrl);
         TestStatus testStatus = blazemeterApiV3.masterStatus(TestConstants.TEST_MASTER_140);
         Assert.assertEquals(testStatus, TestStatus.NotRunning);
     }
@@ -70,7 +70,7 @@ public class TestApiV3Impl {
     @Test
     public void getTestInfo_Error() {
         String c = Credentials.basic(TestConstants.TEST_API_ID_VALID,TestConstants.TEST_API_SECRET_VALID);
-        blazemeterApiV3 = new ApiV3Impl(c,TestConstants.mockedApiUrl);
+        blazemeterApiV3 = new ApiImpl(c,TestConstants.mockedApiUrl);
         TestStatus testStatus = blazemeterApiV3.masterStatus(TestConstants.TEST_MASTER_NOT_FOUND);
         Assert.assertEquals(testStatus, TestStatus.Error);
     }
@@ -82,7 +82,7 @@ public class TestApiV3Impl {
     @Test
     public void startTest_multi() throws JSONException,IOException {
         String c = Credentials.basic(TestConstants.TEST_API_ID_VALID,TestConstants.TEST_API_SECRET_VALID);
-        blazemeterApiV3 = new ApiV3Impl(c,TestConstants.mockedApiUrl);
+        blazemeterApiV3 = new ApiImpl(c,TestConstants.mockedApiUrl);
         Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_MASTER_ID, true).get(JsonConstants.ID),
                 "15105877");
     }
@@ -90,7 +90,7 @@ public class TestApiV3Impl {
     @Test
     public void getTestList_5_5() throws IOException, JSONException, ServletException, MessagingException {
         String c = Credentials.basic(TestConstants.TEST_API_ID_5_TESTS,TestConstants.TEST_API_SECRET_5_TESTS);
-        blazemeterApiV3 = new ApiV3Impl(c, TestConstants.mockedApiUrl);
+        blazemeterApiV3 = new ApiImpl(c, TestConstants.mockedApiUrl);
         LinkedHashMultimap<String, String> testList = blazemeterApiV3.testsMultiMap();
         Assert.assertTrue(testList.asMap().size() == 5);
         Assert.assertTrue(testList.size() == 5);
@@ -100,7 +100,7 @@ public class TestApiV3Impl {
     @Test
     public void getTestReport() {
         String c = Credentials.basic(TestConstants.TEST_API_ID_VALID,TestConstants.TEST_API_SECRET_VALID);
-        blazemeterApiV3 = new ApiV3Impl(c, TestConstants.mockedApiUrl);
+        blazemeterApiV3 = new ApiImpl(c, TestConstants.mockedApiUrl);
         JSONObject testReport = blazemeterApiV3.testReport(TestConstants.TEST_MASTER_ID);
         Assert.assertTrue(testReport.length() == 33);
 
@@ -110,7 +110,7 @@ public class TestApiV3Impl {
     @Test
     public void getTestSessionStatusCode_25() {
         String c = Credentials.basic(TestConstants.TEST_API_ID_VALID,TestConstants.TEST_API_SECRET_VALID);
-        blazemeterApiV3 = new ApiV3Impl(c, TestConstants.mockedApiUrl);
+        blazemeterApiV3 = new ApiImpl(c, TestConstants.mockedApiUrl);
         int status = blazemeterApiV3.getTestMasterStatusCode(TestConstants.TEST_MASTER_25);
         Assert.assertTrue(status == 25);
     }
@@ -119,7 +119,7 @@ public class TestApiV3Impl {
     @Test
     public void getTestSessionStatusCode_70() {
         String c = Credentials.basic(TestConstants.TEST_API_ID_VALID,TestConstants.TEST_API_SECRET_VALID);
-        blazemeterApiV3 = new ApiV3Impl(c, TestConstants.mockedApiUrl);
+        blazemeterApiV3 = new ApiImpl(c, TestConstants.mockedApiUrl);
         int status = blazemeterApiV3.getTestMasterStatusCode(TestConstants.TEST_MASTER_70);
         Assert.assertTrue(status == 70);
     }
@@ -128,7 +128,7 @@ public class TestApiV3Impl {
     @Test
     public void getTestSessionStatusCode_140() {
         String c = Credentials.basic(TestConstants.TEST_API_ID_VALID,TestConstants.TEST_API_SECRET_VALID);
-        blazemeterApiV3 = new ApiV3Impl(c, TestConstants.mockedApiUrl);
+        blazemeterApiV3 = new ApiImpl(c, TestConstants.mockedApiUrl);
         int status = blazemeterApiV3.getTestMasterStatusCode(TestConstants.TEST_MASTER_140);
         Assert.assertTrue(status == 140);
     }
@@ -137,7 +137,7 @@ public class TestApiV3Impl {
     @Test
     public void getTestSessionStatusCode_100() {
         String c = Credentials.basic(TestConstants.TEST_API_ID_VALID,TestConstants.TEST_API_SECRET_VALID);
-        blazemeterApiV3 = new ApiV3Impl(c, TestConstants.mockedApiUrl);
+        blazemeterApiV3 = new ApiImpl(c, TestConstants.mockedApiUrl);
         int status = blazemeterApiV3.getTestMasterStatusCode(TestConstants.TEST_MASTER_100);
         Assert.assertTrue(status == 100);
     }
@@ -146,9 +146,19 @@ public class TestApiV3Impl {
     @Test
     public void getTestSessionStatusCode_0() {
         String c = Credentials.basic(TestConstants.TEST_API_ID_EXCEPTION,TestConstants.TEST_API_SECRET_EXCEPTION);
-        blazemeterApiV3 = new ApiV3Impl(c, TestConstants.mockedApiUrl);
+        blazemeterApiV3 = new ApiImpl(c, TestConstants.mockedApiUrl);
         int status = blazemeterApiV3.getTestMasterStatusCode(TestConstants.TEST_MASTER_0);
         Assert.assertTrue(status == 0);
+    }
+
+    @Test
+    public void accountId() {
+      Assert.fail();
+    }
+
+    @Test
+    public void workspaces() {
+      Assert.fail();
     }
 
 }

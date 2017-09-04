@@ -16,6 +16,8 @@ package com.blazemeter.bamboo.plugin.api;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.blazemeter.bamboo.plugin.TestStatus;
+import java.util.Collection;
+import java.util.Map;
 import okhttp3.MediaType;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -46,8 +48,6 @@ public interface Api {
 
     HashMap<String,String> startTest(String testId, boolean collection) throws JSONException,IOException;
 
-    int getTestCount() throws JSONException, IOException, ServletException;
-
     JSONObject stopTest(String testId) throws IOException, JSONException;
 
     void terminateTest(String testId) throws IOException;
@@ -56,7 +56,7 @@ public interface Api {
 
     LinkedHashMultimap<String, String> testsMultiMap() throws IOException, MessagingException;
 
-    JSONObject getUser() throws IOException,JSONException;
+    JSONObject user() throws IOException,JSONException;
 
     JSONObject getCIStatus(String sessionId) throws JSONException, IOException;
 
@@ -72,14 +72,14 @@ public interface Api {
 
     String getServerUrl();
 
-    void setServerUrl(String serverUrl);
-
     boolean notes(String note,String masterId)throws Exception;
 
     boolean properties(JSONArray properties, String sessionId) throws Exception;
 
-    JSONObject testConfig(String testId) throws IOException, JSONException;
-
     boolean verifyCredentials();
+
+    int accountId();
+    List<Integer> workspaces();
+    public Map<String, Collection<String>> getTestsMultiMap();
 }
 

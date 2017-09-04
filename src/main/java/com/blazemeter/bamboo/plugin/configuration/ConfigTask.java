@@ -22,7 +22,7 @@ import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import com.blazemeter.bamboo.plugin.ServiceManager;
 import com.blazemeter.bamboo.plugin.api.Api;
-import com.blazemeter.bamboo.plugin.api.ApiV3Impl;
+import com.blazemeter.bamboo.plugin.api.ApiImpl;
 import com.blazemeter.bamboo.plugin.configuration.constants.AdminServletConst;
 import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
 import com.google.common.collect.ImmutableList;
@@ -64,8 +64,8 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         String serverUrl = (String) pluginSettings.get(AdminServletConst.URL);
         context.put(AdminServletConst.URL, serverUrl);
         String credentials = Credentials.basic(api_id,api_secret);
-        this.api = new ApiV3Impl(credentials, serverUrl);
-        context.put(Constants.TEST_LIST, ServiceManager.getTestsAsMap(api));
+        this.api = new ApiImpl(credentials, serverUrl);
+        context.put(Constants.TEST_LIST, api.getTestsMultiMap());
     }
 
     /**
@@ -89,9 +89,9 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         context.put(Constants.SETTINGS_JTL_PATH, config.get(Constants.SETTINGS_JTL_PATH));
         context.put(Constants.SETTINGS_JUNIT_PATH, config.get(Constants.SETTINGS_JUNIT_PATH));
         String credentials = Credentials.basic(psai, psas);
-        this.api = new ApiV3Impl(credentials, pssu);
+        this.api = new ApiImpl(credentials, pssu);
         try {
-            context.put(Constants.TEST_LIST, ServiceManager.getTestsAsMap(this.api));
+            context.put(Constants.TEST_LIST, api.getTestsMultiMap());
         } catch (Exception e) {
             LinkedHashMultimap<String, String> tests = LinkedHashMultimap.create();
             tests.put("Check blazemeter & proxy-settings", "");
@@ -116,7 +116,7 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
     @Override
     public void validate(ActionParametersMap params, ErrorCollection errorCollection) {
         super.validate(params, errorCollection);
-
+        LinkedHashMultimap<String, String> tests=LinkedHashMultimap.create();
         final String selectedTest = params.getString(Constants.SETTINGS_SELECTED_TEST_ID);
 
         if (StringUtils.isEmpty(selectedTest)) {
@@ -126,7 +126,12 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
                 errorCollection.addErrorMessage("Cannot load tests from BlazeMeter server. Invalid user key!");
             } else {
                 //verify if the test still exists on BlazeMeter server
-                LinkedHashMultimap<String, String> tests = ServiceManager.getTests(this.api);
+                try{
+                    tests = api.testsMultiMap();
+
+                }catch (Exception e){
+                    errorCollection.addErrorMessage("Failed to get tests from BlazeMeter account: "+e.getMessage());
+                }
                 if (tests != null) {
                     if (!tests.keySet().contains(selectedTest)) {
                         errorCollection.addErrorMessage("Test '" + selectedTest + "' doesn't exits on BlazeMeter server.");

@@ -84,25 +84,6 @@ public class ServiceManager {
 		return "Debug Key";
 	}
 
-	/**
-	 * returns a hash map with test id as key and test name as value
-	 * @return
-	 */
-	public static LinkedHashMultimap<String, String> getTests(Api api) {
-        LinkedHashMultimap<String,String> tests= LinkedHashMultimap.create();
-        try {
-			tests=api.testsMultiMap();
-		} catch (IOException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-            tests.put("Check blazemeter & proxy-settings",
-                      "Check blazemeter & proxy-settings");
-        }finally {
-            return tests;
-        }
-    }
-
     public static boolean notes(Api api, String masterId, String notes, BuildLogger logger) throws InterruptedException {
         boolean note = false;
         int n = 1;
@@ -121,10 +102,6 @@ public class ServiceManager {
             }
         }
         return note;
-    }
-
-    public static Map<String, Collection<String>> getTestsAsMap(Api api) {
-        return getTests(api).asMap();
     }
 
 	public static String startTest(Api api, String testId, BuildLogger logger) {

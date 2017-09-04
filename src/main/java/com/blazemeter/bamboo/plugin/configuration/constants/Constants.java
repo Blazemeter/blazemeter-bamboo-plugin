@@ -46,4 +46,5 @@ public interface Constants {
 
     String MASTERS="/masters/";
     String PUBLIC_TOKEN="public-token";
+    String CHECK_SETTINGS="Check blazemeter & proxy-settings";
 }

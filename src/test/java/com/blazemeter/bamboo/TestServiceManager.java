@@ -18,7 +18,7 @@ import com.atlassian.bamboo.build.logger.BuildLogger;
 import com.atlassian.bamboo.task.TaskState;
 import com.blazemeter.bamboo.plugin.ServiceManager;
 import com.blazemeter.bamboo.plugin.api.Api;
-import com.blazemeter.bamboo.plugin.api.ApiV3Impl;
+import com.blazemeter.bamboo.plugin.api.ApiImpl;
 import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
 import com.google.common.collect.LinkedHashMultimap;
 import okhttp3.Credentials;
@@ -54,18 +54,9 @@ public class TestServiceManager {
 
 
     @Test
-    public void getTests(){
-        String c = Credentials.basic(TestConstants.TEST_API_ID_VALID,TestConstants.TEST_API_SECRET_VALID);
-        Api api = new ApiV3Impl(c, TestConstants.mockedApiUrl);
-        LinkedHashMultimap<String,String> tests=ServiceManager.getTests(api);
-        Assert.assertTrue(tests.size()==4);
-    }
-
-
-    @Test
     public void startTest(){
         String c = Credentials.basic(TestConstants.TEST_API_ID_VALID,TestConstants.TEST_API_SECRET_VALID);
-        Api api = new ApiV3Impl(c, TestConstants.mockedApiUrl);
+        Api api = new ApiImpl(c, TestConstants.mockedApiUrl);
         String testId=ServiceManager.startTest(api,TestConstants.TEST_MASTER_TUT_GY,log);
         Assert.assertEquals("15102806",testId);
     }
@@ -74,7 +65,7 @@ public class TestServiceManager {
     public void getReportUrl(){
         String c = Credentials.basic(TestConstants.TEST_API_ID_VALID,TestConstants.TEST_API_SECRET_VALID);
         String expectedReportUrl=TestConstants.mockedApiUrl+"/app/?"+Constants.PUBLIC_TOKEN+"=ohImO6c8xstG4qBFqgRnsMSAluCBambtrqsTvAEYEXItmrCfgO#masters/testMasterId/summary";
-        Api api = new ApiV3Impl(c, TestConstants.mockedApiUrl);
+        Api api = new ApiImpl(c, TestConstants.mockedApiUrl);
         String actReportUrl=ServiceManager.getReportUrl(api, TestConstants.TEST_MASTER_ID,log);
         Assert.assertEquals(expectedReportUrl,actReportUrl);
     }
@@ -84,7 +75,7 @@ public class TestServiceManager {
     @Test
     public void getCIStatus_success(){
         String c = Credentials.basic(TestConstants.TEST_API_ID_VALID,TestConstants.TEST_API_SECRET_VALID);
-        Api api = new ApiV3Impl(c, TestConstants.mockedApiUrl);
+        Api api = new ApiImpl(c, TestConstants.mockedApiUrl);
         TaskState state= ServiceManager.ciStatus(api, TestConstants.TEST_MASTER_SUCCESS, log);
         Assert.assertEquals(TaskState.SUCCESS,state);
     }
@@ -92,7 +83,7 @@ public class TestServiceManager {
     @Test
     public void getCIStatus_failure(){
         String c = Credentials.basic(TestConstants.TEST_API_ID_VALID,TestConstants.TEST_API_SECRET_VALID);
-        Api api = new ApiV3Impl(c, TestConstants.mockedApiUrl);
+        Api api = new ApiImpl(c, TestConstants.mockedApiUrl);
         TaskState state= ServiceManager.ciStatus(api, TestConstants.TEST_MASTER_FAILURE, log);
         Assert.assertEquals(TaskState.FAILED,state);
     }
@@ -100,7 +91,7 @@ public class TestServiceManager {
     @Test
     public void getCIStatus_error_61700(){
         String c = Credentials.basic(TestConstants.TEST_API_ID_VALID,TestConstants.TEST_API_SECRET_VALID);
-        Api api = new ApiV3Impl(c, TestConstants.mockedApiUrl);
+        Api api = new ApiImpl(c, TestConstants.mockedApiUrl);
         TaskState state = ServiceManager.ciStatus(api, TestConstants.TEST_MASTER_ERROR_61700, log);
         Assert.assertEquals(TaskState.ERROR,state);
     }
@@ -109,7 +100,7 @@ public class TestServiceManager {
     @Test
     public void getCIStatus_error_0(){
         String c = Credentials.basic(TestConstants.TEST_API_ID_VALID,TestConstants.TEST_API_SECRET_VALID);
-        Api api = new ApiV3Impl(c, TestConstants.mockedApiUrl);
+        Api api = new ApiImpl(c, TestConstants.mockedApiUrl);
         TaskState state = ServiceManager.ciStatus(api, TestConstants.TEST_MASTER_ERROR_0, log);
         Assert.assertEquals(TaskState.FAILED,state);
     }
@@ -117,7 +108,7 @@ public class TestServiceManager {
     @Test
     public void getCIStatus_error_70404(){
         String c = Credentials.basic(TestConstants.TEST_API_ID_VALID,TestConstants.TEST_API_SECRET_VALID);
-        Api api = new ApiV3Impl(c, TestConstants.mockedApiUrl);
+        Api api = new ApiImpl(c, TestConstants.mockedApiUrl);
         TaskState state= ServiceManager.ciStatus(api, TestConstants.TEST_MASTER_ERROR_70404,log);
         Assert.assertEquals(TaskState.FAILED,state);
     }
@@ -125,7 +116,7 @@ public class TestServiceManager {
     @Test
     public void stopTestMaster(){
         String c = Credentials.basic(TestConstants.TEST_API_ID_VALID,TestConstants.TEST_API_SECRET_VALID);
-        Api api = new ApiV3Impl(c, TestConstants.mockedApiUrl);
+        Api api = new ApiImpl(c, TestConstants.mockedApiUrl);
         boolean terminate = ServiceManager.stopTestMaster(api, TestConstants.TEST_MASTER_25, log);
         Assert.assertEquals(terminate, true);
         terminate = ServiceManager.stopTestMaster(api, TestConstants.TEST_MASTER_70, log);

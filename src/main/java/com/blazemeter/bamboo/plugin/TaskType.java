@@ -25,7 +25,7 @@ import com.atlassian.bamboo.task.TaskResultBuilder;
 import com.atlassian.bamboo.task.TaskState;
 import com.atlassian.bamboo.v2.build.BuildContext;
 import com.blazemeter.bamboo.plugin.api.Api;
-import com.blazemeter.bamboo.plugin.api.ApiV3Impl;
+import com.blazemeter.bamboo.plugin.api.ApiImpl;
 import com.blazemeter.bamboo.plugin.api.HttpLogger;
 import com.blazemeter.bamboo.plugin.configuration.constants.AdminServletConst;
 import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
@@ -109,7 +109,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         }
         HttpLogger httpLogger = new HttpLogger(httpLog);
         String credentials = Credentials.basic(api_id,api_secret);
-        this.api = new ApiV3Impl(credentials, serverUrl, httpLogger);
+        this.api = new ApiImpl(credentials, serverUrl, httpLogger);
 
         rootDirectory = context.getRootDirectory();
         logger.addBuildLogEntry("Attempting to start test with id:" + testId);

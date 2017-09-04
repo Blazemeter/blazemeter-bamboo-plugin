@@ -29,7 +29,7 @@ public interface UrlManager {
 
     String masterStatus(String appKey, String testId);
 
-    String tests(String appKey);
+    String tests(String appKey,int workspaceId);
 
     String activeTests(String appKey);
 
@@ -43,7 +43,7 @@ public interface UrlManager {
 
     String testReport(String appKey, String reportId);
 
-    String getUser(String appKey);
+    String user(String appKey);
 
     String ciStatus(String appKey, String sessionId);
 
@@ -59,5 +59,5 @@ public interface UrlManager {
 
     String masterId(String appKey,String masterId);
 
-    String testConfig(String appKey, String testId);
-    }
+    String workspaces(String appKey, int accountId);
+}
