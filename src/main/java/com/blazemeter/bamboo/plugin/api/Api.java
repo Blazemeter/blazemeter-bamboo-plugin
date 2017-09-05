@@ -80,6 +80,7 @@ public interface Api {
 
     int accountId();
     HashMap<String,Integer> workspaces();
-    public Map<String, Collection<String>> getTestsMultiMap();
+    Map<String, Collection<String>> getTestsMultiMap();
+    boolean collection(String testId) throws Exception;
 }
 

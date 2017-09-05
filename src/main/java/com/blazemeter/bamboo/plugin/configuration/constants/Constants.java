@@ -47,4 +47,5 @@ public interface Constants {
     String MASTERS="/masters/";
     String PUBLIC_TOKEN="public-token";
     String CHECK_SETTINGS="Check blazemeter & proxy-settings";
+    String UNABLE_TO_GET_JTL_ZIP="Unable to get  JTLZIP from ";
 }

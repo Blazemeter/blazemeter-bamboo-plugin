@@ -173,18 +173,13 @@ public class UrlManagerV3Impl implements UrlManager {
     }
 
     @Override
-    public String activeTests(String appKey) {
+    public String activeTests(String appKey, int workspaceId) {
         try {
             appKey = URLEncoder.encode(appKey, UrlManager.UTF_8);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        /*
-        TODO
-        /api/v4/masters?workspaceId=<>&active=true
-         */
-        return serverUrl + V4 + "/web/active?app_key=" + appKey + CLIENT_IDENTIFICATION;
-
+        return serverUrl + V4 + Constants.MASTERS + "?workspaceId=" + workspaceId + "&active=true&app_key=" + appKey + CLIENT_IDENTIFICATION;
     }
 
     @Override

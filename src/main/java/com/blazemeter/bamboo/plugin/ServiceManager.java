@@ -30,7 +30,6 @@ import com.blazemeter.bamboo.plugin.api.CIStatus;
 import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
 import com.blazemeter.bamboo.plugin.configuration.constants.JsonConstants;
 import com.blazemeter.bamboo.plugin.testresult.TestResult;
-import com.google.common.collect.LinkedHashMultimap;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
@@ -111,7 +110,7 @@ public class ServiceManager {
             logger.addBuildLogEntry("Trying to start test with testId="+testId);
 
             do {
-                boolean collection = collection(testId, api);
+                boolean collection = api.collection(testId);
                 startTestResp=api.startTest(testId,collection);
                 countStartRequests++;
                 if (countStartRequests > 5) {
@@ -127,6 +126,9 @@ public class ServiceManager {
         }catch (Exception e) {
             logger.addErrorLogEntry("Error while starting BlazeMeter Test [" + e.getMessage() + "]");
             logger.addErrorLogEntry("Check server,userKey,testId & proxy settings");
+            if(startTestResp.containsKey(JsonConstants.ERROR)){
+                logger.addErrorLogEntry(startTestResp.get(JsonConstants.ERROR));
+            }
         }
         return startTestResp.get(JsonConstants.ID);
     }
@@ -271,13 +273,13 @@ public class ServiceManager {
             }
             FileUtils.deleteQuietly(jtlZip);
         } catch (JSONException e) {
-            logger.addErrorLogEntry("Unable to get  JTLZIP from "+url+" "+e.getMessage());
+            logger.addErrorLogEntry(Constants.UNABLE_TO_GET_JTL_ZIP+url+" "+e.getMessage());
         } catch (MalformedURLException e) {
-            logger.addErrorLogEntry("Unable to get  JTLZIP from "+url+" "+e.getMessage());
+            logger.addErrorLogEntry(Constants.UNABLE_TO_GET_JTL_ZIP+url+" "+e.getMessage());
         } catch (IOException e) {
-            logger.addErrorLogEntry("Unable to get JTLZIP from "+url+" "+e.getMessage());
+            logger.addErrorLogEntry(Constants.UNABLE_TO_GET_JTL_ZIP+url+" "+e.getMessage());
         } catch (Exception e) {
-            logger.addErrorLogEntry("Unable to get JTLZIP from "+url+" "+e.getMessage());
+            logger.addErrorLogEntry(Constants.UNABLE_TO_GET_JTL_ZIP+url+" "+e.getMessage());
         }
     }
 
@@ -424,28 +426,4 @@ public class ServiceManager {
         }
         return false;
     }
-
-    public static boolean collection(String testId,Api api) throws Exception{
-        boolean exists=false;
-        boolean collection=false;
-
-        LinkedHashMultimap tests = api.testsMultiMap();
-        Set<Map.Entry> entries = tests.entries();
-        for (Map.Entry e : entries) {
-            int point = ((String) e.getKey()).indexOf(".");
-            if (testId.contains(((String) e.getKey()).substring(0,point))) {
-                collection = (((String) e.getKey()).substring(point+1)).contains("multi");
-                exists=true;
-            }
-            if (collection) {
-                break;
-            }
-        }
-        if(!exists){
-            throw new Exception("Test with test id = "+testId+" is not present on server");
-        }
-        return collection;
-    }
-
-
 }

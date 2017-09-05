@@ -442,39 +442,45 @@ public class ApiImpl implements Api {
     @Override
     public boolean active(String testId) {
         boolean isActive = false;
-        String url = this.urlManager.activeTests(APP_KEY);
-        JSONObject jo = null;
-        try {
-            Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON)
-            .addHeader(AUTHORIZATION,this.credentials).
-                    addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
-            jo = new JSONObject(okhttp.newCall(r).execute().body().string());
-            JSONObject result = null;
-            if (jo.has(JsonConstants.RESULT) && (!jo.get(JsonConstants.RESULT).equals(JSONObject.NULL))) {
-                result = (JSONObject) jo.get(JsonConstants.RESULT);
-                JSONArray tests = (JSONArray) result.get(JsonConstants.TESTS);
-                for (int i = 0; i < tests.length(); i++) {
-                    if (String.valueOf(tests.getInt(i)).equals(testId)) {
-                        isActive = true;
-                        return isActive;
+        HashMap<String, Integer> ws = this.workspaces();
+        Set<String> wsk = ws.keySet();
+        for (String k : wsk) {
+            int wsid = ws.get(k);
+            String url = this.urlManager.activeTests(APP_KEY, wsid);
+            JSONObject jo = null;
+            try {
+                Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON)
+                    .addHeader(AUTHORIZATION, this.credentials).
+                        addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
+                jo = new JSONObject(okhttp.newCall(r).execute().body().string());
+                JSONObject result = null;
+                if (jo.has(JsonConstants.RESULT) && (!jo.get(JsonConstants.RESULT).equals(JSONObject.NULL))) {
+                    result = (JSONObject) jo.get(JsonConstants.RESULT);
+                    JSONArray tests = (JSONArray) result.get(JsonConstants.TESTS);
+                    for (int i = 0; i < tests.length(); i++) {
+                        if (String.valueOf(tests.getInt(i)).equals(testId)) {
+                            isActive = true;
+                            return isActive;
+                        }
+                    }
+                    JSONArray collections = (JSONArray) result.get(JsonConstants.COLLECTIONS);
+                    for (int i = 0; i < collections.length(); i++) {
+                        if (String.valueOf(collections.getInt(i)).equals(testId)) {
+                            isActive = true;
+                            return isActive;
+                        }
                     }
                 }
-                JSONArray collections = (JSONArray) result.get(JsonConstants.COLLECTIONS);
-                for (int i = 0; i < collections.length(); i++) {
-                    if (String.valueOf(collections.getInt(i)).equals(testId)) {
-                        isActive = true;
-                        return isActive;
-                    }
-                }
+                return isActive;
+            } catch (JSONException je) {
+                this.logger.info("Failed to check if test=" + testId + " is active: received JSON = " + jo, je);
+                return false;
+            } catch (Exception e) {
+                this.logger.info("Failed to check if test=" + testId + " is active: received JSON = " + jo, e);
+                return false;
             }
-            return isActive;
-        } catch (JSONException je) {
-            this.logger.info("Failed to check if test=" + testId + " is active: received JSON = " + jo, je);
-            return false;
-        } catch (Exception e) {
-            this.logger.info("Failed to check if test=" + testId + " is active: received JSON = " + jo, e);
-            return false;
         }
+        return isActive;
     }
 
     @Override
@@ -606,4 +612,28 @@ public class ApiImpl implements Api {
         }
         return ws;
     }
+
+    @Override
+    public boolean collection(String testId) throws Exception{
+        boolean exists=false;
+        boolean collection=false;
+
+        LinkedHashMultimap tests = this.testsMultiMap();
+        Set<Map.Entry> entries = tests.entries();
+        for (Map.Entry e : entries) {
+            int point = ((String) e.getKey()).indexOf(".");
+            if (point>0&&testId.contains(((String) e.getKey()).substring(0,point))) {
+                collection = (((String) e.getKey()).substring(point+1)).contains("multi");
+                exists=true;
+            }
+            if (collection) {
+                break;
+            }
+        }
+        if(!exists){
+            throw new Exception("Test with test id = "+testId+" is not present on server");
+        }
+        return collection;
+    }
+
 }
