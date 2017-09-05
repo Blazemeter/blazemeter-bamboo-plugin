@@ -315,7 +315,7 @@ public class ApiImpl implements Api {
                 }
                 LinkedHashMultimap<String,String> wst=LinkedHashMultimap.create();
                 if (result != null && result.length() > 0) {
-                    testListOrdered.put(String.valueOf(wsid), "========" + k + "(" + wsid + ")========");
+                    testListOrdered.put(String.valueOf(wsid)+"."+"workspace", "========" + k + "(" + wsid + ")========");
                     for (int i = 0; i < result.length(); i++) {
                         JSONObject entry = null;
                         try {
@@ -614,24 +614,27 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public boolean collection(String testId) throws Exception{
-        boolean exists=false;
-        boolean collection=false;
+    public boolean collection(String testId) throws Exception {
+        boolean exists = false;
+        boolean collection = false;
 
         LinkedHashMultimap tests = this.testsMultiMap();
         Set<Map.Entry> entries = tests.entries();
         for (Map.Entry e : entries) {
             int point = ((String) e.getKey()).indexOf(".");
-            if (point>0&&testId.contains(((String) e.getKey()).substring(0,point))) {
-                collection = (((String) e.getKey()).substring(point+1)).contains("multi");
-                exists=true;
+            if (point > 0 && testId.contains(((String) e.getKey()).substring(0, point))) {
+                collection = (((String) e.getKey()).substring(point + 1)).contains("multi");
+                if (((String) e.getKey()).substring(point + 1).contains("workspace")) {
+                    throw new Exception("Please, select valid testId instead of workspace header");
+                }
+                exists = true;
             }
             if (collection) {
                 break;
             }
         }
-        if(!exists){
-            throw new Exception("Test with test id = "+testId+" is not present on server");
+        if (!exists) {
+            throw new Exception("Test with test id = " + testId + " is not present on server");
         }
         return collection;
     }
