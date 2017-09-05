@@ -313,6 +313,7 @@ public class ApiImpl implements Api {
                 if (jo.has(JsonConstants.RESULT) && (!jo.get(JsonConstants.RESULT).equals(JSONObject.NULL))) {
                     result = (JSONArray) jo.get(JsonConstants.RESULT);
                 }
+                LinkedHashMultimap<String,String> wst=LinkedHashMultimap.create();
                 if (result != null && result.length() > 0) {
                     testListOrdered.put(String.valueOf(wsid), "========" + k + "(" + wsid + ")========");
                     for (int i = 0; i < result.length(); i++) {
@@ -334,16 +335,22 @@ public class ApiImpl implements Api {
                                 }catch (Exception e){
                                     testType = Constants.UNKNOWN_TYPE;
                                 }
-                                testListOrdered.put(id + "." + testType, name + "(" + id + "." + testType + ")");
-
+                                wst.put(id + "." + testType, name + "(" + id + "." + testType + ")");
                             }
                         } catch (JSONException ie) {
                             this.logger.warn("JSONException while getting tests: " + ie);
                         }
                     }
-                } else {
-                    testListOrdered = LinkedHashMultimap.create(0, 0);
                 }
+                Comparator c = new Comparator<Map.Entry<String, String>>() {
+                    @Override
+                    public int compare(Map.Entry<String, String> e1, Map.Entry<String, String> e2) {
+                        return e1.getValue().compareToIgnoreCase(e2.getValue());
+                    }
+                };
+                wst.entries().stream().sorted(c).
+                    forEach(entry -> testListOrdered.put(
+                        ((Map.Entry<String, String>)entry).getKey(), ((Map.Entry<String, String>)entry).getValue()));
             } catch (Exception e) {
                 this.logger.warn("Exception while getting tests: ", e);
                 this.logger.warn("Check connection/proxy settings");
