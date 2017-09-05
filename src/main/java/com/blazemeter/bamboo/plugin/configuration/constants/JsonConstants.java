@@ -15,6 +15,7 @@ package com.blazemeter.bamboo.plugin.configuration.constants;
 
 public interface JsonConstants {
     String DATA = "data";
+    String CONFIGURATION = "configuration";
     String TYPE = "type";
     String NAME = "name";
     String TESTS = "tests";

@@ -328,8 +328,13 @@ public class ApiImpl implements Api {
                             if (entry != null) {
                                 id = String.valueOf(entry.get(JsonConstants.ID));
                                 name = entry.has(JsonConstants.NAME) ? entry.getString(JsonConstants.NAME).replaceAll("&", "&amp;") : "";
-//                                String testType = entry.has(JsonConstants.TYPE) ? entry.getString(JsonConstants.TYPE) : Constants.UNKNOWN_TYPE;
-                                testListOrdered.put(id + "." /*+ TODO testType*/, name + "(" + id + "." + /*TODO testType +*/ ")");
+                                String testType = null;
+                                try{
+                                    testType=entry.getJSONObject(JsonConstants.CONFIGURATION).getString(JsonConstants.TYPE);
+                                }catch (Exception e){
+                                    testType = Constants.UNKNOWN_TYPE;
+                                }
+                                testListOrdered.put(id + "." + testType, name + "(" + id + "." + testType + ")");
 
                             }
                         } catch (JSONException ie) {
