@@ -17,7 +17,7 @@ package com.blazemeter.bamboo;
 import com.blazemeter.bamboo.plugin.TestStatus;
 import com.blazemeter.bamboo.plugin.api.*;
 import com.blazemeter.bamboo.plugin.configuration.constants.JsonConstants;
-import com.google.common.collect.LinkedHashMultimap;
+import java.util.HashMap;
 import okhttp3.Credentials;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,9 +25,6 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import javax.mail.MessagingException;
-import javax.servlet.ServletException;
 import java.io.IOException;
 
 public class TestApiV3Impl {
@@ -41,6 +38,8 @@ public class TestApiV3Impl {
         MockedAPI.getTests();
         MockedAPI.getTestReport();
         MockedAPI.startTest();
+        MockedAPI.accountId();
+        MockedAPI.workspaces();
     }
 
     @AfterClass
@@ -85,16 +84,6 @@ public class TestApiV3Impl {
         blazemeterApiV3 = new ApiImpl(c,TestConstants.mockedApiUrl);
         Assert.assertEquals(blazemeterApiV3.startTest(TestConstants.TEST_MASTER_ID, true).get(JsonConstants.ID),
                 "15105877");
-    }
-
-    @Test
-    public void getTestList_5_5() throws IOException, JSONException, ServletException, MessagingException {
-        String c = Credentials.basic(TestConstants.TEST_API_ID_5_TESTS,TestConstants.TEST_API_SECRET_5_TESTS);
-        blazemeterApiV3 = new ApiImpl(c, TestConstants.mockedApiUrl);
-        LinkedHashMultimap<String, String> testList = blazemeterApiV3.testsMultiMap();
-        Assert.assertTrue(testList.asMap().size() == 5);
-        Assert.assertTrue(testList.size() == 5);
-
     }
 
     @Test
@@ -153,12 +142,19 @@ public class TestApiV3Impl {
 
     @Test
     public void accountId() {
-      Assert.fail();
+        String c = Credentials.basic(TestConstants.TEST_API_ID_VALID,TestConstants.TEST_API_SECRET_VALID);
+        blazemeterApiV3 = new ApiImpl(c, TestConstants.mockedApiUrl);
+        int ai=blazemeterApiV3.accountId();
+      Assert.assertEquals(1,ai);
     }
 
     @Test
     public void workspaces() {
-      Assert.fail();
+        String c = Credentials.basic(TestConstants.TEST_API_ID_VALID,TestConstants.TEST_API_SECRET_VALID);
+        blazemeterApiV3 = new ApiImpl(c, TestConstants.mockedApiUrl);
+        HashMap<String,Integer> ws=blazemeterApiV3.workspaces();
+        Assert.assertEquals(1,ws.size());
+        Assert.assertTrue(32563==ws.get("DWorkspace"));
     }
 
 }

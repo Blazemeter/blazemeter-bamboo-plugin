@@ -20,7 +20,7 @@ import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class TestBmUrlManagerV3 {
+public class TestUrlManager {
     private String appKey="jnk100x987c06f4e10c4";
     private String testId="123456789";
     private String masterId ="987654321";
@@ -46,14 +46,12 @@ public class TestBmUrlManagerV3 {
         Assert.assertEquals(expTestGetStatus, actTestGetStatus);
     }
 
-    /*
-    TODO
     @Test
     public void getTests(){
-    String expGetTestsUrl=bmUrlManager.getServerUrl()+"/api/web/tests?app_key="+appKey+UrlManager.CLIENT_IDENTIFICATION;
-    String actGetTestsUrl=bmUrlManager.tests(appKey);
+    String expGetTestsUrl=bmUrlManager.getServerUrl()+UrlManager.V4+"/tests?workspaceId=1&app_key="+appKey+UrlManager.CLIENT_IDENTIFICATION;
+    String actGetTestsUrl=bmUrlManager.tests(appKey,1);
         Assert.assertEquals(expGetTestsUrl, actGetTestsUrl);
-    }*/
+    }
 
     @Test
     public void testStop_masters(){
@@ -125,8 +123,8 @@ public class TestBmUrlManagerV3 {
 
     @Test
     public void activeTests(){
-        String expActiveTests=bmUrlManager.getServerUrl()+UrlManager.V4+"/web/active?app_key="+appKey+UrlManager.CLIENT_IDENTIFICATION;
-        String actActiveTests=bmUrlManager.activeTests(appKey);
+        String expActiveTests=bmUrlManager.getServerUrl()+UrlManager.V4+Constants.MASTERS+"?workspaceId=1&active=true&app_key="+appKey+UrlManager.CLIENT_IDENTIFICATION;
+        String actActiveTests=bmUrlManager.activeTests(appKey,1);
         Assert.assertEquals(expActiveTests,actActiveTests);
     }
 
@@ -141,7 +139,10 @@ public class TestBmUrlManagerV3 {
 
     @Test
     public void workspaces(){
-        Assert.fail();
+        String exp=bmUrlManager.getServerUrl()+UrlManager.V4 +"/workspaces?app_key="+appKey+"&"+"accountId="
+            +1+UrlManager.CLIENT_IDENTIFICATION;
+        String act=bmUrlManager.workspaces(appKey,1);
+        Assert.assertEquals(exp,act);
     }
 
 }

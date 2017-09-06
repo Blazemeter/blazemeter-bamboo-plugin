@@ -28,6 +28,7 @@ import org.json.JSONException;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -50,15 +51,6 @@ public class TestServiceManager {
     @AfterClass
     public static void tearDown(){
         MockedAPI.stopAPI();
-    }
-
-
-    @Test
-    public void startTest(){
-        String c = Credentials.basic(TestConstants.TEST_API_ID_VALID,TestConstants.TEST_API_SECRET_VALID);
-        Api api = new ApiImpl(c, TestConstants.mockedApiUrl);
-        String testId=ServiceManager.startTest(api,TestConstants.TEST_MASTER_TUT_GY,log);
-        Assert.assertEquals("15102806",testId);
     }
 
     @Test
