@@ -505,7 +505,7 @@ public class ApiImpl implements Api {
     public boolean properties(JSONArray properties, String sessionId) throws Exception {
         String url = this.urlManager.properties(APP_KEY, sessionId);
         RequestBody body = RequestBody.create(JSON, properties.toString());
-        Request r = new Request.Builder().url(url).post(body).build();
+        Request r = new Request.Builder().url(url).post(body).addHeader(AUTHORIZATION,this.credentials).build();
         JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
         try {
             if (jo.get(JsonConstants.RESULT).equals(JSONObject.NULL)) {
