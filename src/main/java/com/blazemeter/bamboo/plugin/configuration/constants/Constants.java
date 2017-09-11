@@ -17,7 +17,6 @@ public interface Constants {
 
     String HTTP_LOG="http-log";
     String BM_TRESHOLDS="bm-thresholds.xml";
-    String THREE_DOTS ="...";
     String PLUGIN_KEY="com.blazemeter.bamboo.plugin.BlazeMeterBamboo:blazemeter";
 
     //settings properties

@@ -101,9 +101,9 @@ public class AdminServlet extends HttpServlet {
 			transactionTemplate.execute(new TransactionCallback() {
 				public Object doInTransaction() {
 					PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
-					pluginSettings.put(AdminServletConst.API_ID, req.getParameter(AdminServletConst.API_ID).trim());
-					pluginSettings.put(AdminServletConst.API_SECRET, req.getParameter(AdminServletConst.API_SECRET).trim());
-					pluginSettings.put(AdminServletConst.URL, req.getParameter(AdminServletConst.URL).trim());
+					pluginSettings.put(AdminServletConst.API_ID, api_id);
+					pluginSettings.put(AdminServletConst.API_SECRET, api_secret);
+					pluginSettings.put(AdminServletConst.URL, url);
 					return null;
 				}
 			});
@@ -112,11 +112,11 @@ public class AdminServlet extends HttpServlet {
 			context.put(AdminServletConst.URL_ERROR, "User settings are updated. Check that jobs are configured properly");
 		} else {
 			context.put(AdminServletConst.API_ID_ERROR, "User key is not saved! Check credentials with ID = "
-                    + req.getParameter(AdminServletConst.API_ID).trim() + " and proxy settings.");
+                    + api_id + " and proxy settings.");
             context.put(AdminServletConst.API_SECRET_ERROR, "User key is not saved! Check credentials with ID = "
-                    + req.getParameter(AdminServletConst.API_ID).trim() + " and proxy settings.");
+                    + api_id + " and proxy settings.");
             context.put(AdminServletConst.URL_ERROR, "Server url is not saved! Check server url "
-                    + req.getParameter(AdminServletConst.URL).trim() + " and proxy settings.");
+                    + url + " and proxy settings.");
         }
         renderer.render(AdminServletConst.BLAZEMETER_ADMIN_VM, context, resp.getWriter());
     }

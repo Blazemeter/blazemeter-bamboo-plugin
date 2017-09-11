@@ -32,7 +32,6 @@ public class HttpLogger implements HttpLoggingInterceptor.Logger {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        http_lfh.setFormatter(new CutUserKeyFormatter());
         httpLog.addHandler(http_lfh);
         httpLog.setUseParentHandlers(false);
 
