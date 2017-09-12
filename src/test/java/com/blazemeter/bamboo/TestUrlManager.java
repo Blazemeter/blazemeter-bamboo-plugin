@@ -48,7 +48,7 @@ public class TestUrlManager {
 
     @Test
     public void getTests(){
-    String expGetTestsUrl=bmUrlManager.getServerUrl()+UrlManager.V4+"/tests?workspaceId=1&app_key="+appKey+UrlManager.CLIENT_IDENTIFICATION;
+    String expGetTestsUrl=bmUrlManager.getServerUrl()+UrlManager.V4+"/tests?limit=10000&workspaceId=1&app_key="+appKey+UrlManager.CLIENT_IDENTIFICATION;
     String actGetTestsUrl=bmUrlManager.tests(appKey,1);
         Assert.assertEquals(expGetTestsUrl, actGetTestsUrl);
     }

@@ -48,7 +48,7 @@ public class UrlManagerV3Impl implements UrlManager {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        return serverUrl + V4+"/tests?workspaceId="+workspaceId+"&app_key=" + appKey + CLIENT_IDENTIFICATION;
+        return serverUrl + V4+"/tests?limit=10000&workspaceId="+workspaceId+"&app_key=" + appKey + CLIENT_IDENTIFICATION;
     }
 
     @Override
