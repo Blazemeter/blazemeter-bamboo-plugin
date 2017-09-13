@@ -31,6 +31,8 @@ public interface UrlManager {
 
     String tests(String appKey,int workspaceId);
 
+    String multiTests(String appKey,int workspaceId);
+
     String activeTests(String appKey,int workspaceId);
 
     String testStart(String appKey, String testId);

@@ -55,6 +55,13 @@ public class TestUrlManager {
     }
 
     @Test
+    public void getMultiTests(){
+    String expGetTestsUrl=bmUrlManager.getServerUrl()+UrlManager.V4+"/multi-tests?limit=10000&workspaceId=1&app_key="+appKey+UrlManager.CLIENT_IDENTIFICATION;
+    String actGetTestsUrl=bmUrlManager.multiTests(appKey,1);
+        Assert.assertEquals(expGetTestsUrl, actGetTestsUrl);
+    }
+
+    @Test
     public void testStop_masters(){
         String expTestStop=bmUrlManager.getServerUrl()+UrlManager.V4+Constants.MASTERS
                 +testId+"/stop?app_key="+appKey+UrlManager.CLIENT_IDENTIFICATION;

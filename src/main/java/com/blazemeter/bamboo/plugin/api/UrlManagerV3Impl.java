@@ -52,6 +52,16 @@ public class UrlManagerV3Impl implements UrlManager {
     }
 
     @Override
+    public String multiTests(String appKey,int workspaceId) {
+        try {
+            appKey = URLEncoder.encode(appKey, UrlManager.UTF_8);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return serverUrl + V4+"/multi-tests?limit=10000&workspaceId="+workspaceId+"&app_key=" + appKey + CLIENT_IDENTIFICATION;
+    }
+
+    @Override
     public String testStart(String appKey, String testId) {
         try {
             appKey = URLEncoder.encode(appKey, UrlManager.UTF_8);
