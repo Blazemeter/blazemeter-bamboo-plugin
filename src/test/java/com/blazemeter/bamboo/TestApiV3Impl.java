@@ -24,6 +24,7 @@ import org.json.JSONObject;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import java.io.IOException;
 
@@ -144,17 +145,16 @@ public class TestApiV3Impl {
     public void accountId() {
         String c = Credentials.basic(TestConstants.TEST_API_ID_VALID,TestConstants.TEST_API_SECRET_VALID);
         blazemeterApiV3 = new ApiImpl(c, TestConstants.mockedApiUrl);
-        int ai=blazemeterApiV3.accountId();
-      Assert.assertEquals(1,ai);
+        Assert.assertTrue(blazemeterApiV3.accounts().size()==3);
     }
 
     @Test
     public void workspaces() {
         String c = Credentials.basic(TestConstants.TEST_API_ID_VALID,TestConstants.TEST_API_SECRET_VALID);
         blazemeterApiV3 = new ApiImpl(c, TestConstants.mockedApiUrl);
-        HashMap<String,Integer> ws=blazemeterApiV3.workspaces();
+        HashMap<Integer,String> ws=blazemeterApiV3.workspaces();
         Assert.assertEquals(1,ws.size());
-        Assert.assertTrue(32563==ws.get("DWorkspace"));
+        Assert.assertTrue("DWorkspace".equals(ws.get(32563)));
     }
 
 }

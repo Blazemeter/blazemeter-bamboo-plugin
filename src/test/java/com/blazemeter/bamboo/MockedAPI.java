@@ -302,13 +302,13 @@ public class MockedAPI {
 
 
     public static void accountId()  throws IOException{
-        File jsonFile = new File(TestConstants.RESOURCES + "/accountId.json");
+        File jsonFile = new File(TestConstants.RESOURCES + "/accountIds.json");
         String b= FileUtils.readFileToString(jsonFile);
         String c = Credentials.basic(TestConstants.TEST_API_ID_VALID,TestConstants.TEST_API_SECRET_VALID);
         mockServer.when(
                 request()
                         .withMethod("GET")
-                        .withPath(UrlManager.V4+"/user")
+                        .withPath(UrlManager.V4+"/accounts")
                         .withHeader(Api.ACCEPT, Api.APP_JSON)
                         .withHeader(Api.AUTHORIZATION, c),
                 unlimited()
@@ -446,7 +446,7 @@ public class MockedAPI {
             request()
                 .withMethod("GET")
                 .withPath(expectedPath)
-                .withQueryStringParameter("accountId", "1")
+                .withQueryStringParameter("accountId", "9322")
                 .withHeader(Api.ACCEPT, Api.APP_JSON)
                 .withHeader(Api.AUTHORIZATION, c),
             unlimited()

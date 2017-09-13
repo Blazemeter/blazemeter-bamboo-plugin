@@ -20,21 +20,19 @@ import com.atlassian.bamboo.task.TaskDefinition;
 import com.atlassian.bamboo.utils.error.ErrorCollection;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
-import com.blazemeter.bamboo.plugin.ServiceManager;
 import com.blazemeter.bamboo.plugin.api.Api;
 import com.blazemeter.bamboo.plugin.api.ApiImpl;
 import com.blazemeter.bamboo.plugin.configuration.constants.AdminServletConst;
 import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.LinkedHashMultimap;
 import okhttp3.Credentials;
 import org.apache.commons.lang.StringUtils;
 
-import java.util.List;
 import java.util.Map;
 
 public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskRequirementSupport {
 
+/*
     private static final List<String> FIELDS_TO_COPY =
         ImmutableList.of(Constants.SETTINGS_SELECTED_TEST_ID,
             Constants.SETTINGS_JTL_REPORT,
@@ -43,6 +41,7 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
             Constants.SETTINGS_NOTES,
             Constants.SETTINGS_JTL_PATH,
             Constants.SETTINGS_JUNIT_PATH);
+*/
     private Api api;
 
 //    private TextProvider textProvider;

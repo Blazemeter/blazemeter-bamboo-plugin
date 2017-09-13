@@ -209,6 +209,16 @@ public class UrlManagerV3Impl implements UrlManager {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        return serverUrl + V4 + "/workspaces?app_key=" + appKey + "&"+"accountId="+accountId+CLIENT_IDENTIFICATION;
+        return serverUrl + V4 + "/workspaces?limit=1000&enabled=true&app_key=" + appKey + "&"+"accountId="+accountId+CLIENT_IDENTIFICATION;
+    }
+
+    @Override
+    public String accounts(String appKey) {
+        try {
+            appKey = URLEncoder.encode(appKey, UrlManager.UTF_8);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return serverUrl + V4 + "/accounts?app_key=" + appKey + "&" + CLIENT_IDENTIFICATION;
     }
 }

@@ -18,6 +18,7 @@ import com.blazemeter.bamboo.plugin.api.UrlManager;
 import com.blazemeter.bamboo.plugin.api.UrlManagerV3Impl;
 import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class TestUrlManager {
@@ -139,10 +140,16 @@ public class TestUrlManager {
 
     @Test
     public void workspaces(){
-        String exp=bmUrlManager.getServerUrl()+UrlManager.V4 +"/workspaces?app_key="+appKey+"&"+"accountId="
+        String exp=bmUrlManager.getServerUrl()+UrlManager.V4 +"/workspaces?limit=1000&enabled=true&app_key="+appKey+"&"+"accountId="
             +1+UrlManager.CLIENT_IDENTIFICATION;
         String act=bmUrlManager.workspaces(appKey,1);
         Assert.assertEquals(exp,act);
     }
 
+    @Test
+    public void accounts(){
+        String exp=bmUrlManager.getServerUrl()+UrlManager.V4 +"/accounts?app_key="+appKey+"&"+UrlManager.CLIENT_IDENTIFICATION;
+        String act=bmUrlManager.accounts(appKey);
+        Assert.assertEquals(exp,act);
+    }
 }

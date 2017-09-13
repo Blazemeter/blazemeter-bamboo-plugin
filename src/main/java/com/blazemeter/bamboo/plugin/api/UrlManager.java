@@ -60,4 +60,6 @@ public interface UrlManager {
     String masterId(String appKey,String masterId);
 
     String workspaces(String appKey, int accountId);
+
+    String accounts(String appKey);
 }
