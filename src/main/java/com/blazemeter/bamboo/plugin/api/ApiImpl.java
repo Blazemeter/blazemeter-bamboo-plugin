@@ -309,6 +309,8 @@ public class ApiImpl implements Api {
                     result = (JSONArray) jo.get(JsonConstants.RESULT);
                 }
                 LinkedHashMultimap<String, String> wst = LinkedHashMultimap.create();
+                LinkedHashMultimap<String, String> wsc = this.collectionsMultiMap(k);
+                wst.putAll(wsc);
                 if (result != null && result.length() > 0) {
                     testListOrdered.put(String.valueOf(k) + "." + "workspace", "========" + wsn + "(" + k + ")========");
                     for (int i = 0; i < result.length(); i++) {
@@ -353,6 +355,60 @@ public class ApiImpl implements Api {
             }
         }
         return testListOrdered;
+    }
+
+    @Override
+    public LinkedHashMultimap<String, String> collectionsMultiMap(int workspaceId) {
+        LinkedHashMultimap<String, String> collectionsListOrdered = LinkedHashMultimap.create();
+        logger.info("Getting collections...");
+        String url = this.urlManager.multiTests(APP_KEY, workspaceId);
+        try {
+            Request r = new Request.Builder().url(url).get().addHeader(ACCEPT, APP_JSON)
+                .addHeader(AUTHORIZATION, this.credentials).
+                    addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
+            JSONObject jo = new JSONObject(okhttp.newCall(r).execute().body().string());
+            JSONArray result = null;
+            this.logger.info("Received json: " + jo.toString());
+            if (jo.has(JsonConstants.ERROR) && (jo.get(JsonConstants.RESULT).equals(JSONObject.NULL)) &&
+                (((JSONObject) jo.get(JsonConstants.ERROR)).getInt(JsonConstants.CODE) == 401)) {
+                return collectionsListOrdered;
+            }
+            if (jo.has(JsonConstants.RESULT) && (!jo.get(JsonConstants.RESULT).equals(JSONObject.NULL))) {
+                result = (JSONArray) jo.get(JsonConstants.RESULT);
+            }
+            if (result != null && result.length() > 0) {
+                for (int i = 0; i < result.length(); i++) {
+                    JSONObject entry = null;
+                    try {
+                        entry = result.getJSONObject(i);
+                    } catch (JSONException e) {
+                        this.logger.warn("JSONException while getting tests: " + e);
+                    }
+                    String id;
+                    String name;
+                    try {
+                        if (entry != null) {
+                            id = String.valueOf(entry.get(JsonConstants.ID));
+                            name = entry.has(JsonConstants.NAME) ? entry.getString(JsonConstants.NAME).replaceAll("&", "&amp;") : "";
+                            String collectionsType = null;
+                            try {
+                                collectionsType = entry.getString(JsonConstants.COLLECTION_TYPE);
+                            } catch (Exception e) {
+                                collectionsType = Constants.UNKNOWN_TYPE;
+                            }
+                            collectionsListOrdered.put(id + "." + collectionsType, name + "(" + id + "." + collectionsType + ")");
+                        }
+                    } catch (JSONException ie) {
+                        this.logger.warn("JSONException while getting tests: " + ie);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            this.logger.warn("Exception while getting tests: ", e);
+            this.logger.warn("Check connection/proxy settings");
+            collectionsListOrdered.put(Constants.CHECK_SETTINGS, Constants.CHECK_SETTINGS);
+        }
+        return collectionsListOrdered;
     }
 
     @Override

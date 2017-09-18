@@ -17,6 +17,7 @@ public interface JsonConstants {
     String DATA = "data";
     String CONFIGURATION = "configuration";
     String TYPE = "type";
+    String COLLECTION_TYPE = "collectionType";
     String NAME = "name";
     String TESTS = "tests";
     String RESULT = "result";
@@ -31,7 +32,4 @@ public interface JsonConstants {
     String ID="id";
     String TEST_COLLECTION_ID="testCollectionId";
     String TEST_ID="testId";
-    String DEFAULT_PROJECT ="defaultProject";
-    String ACCOUNT_ID="accountId";
-
 }

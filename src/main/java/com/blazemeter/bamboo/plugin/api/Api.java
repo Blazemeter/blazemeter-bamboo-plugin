@@ -24,7 +24,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import javax.mail.MessagingException;
-import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -54,6 +53,8 @@ public interface Api {
     JSONObject testReport(String reportId);
 
     LinkedHashMultimap<String, String> testsMultiMap() throws IOException, MessagingException;
+
+    LinkedHashMultimap<String, String> collectionsMultiMap(int workspaceId) throws IOException, MessagingException;
 
     JSONObject user() throws IOException, JSONException;
 
