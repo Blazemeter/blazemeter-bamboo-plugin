@@ -31,20 +31,7 @@ import org.apache.commons.lang.StringUtils;
 import java.util.Map;
 
 public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskRequirementSupport {
-
-/*
-    private static final List<String> FIELDS_TO_COPY =
-        ImmutableList.of(Constants.SETTINGS_SELECTED_TEST_ID,
-            Constants.SETTINGS_JTL_REPORT,
-            Constants.SETTINGS_JUNIT_REPORT,
-            Constants.SETTINGS_JMETER_PROPERTIES,
-            Constants.SETTINGS_NOTES,
-            Constants.SETTINGS_JTL_PATH,
-            Constants.SETTINGS_JUNIT_PATH);
-*/
     private Api api;
-
-//    private TextProvider textProvider;
 
     PluginSettingsFactory pluginSettingsFactory;
 

@@ -15,6 +15,7 @@
 package com.blazemeter.bamboo.plugin.api;
 
 import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
+import java.util.logging.SimpleFormatter;
 import okhttp3.logging.HttpLoggingInterceptor;
 
 import java.io.IOException;
@@ -32,6 +33,7 @@ public class HttpLogger implements HttpLoggingInterceptor.Logger {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        http_lfh.setFormatter(new SimpleFormatter());
         httpLog.addHandler(http_lfh);
         httpLog.setUseParentHandlers(false);
 

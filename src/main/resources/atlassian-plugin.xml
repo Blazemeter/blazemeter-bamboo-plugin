@@ -23,7 +23,7 @@
 	</plugin-info>
 
 	<!-- add our i18n resource -->
-	<resource type="i18n" name="i18n" location="BlazeMeterBamboo" />
+	<resource type="i18n" name="i18n" location="BlazeMeterBamboo"/>
 
 	<!-- add our web resources -->
 	<web-resource key="BlazeMeterResources" name="BlazeMeterResources">
@@ -75,6 +75,7 @@
 	<!-- Definition for BlazeMeter task plugin -->
 	<taskType key="blazemeter" name="BlazeMeter Test"
 		class="com.blazemeter.bamboo.plugin.TaskType">
+		<help link="blazemeter.task.help.link" title="blazemeter.task.help.title" />
 		<description>Execute the BlazeMeter tests as part of your build
 		</description>
 		<category name="builder" />
