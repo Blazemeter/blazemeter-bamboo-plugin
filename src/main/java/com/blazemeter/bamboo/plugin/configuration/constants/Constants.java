@@ -47,4 +47,5 @@ public interface Constants {
     String PUBLIC_TOKEN="public-token";
     String CHECK_SETTINGS="Check blazemeter & proxy-settings";
     String UNABLE_TO_GET_JTL_ZIP="Unable to get  JTLZIP from ";
+    String UNABLE_TO_GET_JUNIT_REPORT="Failed to get junit report for test ";
 }

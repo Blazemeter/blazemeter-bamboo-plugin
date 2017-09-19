@@ -220,14 +220,15 @@ public class ServiceManager {
         }
     }
 
-    public static void downloadJunitReport(Api api,String masterId, File junitD, BuildLogger logger) {
+    public static void downloadJunitReport(Api api, String masterId, File junitD, BuildLogger logger) {
         try {
             String junit = api.retrieveJUNITXML(masterId);
-            File junitFile=new File(junitD,Constants.BM_TRESHOLDS);
-            logger.addBuildLogEntry("Trying to save junit report to "+junitFile.getAbsolutePath());
-            FileUtils.writeStringToFile(junitFile,junit);
+            File junitFile = new File(junitD, Constants.BM_TRESHOLDS);
+            logger.addBuildLogEntry("Trying to save junit report to " + junitFile.getAbsolutePath());
+            FileUtils.writeStringToFile(junitFile, junit);
         } catch (Exception e) {
-            logger.addErrorLogEntry("Failed to get junit report for test with masterId="+masterId,e);
+            logger.addErrorLogEntry(Constants.UNABLE_TO_GET_JUNIT_REPORT + " with masterId = "
+                + masterId + " " + e.getMessage());
         }
     }
 
@@ -259,7 +260,8 @@ public class ServiceManager {
                     FileUtils.copyURLToFile(url, jtlZip,conTo,30000);
                     jtl = true;
                 } catch (Exception e) {
-                    logger.addErrorLogEntry("Unable to get JTLZIP from " + url + ", " + e);
+                    logger.addErrorLogEntry(Constants.UNABLE_TO_GET_JTL_ZIP + url + ", " + e);
+                    return;
                 } finally {
                     i++;
                 }
