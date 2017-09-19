@@ -248,8 +248,9 @@ public class ApiImpl implements Api {
     public void terminateTest(String testId) throws IOException {
         String url = this.urlManager.testTerminate(APP_KEY, testId);
         RequestBody emptyBody = RequestBody.create(null, new byte[0]);
-        Request r = new Request.Builder().url(url).post(emptyBody).addHeader(ACCEPT, APP_JSON).
-            addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
+        Request r = new Request.Builder().url(url).post(emptyBody).addHeader(ACCEPT, APP_JSON)
+            .addHeader(AUTHORIZATION, this.credentials).
+                addHeader(CONTENT_TYPE, APP_JSON_UTF_8).build();
         okhttp.newCall(r).execute();
         return;
     }
