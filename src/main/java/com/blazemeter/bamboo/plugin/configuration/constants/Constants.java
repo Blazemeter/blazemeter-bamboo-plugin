@@ -41,7 +41,7 @@ public interface Constants {
     String PROXY_HOST="http.proxyHost";
     String PROXY_PORT="http.proxyPort";
     String PROXY_USER="http.proxyUser";
-    String PROXY_PASS="http.proxyPassword";
+    String PROXY_PASS="http.proxyPass";
 
     String MASTERS="/masters/";
     String PUBLIC_TOKEN="public-token";
