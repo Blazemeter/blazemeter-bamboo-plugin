@@ -261,7 +261,6 @@ public class ServiceManager {
                     jtl = true;
                 } catch (Exception e) {
                     logger.addErrorLogEntry(Constants.UNABLE_TO_GET_JTL_ZIP + url + ", " + e);
-                    return;
                 } finally {
                     i++;
                 }
@@ -306,14 +305,17 @@ public class ServiceManager {
         return props;
     }
 
-    public static File resolvePath(TaskContext context, String path,BuildLogger logger) throws Exception {
+    public static File resolvePath(TaskContext context, String path, BuildLogger logger) throws Exception {
         File f = null;
         File root = new File("/");
+        if (path.equals("/")) {
+            f = root;
+        }
         if (path.startsWith("/")) {
             f = new File(root, path);
         } else {
-            f = new File(context.getWorkingDirectory().getAbsolutePath()+"/build # "
-                    +context.getBuildContext().getBuildNumber(), path);
+            f = new File(context.getWorkingDirectory().getAbsolutePath() + "/build # "
+                + context.getBuildContext().getBuildNumber(), path);
         }
         if (!f.exists()) {
             boolean mkDir = false;
@@ -323,12 +325,17 @@ public class ServiceManager {
                 throw new Exception("Failed to find filepath = " + f.getName());
             } finally {
                 if (!mkDir) {
-                    logger.addBuildLogEntry("Failed to create "+f.getCanonicalPath()+" , workspace will be used.");
+                    logger.addBuildLogEntry("Failed to create " + f.getCanonicalPath() + " , workspace will be used.");
                     f = new File(context.getWorkingDirectory(), path);
                     f.mkdirs();
-                    logger.addBuildLogEntry("Resolving path into "+f.getCanonicalPath());
+                    logger.addBuildLogEntry("Resolving path into " + f.getCanonicalPath());
                 }
             }
+        }
+        if (!f.canWrite()) {
+            f = new File(context.getWorkingDirectory(), path);
+            f.mkdirs();
+            logger.addBuildLogEntry("Resolving path into " + f.getCanonicalPath());
         }
         return f.getCanonicalFile();
     }
