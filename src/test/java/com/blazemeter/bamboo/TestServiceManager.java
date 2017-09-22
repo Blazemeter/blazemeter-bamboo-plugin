@@ -40,7 +40,6 @@ public class TestServiceManager {
     @BeforeClass
     public static void setUp()throws IOException{
         MockedAPI.startAPI();
-        MockedAPI.getTests();
         MockedAPI.startTest();
         MockedAPI.stopTestSession();
         MockedAPI.getMasterStatus();

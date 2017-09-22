@@ -36,7 +36,6 @@ public class TestApiV3Impl {
     public static void setUp() throws IOException {
         MockedAPI.startAPI();
         MockedAPI.getMasterStatus();
-        MockedAPI.getTests();
         MockedAPI.getTestReport();
         MockedAPI.startTest();
         MockedAPI.accountId();

@@ -20,7 +20,6 @@ public interface UrlManager {
             + ServiceManager.getVersion()+"&​";
     String V4 ="/api/v4";
     String TESTS="/tests";
-    String API_WEB="/api/web";
     String UTF_8="UTF-8";
 
     String getServerUrl();
