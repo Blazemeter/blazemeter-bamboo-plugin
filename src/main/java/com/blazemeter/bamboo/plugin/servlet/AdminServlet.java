@@ -14,8 +14,6 @@
 package com.blazemeter.bamboo.plugin.servlet;
 
 import com.atlassian.sal.api.transaction.TransactionCallback;
-import com.blazemeter.bamboo.plugin.api.Api;
-import com.blazemeter.bamboo.plugin.api.ApiImpl;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,8 +27,12 @@ import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import com.atlassian.templaterenderer.TemplateRenderer;
 import com.atlassian.sal.api.transaction.TransactionTemplate;
+import com.blazemeter.api.explorer.User;
+import com.blazemeter.api.logging.Logger;
+import com.blazemeter.api.logging.UserNotifier;
+import com.blazemeter.api.utils.BlazeMeterUtils;
 import com.blazemeter.bamboo.plugin.configuration.constants.AdminServletConst;
-import okhttp3.Credentials;
+import com.blazemeter.bamboo.plugin.logging.*;
 
 public class AdminServlet extends HttpServlet {
     private final TransactionTemplate transactionTemplate;
@@ -49,22 +51,21 @@ public class AdminServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Map<String, Object> context = new HashMap<String, Object>();
-
         resp.setContentType("text/html;charset=utf-8");
 
         PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
-        String api_id = (String) pluginSettings.get(AdminServletConst.API_ID);
-        if (api_id != null) {
-            context.put(AdminServletConst.API_ID, api_id.trim());
+        String apiId = (String) pluginSettings.get(AdminServletConst.API_ID);
+        if (apiId != null) {
+            context.put(AdminServletConst.API_ID, apiId.trim());
             context.put(AdminServletConst.API_ID_ERROR, "");
         } else {
             context.put(AdminServletConst.API_ID, "");
             context.put(AdminServletConst.API_ID_ERROR, "Please set the BlazeMeter api credentials!");
         }
 
-        String api_secret = (String) pluginSettings.get(AdminServletConst.API_SECRET);
-        if (api_secret != null) {
-            context.put(AdminServletConst.API_SECRET, api_secret.trim());
+        String apiSecret = (String) pluginSettings.get(AdminServletConst.API_SECRET);
+        if (apiSecret != null) {
+            context.put(AdminServletConst.API_SECRET, apiSecret.trim());
             context.put(AdminServletConst.API_SECRET_ERROR, "");
         } else {
             context.put(AdminServletConst.API_SECRET, "");
@@ -88,21 +89,29 @@ public class AdminServlet extends HttpServlet {
         Map<String, Object> context = new HashMap<String, Object>();
         resp.setContentType("text/html;charset=utf-8");
 
-        String api_id = req.getParameter(AdminServletConst.API_ID).trim();
-        String api_secret = req.getParameter(AdminServletConst.API_SECRET).trim();
+        String apiId = req.getParameter(AdminServletConst.API_ID).trim();
+        String apiSecret = req.getParameter(AdminServletConst.API_SECRET).trim();
         String url = req.getParameter(AdminServletConst.URL).trim();
 
-        context.put(AdminServletConst.API_ID, api_id);
-        context.put(AdminServletConst.API_SECRET, api_secret);
+        context.put(AdminServletConst.API_ID, apiId);
+        context.put(AdminServletConst.API_SECRET, apiSecret);
         context.put(AdminServletConst.URL, url);
-       String credentials = Credentials.basic(api_id,api_secret);
-       Api api= new ApiImpl(credentials, url);
-		if (api.verifyCredentials()){
+
+        UserNotifier emptyUserNotifier = new EmptyUserNotifier();
+        Logger logger = new BzmLogger();
+        BlazeMeterUtils utils = new BlazeMeterUtils(apiId,apiSecret,url,url,emptyUserNotifier,logger);
+        User user = null;
+        try{
+            user = User.getUser(utils);
+        }catch (Exception e){
+		    logger.error("Failed to find user on server.",e);
+        }
+        if (user.getId()!=null){
 			transactionTemplate.execute(new TransactionCallback() {
 				public Object doInTransaction() {
 					PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
-					pluginSettings.put(AdminServletConst.API_ID, api_id);
-					pluginSettings.put(AdminServletConst.API_SECRET, api_secret);
+					pluginSettings.put(AdminServletConst.API_ID, apiId);
+					pluginSettings.put(AdminServletConst.API_SECRET, apiSecret);
 					pluginSettings.put(AdminServletConst.URL, url);
 					return null;
 				}
@@ -112,9 +121,9 @@ public class AdminServlet extends HttpServlet {
 			context.put(AdminServletConst.URL_ERROR, "User settings are updated. Check that jobs are configured properly");
 		} else {
 			context.put(AdminServletConst.API_ID_ERROR, "User key is not saved! Check credentials with ID = "
-                    + api_id + " and proxy settings.");
+                    + apiId + " and proxy settings.");
             context.put(AdminServletConst.API_SECRET_ERROR, "User key is not saved! Check credentials with ID = "
-                    + api_id + " and proxy settings.");
+                    + apiId + " and proxy settings.");
             context.put(AdminServletConst.URL_ERROR, "Server url is not saved! Check server url "
                     + url + " and proxy settings.");
         }

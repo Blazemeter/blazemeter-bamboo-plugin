@@ -24,9 +24,7 @@ import com.atlassian.bamboo.task.TaskResult;
 import com.atlassian.bamboo.task.TaskResultBuilder;
 import com.atlassian.bamboo.task.TaskState;
 import com.atlassian.bamboo.v2.build.BuildContext;
-import com.blazemeter.bamboo.plugin.api.Api;
-import com.blazemeter.bamboo.plugin.api.ApiImpl;
-import com.blazemeter.bamboo.plugin.api.HttpLogger;
+import com.blazemeter.api.utils.BlazeMeterUtils;
 import com.blazemeter.bamboo.plugin.configuration.constants.AdminServletConst;
 import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
 import com.blazemeter.bamboo.plugin.testresult.TestResult;
@@ -52,7 +50,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
     String notes;
     String jtlPath;
     String junitPath;
-    Api api;
+    BlazeMeterUtils utils;
     boolean jtlReport = false;
     boolean junitReport = false;
     File rootDirectory;
@@ -65,7 +63,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
 
     @Override
     public TaskResult execute(TaskContext context) throws TaskException {
-        final BuildLogger logger = context.getBuildLogger();
+        /*final BuildLogger logger = context.getBuildLogger();
         TaskResultBuilder resultBuilder = TaskResultBuilder.create(context);
         ConfigurationMap configMap = context.getConfigurationMap();
         String api_id=null;
@@ -254,6 +252,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
                 return resultBuilder.success().build();
             default:
                 return resultBuilder.success().build();
-        }
+        }*/
+    return  null;
     }
 }

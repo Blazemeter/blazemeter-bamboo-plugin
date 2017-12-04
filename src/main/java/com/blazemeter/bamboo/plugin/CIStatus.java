@@ -11,8 +11,8 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  */
-package com.blazemeter.bamboo.plugin.api;
+package com.blazemeter.bamboo.plugin;
 
-public enum Method {
-    GET, POST, PUT,PATCH
+public enum CIStatus {
+    success,errors, failures
 }
