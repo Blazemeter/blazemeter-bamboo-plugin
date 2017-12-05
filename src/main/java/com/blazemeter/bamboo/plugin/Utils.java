@@ -19,30 +19,22 @@ import java.util.*;
 
 import com.atlassian.bamboo.build.logger.BuildLogger;
 import com.atlassian.bamboo.task.TaskContext;
-import com.atlassian.util.concurrent.NotNull;
 
-public class ServiceManager {
-    private final static int BUFFER_SIZE = 2048;
-    private final static int DELAY=10000;
+public class Utils {
 
-    private ServiceManager(){
+    private Utils(){
 	}
 
 
     public static String getVersion() {
         Properties props = new Properties();
         try {
-            props.load(ServiceManager.class.getResourceAsStream("version.properties"));
+            props.load(Utils.class.getResourceAsStream("version.properties"));
         } catch (IOException ex) {
             props.setProperty("version", "N/A");
         }
         return props.getProperty("version");
     }
-
-    @NotNull
-	public String getDebugKey() {
-		return "Debug Key";
-	}
 
     public static File resolvePath(TaskContext context, String path, BuildLogger logger) throws Exception {
         File f = null;
