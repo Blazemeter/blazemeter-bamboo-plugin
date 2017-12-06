@@ -131,7 +131,6 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
             logger.addBuildLogEntry("BlazeMeter user key not defined!");
             throw new TaskException("BlazeMeter user key not defined!");
         }
-        //TODO
         UserNotifier notifier = new BambooUserNotifier(logger);
         Logger log = new BzmLogger(logHandler);
         BlazeMeterUtils utils = new BlazeMeterUtils(apiId, apiSecret, url, url, notifier, log);

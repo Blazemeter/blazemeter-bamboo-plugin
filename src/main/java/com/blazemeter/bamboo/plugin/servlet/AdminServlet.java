@@ -101,15 +101,8 @@ public class AdminServlet extends HttpServlet {
         UserNotifier emptyUserNotifier = new EmptyUserNotifier();
         Logger logger = new BzmLogger();
         BlazeMeterUtils utils = new BlazeMeterUtils(apiId, apiSecret, url, url, emptyUserNotifier, logger);
-        User user = null;
         try {
-            user = User.getUser(utils);
-        } catch (Exception e) {
-            //TODO
-            //if server has returned "Unathourized" -> show error message
-            logger.error("Failed to find user on server.", e);
-        }
-        if (user.getId() != null) {
+            User.getUser(utils);
             transactionTemplate.execute(new TransactionCallback() {
                 public Object doInTransaction() {
                     PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
@@ -122,14 +115,16 @@ public class AdminServlet extends HttpServlet {
             context.put(AdminServletConst.API_ID_ERROR, "User settings are updated. Check that jobs are configured properly");
             context.put(AdminServletConst.API_SECRET_ERROR, "User settings are updated. Check that jobs are configured properly");
             context.put(AdminServletConst.URL_ERROR, "User settings are updated. Check that jobs are configured properly");
-        } else {
+        } catch (Exception e) {
+            logger.error("Failed to find user on server.", e);
             context.put(AdminServletConst.API_ID_ERROR, "User key is not saved! Check credentials with ID = "
                     + apiId + " and proxy settings.");
             context.put(AdminServletConst.API_SECRET_ERROR, "User key is not saved! Check credentials with ID = "
                     + apiId + " and proxy settings.");
             context.put(AdminServletConst.URL_ERROR, "Server url is not saved! Check server url "
                     + url + " and proxy settings.");
+        } finally {
+            renderer.render(AdminServletConst.BLAZEMETER_ADMIN_VM, context, resp.getWriter());
         }
-        renderer.render(AdminServletConst.BLAZEMETER_ADMIN_VM, context, resp.getWriter());
     }
 }

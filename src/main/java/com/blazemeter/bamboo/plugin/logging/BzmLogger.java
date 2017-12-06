@@ -25,8 +25,7 @@ public class BzmLogger implements Logger {
     private java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Constants.HTTP_LOG);
 
 
-    public BzmLogger() {
-    }
+    public BzmLogger() {}
 
     public BzmLogger(FileHandler httpLfh) {
         httpLfh.setFormatter(new SimpleFormatter());
