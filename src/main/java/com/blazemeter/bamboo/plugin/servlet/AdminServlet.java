@@ -1,6 +1,6 @@
 /**
  * Copyright 2016 BlazeMeter Inc.
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,6 +14,7 @@
 package com.blazemeter.bamboo.plugin.servlet;
 
 import com.atlassian.sal.api.transaction.TransactionCallback;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,7 +43,7 @@ public class AdminServlet extends HttpServlet {
     private final TemplateRenderer renderer;
 
     public AdminServlet(PluginSettingsFactory pluginSettingsFactory, TemplateRenderer renderer,
-        TransactionTemplate transactionTemplate) {
+                        TransactionTemplate transactionTemplate) {
         this.pluginSettingsFactory = pluginSettingsFactory;
         this.renderer = renderer;
         this.transactionTemplate = transactionTemplate;
@@ -99,30 +100,30 @@ public class AdminServlet extends HttpServlet {
 
         UserNotifier emptyUserNotifier = new EmptyUserNotifier();
         Logger logger = new BzmLogger();
-        BlazeMeterUtils utils = new BlazeMeterUtils(apiId,apiSecret,url,url,emptyUserNotifier,logger);
+        BlazeMeterUtils utils = new BlazeMeterUtils(apiId, apiSecret, url, url, emptyUserNotifier, logger);
         User user = null;
-        try{
+        try {
             user = User.getUser(utils);
-        }catch (Exception e){
+        } catch (Exception e) {
             //TODO
             //if server has returned "Unathourized" -> show error message
-		    logger.error("Failed to find user on server.",e);
+            logger.error("Failed to find user on server.", e);
         }
-        if (user.getId()!=null){
-			transactionTemplate.execute(new TransactionCallback() {
-				public Object doInTransaction() {
-					PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
-					pluginSettings.put(AdminServletConst.API_ID, apiId);
-					pluginSettings.put(AdminServletConst.API_SECRET, apiSecret);
-					pluginSettings.put(AdminServletConst.URL, url);
-					return null;
-				}
-			});
-			context.put(AdminServletConst.API_ID_ERROR, "User settings are updated. Check that jobs are configured properly");
-			context.put(AdminServletConst.API_SECRET_ERROR, "User settings are updated. Check that jobs are configured properly");
-			context.put(AdminServletConst.URL_ERROR, "User settings are updated. Check that jobs are configured properly");
-		} else {
-			context.put(AdminServletConst.API_ID_ERROR, "User key is not saved! Check credentials with ID = "
+        if (user.getId() != null) {
+            transactionTemplate.execute(new TransactionCallback() {
+                public Object doInTransaction() {
+                    PluginSettings pluginSettings = pluginSettingsFactory.createGlobalSettings();
+                    pluginSettings.put(AdminServletConst.API_ID, apiId);
+                    pluginSettings.put(AdminServletConst.API_SECRET, apiSecret);
+                    pluginSettings.put(AdminServletConst.URL, url);
+                    return null;
+                }
+            });
+            context.put(AdminServletConst.API_ID_ERROR, "User settings are updated. Check that jobs are configured properly");
+            context.put(AdminServletConst.API_SECRET_ERROR, "User settings are updated. Check that jobs are configured properly");
+            context.put(AdminServletConst.URL_ERROR, "User settings are updated. Check that jobs are configured properly");
+        } else {
+            context.put(AdminServletConst.API_ID_ERROR, "User key is not saved! Check credentials with ID = "
                     + apiId + " and proxy settings.");
             context.put(AdminServletConst.API_SECRET_ERROR, "User key is not saved! Check credentials with ID = "
                     + apiId + " and proxy settings.");

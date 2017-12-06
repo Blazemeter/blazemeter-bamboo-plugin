@@ -23,24 +23,16 @@ import java.util.logging.SimpleFormatter;
 
 public class BzmLogger implements Logger {
     private java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Constants.HTTP_LOG);
-    private FileHandler httpLfh;
 
 
     public BzmLogger() {
     }
 
-    public BzmLogger(String httpLogFile) {
-        try {
-            httpLfh = new FileHandler(httpLogFile);
-        } catch (Exception e) {
-            logger.log(Level.WARNING, e.getMessage());
-            return;
-        }
+    public BzmLogger(FileHandler httpLfh) {
         httpLfh.setFormatter(new SimpleFormatter());
         logger.addHandler(httpLfh);
         logger.setUseParentHandlers(false);
     }
-
 
     @Override
     public void debug(String message) {
@@ -81,4 +73,5 @@ public class BzmLogger implements Logger {
     public void error(String message, Throwable throwable) {
         logger.log(Level.WARNING, message, throwable);
     }
+
 }
