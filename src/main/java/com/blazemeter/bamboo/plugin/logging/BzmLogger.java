@@ -22,7 +22,7 @@ import java.util.logging.Level;
 import java.util.logging.SimpleFormatter;
 
 public class BzmLogger implements Logger {
-    private java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Constants.BZM_LOG);
+    private java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Constants.HTTP_LOG);
     private FileHandler httpLfh;
 
 

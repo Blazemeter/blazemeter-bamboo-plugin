@@ -135,14 +135,15 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
     private Logger setUpLogger(TaskContext context) {
         File dd = new File(context.getWorkingDirectory().getAbsolutePath() + "/build # "
                 + context.getBuildContext().getBuildNumber());
-        String log = dd + File.separator + Constants.BZM_LOG;
+        String log = dd + File.separator + Constants.HTTP_LOG;
         File logFile = new File(log);
         BuildLogger buildLogger = context.getBuildLogger();
         try {
+            logFile.getParentFile().mkdirs();
             logFile.createNewFile();
         } catch (Exception e) {
             buildLogger.addBuildLogEntry("Failed to create log file = " + log);
-            logFile = new File(context.getWorkingDirectory().getAbsolutePath());
+            logFile = new File(context.getWorkingDirectory().getAbsolutePath(),File.separator + Constants.HTTP_LOG);
             try {
                 buildLogger.addBuildLogEntry("Log will be written to " + logFile.getAbsolutePath());
                 logFile.createNewFile();
