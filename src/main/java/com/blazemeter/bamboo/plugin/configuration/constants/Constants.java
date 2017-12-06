@@ -15,7 +15,7 @@ package com.blazemeter.bamboo.plugin.configuration.constants;
 
 public interface Constants {
 
-    String HTTP_LOG="http-log";
+    String HTTP_LOG ="http-log";
     String BM_TRESHOLDS="bm-thresholds.xml";
     String PLUGIN_KEY="com.blazemeter.bamboo.plugin.BlazeMeterBamboo:blazemeter";
 

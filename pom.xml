@@ -7,16 +7,16 @@
     <modelVersion>4.0.0</modelVersion>
     <properties>
         <jenkins.build.number>local</jenkins.build.number>
-        <bamboo.version>5.7.2</bamboo.version>
+        <bamboo.version>6.2.2</bamboo.version>
         <bamboo.data.version>5.7.2</bamboo.data.version>
-        <amps.version>5.0.13</amps.version>
+        <amps.version>6.3.6</amps.version>
         <plugin.testrunner.version>1.2.3</plugin.testrunner.version>
     </properties>
 
 
     <groupId>com.blazemeter.bamboo.plugin</groupId>
     <artifactId>BlazeMeterBamboo</artifactId>
-    <version>3.0.${jenkins.build.number}</version>
+    <version>3.1.${jenkins.build.number}</version>
 
     <organization>
         <name>BlazeMeter LTD.</name>
@@ -74,6 +74,11 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.4</version>
+        </dependency>
+        <dependency>
+            <groupId>com.blazemeter</groupId>
+            <artifactId>blazemeter-api-client</artifactId>
+            <version>1.1</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

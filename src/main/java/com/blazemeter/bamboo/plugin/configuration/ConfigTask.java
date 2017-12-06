@@ -1,6 +1,6 @@
 /**
  * Copyright 2016 BlazeMeter Inc.
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,20 +20,26 @@ import com.atlassian.bamboo.task.TaskDefinition;
 import com.atlassian.bamboo.utils.error.ErrorCollection;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
-import com.blazemeter.bamboo.plugin.api.Api;
-import com.blazemeter.bamboo.plugin.api.ApiImpl;
+import com.blazemeter.api.explorer.User;
+import com.blazemeter.api.explorer.test.AbstractTest;
+import com.blazemeter.api.explorer.test.TestDetector;
+import com.blazemeter.api.logging.Logger;
+import com.blazemeter.api.logging.UserNotifier;
+import com.blazemeter.api.utils.BlazeMeterUtils;
 import com.blazemeter.bamboo.plugin.configuration.constants.AdminServletConst;
 import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
+import com.blazemeter.bamboo.plugin.logging.BzmLogger;
+import com.blazemeter.bamboo.plugin.logging.EmptyUserNotifier;
+import com.blazemeter.ciworkflow.TestsListFlow;
 import com.google.common.collect.LinkedHashMultimap;
-import okhttp3.Credentials;
 import org.apache.commons.lang.StringUtils;
 
+import java.util.List;
 import java.util.Map;
 
 public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskRequirementSupport {
-    private Api api;
-
     PluginSettingsFactory pluginSettingsFactory;
+    BlazeMeterUtils utils;
 
     public ConfigTask(PluginSettingsFactory pluginSettingsFactory) {
         this.pluginSettingsFactory = pluginSettingsFactory;
@@ -45,13 +51,22 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
     public void populateContextForCreate(Map<String, Object> context) {
         super.populateContextForCreate(context);
         PluginSettings pluginSettings = this.pluginSettingsFactory.createGlobalSettings();
-        String api_id = (String) pluginSettings.get(AdminServletConst.API_ID);
-        String api_secret = (String) pluginSettings.get(AdminServletConst.API_SECRET);
-        String serverUrl = (String) pluginSettings.get(AdminServletConst.URL);
-        context.put(AdminServletConst.URL, serverUrl);
-        String credentials = Credentials.basic(api_id,api_secret);
-        this.api = new ApiImpl(credentials, serverUrl);
-        context.put(Constants.TEST_LIST, api.getTestsMultiMap());
+        String apiId = (String) pluginSettings.get(AdminServletConst.API_ID);
+        String apiSecret = (String) pluginSettings.get(AdminServletConst.API_SECRET);
+        String url = (String) pluginSettings.get(AdminServletConst.URL);
+        context.put(AdminServletConst.URL, url);
+        UserNotifier emptyUserNotifier = new EmptyUserNotifier();
+        Logger logger = new BzmLogger();
+        utils = new BlazeMeterUtils(apiId, apiSecret, url, url, emptyUserNotifier, logger);
+        User user = null;
+        try {
+            user = User.getUser(utils);
+            assert user.getId() != null;
+            LinkedHashMultimap<String, String> testListDropDown = testsList();
+            context.put(Constants.TEST_LIST, testListDropDown.asMap());
+        } catch (Exception e) {
+            logger.error("Failed to fetch tests for user = " + user.getId(), e);
+        }
     }
 
     /**
@@ -74,25 +89,29 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         context.put(Constants.SETTINGS_JMETER_PROPERTIES, config.get(Constants.SETTINGS_JMETER_PROPERTIES));
         context.put(Constants.SETTINGS_JTL_PATH, config.get(Constants.SETTINGS_JTL_PATH));
         context.put(Constants.SETTINGS_JUNIT_PATH, config.get(Constants.SETTINGS_JUNIT_PATH));
-        String credentials = Credentials.basic(psai, psas);
-        this.api = new ApiImpl(credentials, pssu);
+        UserNotifier emptyUserNotifier = new EmptyUserNotifier();
+        Logger logger = new BzmLogger();
+        utils = new BlazeMeterUtils(psai, psas, pssu, pssu, emptyUserNotifier, logger);
+        User user = null;
         try {
-            context.put(Constants.TEST_LIST, api.getTestsMultiMap());
+            user = User.getUser(utils);
+            assert user.getId() != null;
+            LinkedHashMultimap<String, String> testListDropDown = testsList();
+            context.put(Constants.TEST_LIST, testListDropDown.asMap());
         } catch (Exception e) {
-            LinkedHashMultimap<String, String> tests = LinkedHashMultimap.create();
-            tests.put("Check blazemeter & proxy-settings", "");
-            context.put(Constants.TEST_LIST, tests);
+            logger.error("Failed to fetch tests for user = " + user.getId(), e);
         }
+
     }
 
     @Override
     public void populateContextForView(Map<String, Object> context, TaskDefinition taskDefinition) {
         context.put(AdminServletConst.API_ID,
-            taskDefinition.getConfiguration().get(AdminServletConst.API_ID));
+                taskDefinition.getConfiguration().get(AdminServletConst.API_ID));
         context.put(AdminServletConst.API_SECRET,
-            taskDefinition.getConfiguration().get(AdminServletConst.API_SECRET));
+                taskDefinition.getConfiguration().get(AdminServletConst.API_SECRET));
         context.put(AdminServletConst.URL,
-            taskDefinition.getConfiguration().get(AdminServletConst.URL));
+                taskDefinition.getConfiguration().get(AdminServletConst.URL));
         super.populateContextForView(context, taskDefinition);
     }
 
@@ -102,33 +121,26 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
     @Override
     public void validate(ActionParametersMap params, ErrorCollection errorCollection) {
         super.validate(params, errorCollection);
-        LinkedHashMultimap<String, String> tests=LinkedHashMultimap.create();
         final String selectedTest = params.getString(Constants.SETTINGS_SELECTED_TEST_ID);
-
         if (StringUtils.isEmpty(selectedTest)) {
             errorCollection.addErrorMessage("Check that user has tests in account");
         } else {
-            if(selectedTest.contains(".workspace")){
+            if (selectedTest.contains(".workspace")) {
                 errorCollection.addErrorMessage("Cannot save workspace ID as a test ID");
                 return;
             }
-            if (!this.api.verifyCredentials()) {
-                errorCollection.addErrorMessage("Cannot load tests from BlazeMeter server. Invalid user key!");
-            } else {
-                //verify if the test still exists on BlazeMeter server
-                try{
-                    tests = api.testsMultiMap();
-
-                }catch (Exception e){
-                    errorCollection.addErrorMessage("Failed to get tests from BlazeMeter account: "+e.getMessage());
-                }
-                if (tests != null) {
-                    if (!tests.keySet().contains(selectedTest)) {
+            try {
+                if (StringUtils.isBlank(User.getUser(utils).getId())) {
+                    errorCollection.addErrorMessage("Cannot load tests from BlazeMeter server. Invalid user key!");
+                } else {
+                    //verify if the test still exists on BlazeMeter server
+                    AbstractTest receivedTest = TestDetector.detectTest(utils, selectedTest);
+                    if (receivedTest == null) {
                         errorCollection.addErrorMessage("Test '" + selectedTest + "' doesn't exits on BlazeMeter server.");
                     }
-                } else {
-                    errorCollection.addErrorMessage("No tests defined on BlazeMeter server!");
                 }
+            } catch (Exception e) {
+                errorCollection.addErrorMessage("Failed to get tests from BlazeMeter account: " + e.getMessage());
             }
         }
     }
@@ -152,11 +164,21 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
 
         PluginSettings pluginSettings = this.pluginSettingsFactory.createGlobalSettings();
         config.put(AdminServletConst.API_ID,
-            (String) pluginSettings.get(AdminServletConst.API_ID));
+                (String) pluginSettings.get(AdminServletConst.API_ID));
         config.put(AdminServletConst.API_SECRET,
-            (String) pluginSettings.get(AdminServletConst.API_SECRET));
+                (String) pluginSettings.get(AdminServletConst.API_SECRET));
         config.put(AdminServletConst.URL,
-            (String) pluginSettings.get(AdminServletConst.URL));
+                (String) pluginSettings.get(AdminServletConst.URL));
         return config;
+    }
+
+    private LinkedHashMultimap<String, String> testsList() {
+        TestsListFlow listFlow = new TestsListFlow(utils);
+        List<AbstractTest> tests = listFlow.getUsersTests();
+        LinkedHashMultimap<String, String> testListDropDown = LinkedHashMultimap.create();
+        for (AbstractTest t : tests) {
+            testListDropDown.put(t.getId(), t.getName() + "(" + t.getId() + "." + t.getTestType() + ")");
+        }
+        return testListDropDown;
     }
 }
