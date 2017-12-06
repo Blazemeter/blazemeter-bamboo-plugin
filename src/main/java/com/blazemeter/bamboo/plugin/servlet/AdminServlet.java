@@ -104,6 +104,8 @@ public class AdminServlet extends HttpServlet {
         try{
             user = User.getUser(utils);
         }catch (Exception e){
+            //TODO
+            //if server has returned "Unathourized" -> show error message
 		    logger.error("Failed to find user on server.",e);
         }
         if (user.getId()!=null){

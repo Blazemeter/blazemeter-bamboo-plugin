@@ -17,27 +17,28 @@ package com.blazemeter.bamboo.plugin.logging;
 import com.blazemeter.api.logging.Logger;
 import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
 
-import java.io.IOException;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.SimpleFormatter;
 
 public class BzmLogger implements Logger {
-    private java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Constants.HTTP_LOG);
+    private java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Constants.BZM_LOG);
     private FileHandler httpLfh;
+
+
+    public BzmLogger() {
+    }
 
     public BzmLogger(String httpLogFile) {
         try {
             httpLfh = new FileHandler(httpLogFile);
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.log(Level.WARNING, e.getMessage());
+            return;
         }
         httpLfh.setFormatter(new SimpleFormatter());
         logger.addHandler(httpLfh);
         logger.setUseParentHandlers(false);
-    }
-
-    public BzmLogger() {
     }
 
 

@@ -62,7 +62,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         try {
             build = setUpCiBuild(context);
         } catch (TaskException e) {
-            resultBuilder.failed().build();
+            return resultBuilder.failed().build();
         }
         BuildResult buildResult = build.execute();
         switch (buildResult) {
@@ -81,44 +81,11 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         ConfigurationMap configMap = context.getConfigurationMap();
         BuildContext buildContext = context.getBuildContext();
         buildContext.getBuildDefinition().getTaskDefinitions().get(0).getPluginKey();
-        List<TaskDefinition> tds = buildContext.getBuildDefinition().getTaskDefinitions();
-        // TODO
-        //extract to setUp BlazeMeterUtils
-        String apiId = null;
-        String apiSecret = null;
-        String url = null;
-        for (TaskDefinition d : tds) {
-            if (d.getPluginKey().equals(Constants.PLUGIN_KEY)) {
-                Map<String, String> conf = d.getConfiguration();
-                apiId = conf.get(AdminServletConst.API_ID);
-                apiSecret = conf.get(AdminServletConst.API_SECRET);
-                url = conf.get(AdminServletConst.URL);
-            }
-        }
-        /////////////////////////////
         String testId = configMap.get(Constants.SETTINGS_SELECTED_TEST_ID);
         final BuildLogger logger = context.getBuildLogger();
-        if (StringUtils.isBlank(apiId)) {
-            logger.addBuildLogEntry("BlazeMeter user key not defined!");
-            throw new TaskException("BlazeMeter user key not defined!");
-        }
-        //TODO
-        UserNotifier notifier = new EmptyUserNotifier();
-        //TODO
-        // extract to setUpLogger
-//        File dd = new File(context.getWorkingDirectory().getAbsolutePath() + "/build # "
-//                + context.getBuildContext().getBuildNumber());
-//        String httpLog = dd + File.separator + Constants.HTTP_LOG;
-//        File httpLog_f = new File(httpLog);
-//        try {
-//            FileUtils.touch(httpLog_f);
-//        } catch (IOException e) {
-//            logger.addErrorLogEntry("Failed to create http-log file = " + httpLog + ": " + e.getMessage());
-//        }
-        Logger log = new BzmLogger();
-        BlazeMeterUtils utils = new BlazeMeterUtils(apiId, apiSecret, url, url, notifier, log);
         AbstractTest test;
         try {
+            BlazeMeterUtils utils = setUpBzmUtils(context);
             test = TestDetector.detectTest(utils, testId);
         } catch (Exception e) {
             logger.addBuildLogEntry("Failed to find test = " + testId + " on server.");
@@ -131,12 +98,60 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         String jtlPath = configMap.get(Constants.SETTINGS_JTL_PATH);
         String junitPath = configMap.get(Constants.SETTINGS_JUNIT_PATH);
 
-        File rootDirectory = context.getRootDirectory();
-
         String dd = context.getWorkingDirectory().getAbsolutePath() + "/build # "
                 + context.getBuildContext().getBuildNumber();
 
         CiBuild build = new CiBuild(test, jmeterProps, notes, jtlReport, junitReport, junitPath, jtlPath, dd);
         return build;
+    }
+
+    private BlazeMeterUtils setUpBzmUtils(TaskContext context) throws TaskException {
+        List<TaskDefinition> tds = context.getBuildContext().getBuildDefinition().getTaskDefinitions();
+        final BuildLogger logger = context.getBuildLogger();
+
+        String apiId = null;
+        String apiSecret = null;
+        String url = null;
+        for (TaskDefinition d : tds) {
+            if (d.getPluginKey().equals(Constants.PLUGIN_KEY)) {
+                Map<String, String> conf = d.getConfiguration();
+                apiId = conf.get(AdminServletConst.API_ID);
+                apiSecret = conf.get(AdminServletConst.API_SECRET);
+                url = conf.get(AdminServletConst.URL);
+            }
+        }
+        if (StringUtils.isBlank(apiId)) {
+            logger.addBuildLogEntry("BlazeMeter user key not defined!");
+            throw new TaskException("BlazeMeter user key not defined!");
+        }
+
+        //TODO
+        UserNotifier notifier = new EmptyUserNotifier();
+        Logger log = setUpLogger(context);
+        BlazeMeterUtils utils = new BlazeMeterUtils(apiId, apiSecret, url, url, notifier, log);
+        return utils;
+    }
+
+    private Logger setUpLogger(TaskContext context) {
+        File dd = new File(context.getWorkingDirectory().getAbsolutePath() + "/build # "
+                + context.getBuildContext().getBuildNumber());
+        String log = dd + File.separator + Constants.BZM_LOG;
+        File logFile = new File(log);
+        BuildLogger buildLogger = context.getBuildLogger();
+        try {
+            logFile.createNewFile();
+        } catch (Exception e) {
+            buildLogger.addBuildLogEntry("Failed to create log file = " + log);
+            logFile = new File(context.getWorkingDirectory().getAbsolutePath());
+            try {
+                buildLogger.addBuildLogEntry("Log will be written to " + logFile.getAbsolutePath());
+                logFile.createNewFile();
+            } catch (Exception ex) {
+                buildLogger.addBuildLogEntry("Failed to create log file = " + logFile.getAbsolutePath());
+                return new BzmLogger();
+            }
+        }
+        Logger bzmLog = new BzmLogger(log);
+        return bzmLog;
     }
 }
