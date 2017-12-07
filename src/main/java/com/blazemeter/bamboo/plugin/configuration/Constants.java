@@ -11,7 +11,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  */
-package com.blazemeter.bamboo.plugin.configuration.constants;
+package com.blazemeter.bamboo.plugin.configuration;
 
 public interface Constants {
 
@@ -28,24 +28,14 @@ public interface Constants {
      String SETTINGS_JTL_PATH="jtl.path";
      String SETTINGS_JUNIT_PATH="junit.path";
 
-     String UNKNOWN_TYPE="unknown_type";
-
-
     //BlazeMeterConfigTask
      String TEST_LIST ="testlist";
-     String REPORT_URL ="reportUrl";
-     String BM_KPIS="bm-kpis.jtl";
-     String BM_ARTEFACTS="bm-artefacts.zip";
-
-
-    String PROXY_HOST="http.proxyHost";
-    String PROXY_PORT="http.proxyPort";
-    String PROXY_USER="http.proxyUser";
-    String PROXY_PASS="http.proxyPass";
-
-    String MASTERS="/masters/";
-    String PUBLIC_TOKEN="public-token";
-    String CHECK_SETTINGS="Check blazemeter & proxy-settings";
-    String UNABLE_TO_GET_JTL_ZIP="Unable to get  JTLZIP from ";
-    String UNABLE_TO_GET_JUNIT_REPORT="Failed to get junit report for test ";
+    //Admin page constants
+    String API_ID_ERROR ="api_id_error";
+    String API_SECRET_ERROR ="api_secret_error";
+    String API_ID = "id";
+    String API_SECRET = "secret";
+    String URL ="url";
+    String URL_ERROR ="url_error";
+    String BLAZEMETER_ADMIN_VM ="blazemeteradmin.vm";
 }

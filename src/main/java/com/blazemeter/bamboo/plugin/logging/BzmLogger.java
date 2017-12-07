@@ -15,7 +15,7 @@
 package com.blazemeter.bamboo.plugin.logging;
 
 import com.blazemeter.api.logging.Logger;
-import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
+import com.blazemeter.bamboo.plugin.configuration.Constants;
 
 import java.util.logging.FileHandler;
 import java.util.logging.Level;

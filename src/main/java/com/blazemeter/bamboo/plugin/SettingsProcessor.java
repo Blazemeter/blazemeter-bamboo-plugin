@@ -19,8 +19,7 @@ import com.atlassian.bamboo.task.TaskDefinition;
 import com.atlassian.bamboo.v2.build.BuildContext;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
-import com.blazemeter.bamboo.plugin.configuration.constants.AdminServletConst;
-import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
+import com.blazemeter.bamboo.plugin.configuration.Constants;
 
 import java.util.List;
 import java.util.Map;
@@ -38,17 +37,17 @@ public class SettingsProcessor implements PreJobAction {
     @Override
     public void execute(@NotNull final StageExecution stageExecution, @NotNull final BuildContext buildContext) {
         PluginSettings pluginSettings = this.pluginSettingsFactory.createGlobalSettings();
-        String api_id = (String) pluginSettings.get(AdminServletConst.API_ID);
-        String api_secret = (String) pluginSettings.get(AdminServletConst.API_SECRET);
-        String serverUrl = (String) pluginSettings.get(AdminServletConst.URL);
+        String api_id = (String) pluginSettings.get(Constants.API_ID);
+        String api_secret = (String) pluginSettings.get(Constants.API_SECRET);
+        String serverUrl = (String) pluginSettings.get(Constants.URL);
         buildContext.getBuildDefinition().getTaskDefinitions().get(0).getPluginKey();
         List<TaskDefinition> tds = buildContext.getBuildDefinition().getTaskDefinitions();
         for (TaskDefinition d : tds) {
             if (d.getPluginKey().equals(Constants.PLUGIN_KEY)) {
                 Map<String, String> conf = d.getConfiguration();
-                conf.put(AdminServletConst.API_ID, api_id);
-                conf.put(AdminServletConst.API_SECRET, api_secret);
-                conf.put(AdminServletConst.URL, serverUrl);
+                conf.put(Constants.API_ID, api_id);
+                conf.put(Constants.API_SECRET, api_secret);
+                conf.put(Constants.URL, serverUrl);
             }
         }
     }
