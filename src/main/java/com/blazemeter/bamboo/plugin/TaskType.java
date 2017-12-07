@@ -38,6 +38,7 @@ import java.util.Map;
 
 import com.blazemeter.ciworkflow.BuildResult;
 import com.blazemeter.ciworkflow.CiBuild;
+import com.blazemeter.ciworkflow.CiPostProcess;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -89,10 +90,9 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         buildContext.getBuildDefinition().getTaskDefinitions().get(0).getPluginKey();
         String testId = configMap.get(Constants.SETTINGS_SELECTED_TEST_ID);
         final BuildLogger logger = context.getBuildLogger();
-        AbstractTest test;
+        BlazeMeterUtils utils;
         try {
-            BlazeMeterUtils utils = setUpBzmUtils(context, logHandler);
-            test = TestDetector.detectTest(utils, testId);
+            utils = setUpBzmUtils(context, logHandler);
         } catch (Exception e) {
             logger.addBuildLogEntry("Failed to find test = " + testId + " on server.");
             throw new TaskException("");
@@ -107,7 +107,8 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         String dd = context.getWorkingDirectory().getAbsolutePath() + "/build # "
                 + context.getBuildContext().getBuildNumber();
 
-        CiBuild build = new CiBuild(test, jmeterProps, notes, jtlReport, junitReport, junitPath, jtlPath, dd);
+        CiPostProcess ciPostProcess = new CiPostProcess(jtlReport, junitReport, junitPath, jtlPath, dd, utils.getNotifier(), utils.getLogger());
+        CiBuild build = new CiBuild(utils, testId, jmeterProps, notes, ciPostProcess);
         return build;
     }
 

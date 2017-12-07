@@ -19,6 +19,8 @@ import java.util.*;
 
 import com.atlassian.bamboo.build.logger.BuildLogger;
 import com.atlassian.bamboo.task.TaskContext;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 
 public class Utils {
 
