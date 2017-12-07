@@ -26,8 +26,6 @@ import com.blazemeter.api.explorer.test.TestDetector;
 import com.blazemeter.api.logging.Logger;
 import com.blazemeter.api.logging.UserNotifier;
 import com.blazemeter.api.utils.BlazeMeterUtils;
-import com.blazemeter.bamboo.plugin.configuration.constants.AdminServletConst;
-import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
 import com.blazemeter.bamboo.plugin.logging.BzmLogger;
 import com.blazemeter.bamboo.plugin.logging.EmptyUserNotifier;
 import com.blazemeter.ciworkflow.TestsListFlow;
@@ -51,13 +49,13 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
     public void populateContextForCreate(Map<String, Object> context) {
         super.populateContextForCreate(context);
         PluginSettings pluginSettings = this.pluginSettingsFactory.createGlobalSettings();
-        String apiId = (String) pluginSettings.get(AdminServletConst.API_ID);
-        String apiSecret = (String) pluginSettings.get(AdminServletConst.API_SECRET);
-        String url = (String) pluginSettings.get(AdminServletConst.URL);
-        context.put(AdminServletConst.URL, url);
+        String apiId = (String) pluginSettings.get(Constants.API_ID);
+        String apiSecret = (String) pluginSettings.get(Constants.API_SECRET);
+        String url = (String) pluginSettings.get(Constants.URL);
+        context.put(Constants.URL, url);
         UserNotifier emptyUserNotifier = new EmptyUserNotifier();
         Logger logger = new BzmLogger();
-        utils = new BlazeMeterUtils(apiId, apiSecret, url, url, emptyUserNotifier, logger);
+        utils = new BambooBzmUtils(apiId, apiSecret, url, url, emptyUserNotifier, logger);
         User user = null;
         try {
             user = User.getUser(utils);
@@ -75,13 +73,13 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
     public void populateContextForEdit(Map<String, Object> context, TaskDefinition taskDefinition) {
         super.populateContextForEdit(context, taskDefinition);
         PluginSettings pluginSettings = this.pluginSettingsFactory.createGlobalSettings();
-        String psai = (String) pluginSettings.get(AdminServletConst.API_ID);
-        String psas = (String) pluginSettings.get(AdminServletConst.API_SECRET);
-        String pssu = (String) pluginSettings.get(AdminServletConst.URL);
+        String psai = (String) pluginSettings.get(Constants.API_ID);
+        String psas = (String) pluginSettings.get(Constants.API_SECRET);
+        String pssu = (String) pluginSettings.get(Constants.URL);
         Map<String, String> config = taskDefinition.getConfiguration();
-        context.put(AdminServletConst.API_ID, psai);
-        context.put(AdminServletConst.API_SECRET, psas);
-        context.put(AdminServletConst.URL, psai);
+        context.put(Constants.API_ID, psai);
+        context.put(Constants.API_SECRET, psas);
+        context.put(Constants.URL, psai);
         context.put(Constants.SETTINGS_SELECTED_TEST_ID, config.get(Constants.SETTINGS_SELECTED_TEST_ID));
         context.put(Constants.SETTINGS_NOTES, config.get(Constants.SETTINGS_NOTES));
         context.put(Constants.SETTINGS_JUNIT_REPORT, config.get(Constants.SETTINGS_JUNIT_REPORT));
@@ -91,7 +89,7 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         context.put(Constants.SETTINGS_JUNIT_PATH, config.get(Constants.SETTINGS_JUNIT_PATH));
         UserNotifier emptyUserNotifier = new EmptyUserNotifier();
         Logger logger = new BzmLogger();
-        utils = new BlazeMeterUtils(psai, psas, pssu, pssu, emptyUserNotifier, logger);
+        utils = new BambooBzmUtils(psai, psas, pssu, pssu, emptyUserNotifier, logger);
         User user = null;
         try {
             user = User.getUser(utils);
@@ -106,12 +104,12 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
 
     @Override
     public void populateContextForView(Map<String, Object> context, TaskDefinition taskDefinition) {
-        context.put(AdminServletConst.API_ID,
-                taskDefinition.getConfiguration().get(AdminServletConst.API_ID));
-        context.put(AdminServletConst.API_SECRET,
-                taskDefinition.getConfiguration().get(AdminServletConst.API_SECRET));
-        context.put(AdminServletConst.URL,
-                taskDefinition.getConfiguration().get(AdminServletConst.URL));
+        context.put(Constants.API_ID,
+                taskDefinition.getConfiguration().get(Constants.API_ID));
+        context.put(Constants.API_SECRET,
+                taskDefinition.getConfiguration().get(Constants.API_SECRET));
+        context.put(Constants.URL,
+                taskDefinition.getConfiguration().get(Constants.URL));
         super.populateContextForView(context, taskDefinition);
     }
 
@@ -163,12 +161,12 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         config.put(Constants.SETTINGS_JUNIT_REPORT, junitReport);
 
         PluginSettings pluginSettings = this.pluginSettingsFactory.createGlobalSettings();
-        config.put(AdminServletConst.API_ID,
-                (String) pluginSettings.get(AdminServletConst.API_ID));
-        config.put(AdminServletConst.API_SECRET,
-                (String) pluginSettings.get(AdminServletConst.API_SECRET));
-        config.put(AdminServletConst.URL,
-                (String) pluginSettings.get(AdminServletConst.URL));
+        config.put(Constants.API_ID,
+                (String) pluginSettings.get(Constants.API_ID));
+        config.put(Constants.API_SECRET,
+                (String) pluginSettings.get(Constants.API_SECRET));
+        config.put(Constants.URL,
+                (String) pluginSettings.get(Constants.URL));
         return config;
     }
 

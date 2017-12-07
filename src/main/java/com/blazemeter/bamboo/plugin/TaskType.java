@@ -28,11 +28,10 @@ import com.blazemeter.api.explorer.test.TestDetector;
 import com.blazemeter.api.logging.Logger;
 import com.blazemeter.api.logging.UserNotifier;
 import com.blazemeter.api.utils.BlazeMeterUtils;
-import com.blazemeter.bamboo.plugin.configuration.constants.AdminServletConst;
-import com.blazemeter.bamboo.plugin.configuration.constants.Constants;
+import com.blazemeter.bamboo.plugin.configuration.BambooBzmUtils;
+import com.blazemeter.bamboo.plugin.configuration.Constants;
 import com.blazemeter.bamboo.plugin.logging.BambooUserNotifier;
 import com.blazemeter.bamboo.plugin.logging.BzmLogger;
-import com.blazemeter.bamboo.plugin.logging.EmptyUserNotifier;
 
 import java.util.List;
 import java.util.Map;
@@ -112,7 +111,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         return build;
     }
 
-    private BlazeMeterUtils setUpBzmUtils(TaskContext context, FileHandler logHandler) throws TaskException {
+    private BambooBzmUtils setUpBzmUtils(TaskContext context, FileHandler logHandler) throws TaskException {
         List<TaskDefinition> tds = context.getBuildContext().getBuildDefinition().getTaskDefinitions();
         final BuildLogger logger = context.getBuildLogger();
 
@@ -122,9 +121,9 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         for (TaskDefinition d : tds) {
             if (d.getPluginKey().equals(Constants.PLUGIN_KEY)) {
                 Map<String, String> conf = d.getConfiguration();
-                apiId = conf.get(AdminServletConst.API_ID);
-                apiSecret = conf.get(AdminServletConst.API_SECRET);
-                url = conf.get(AdminServletConst.URL);
+                apiId = conf.get(Constants.API_ID);
+                apiSecret = conf.get(Constants.API_SECRET);
+                url = conf.get(Constants.URL);
             }
         }
         if (StringUtils.isBlank(apiId)) {
@@ -133,7 +132,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         }
         UserNotifier notifier = new BambooUserNotifier(logger);
         Logger log = new BzmLogger(logHandler);
-        BlazeMeterUtils utils = new BlazeMeterUtils(apiId, apiSecret, url, url, notifier, log);
+        BambooBzmUtils utils = new BambooBzmUtils(apiId, apiSecret, url, url, notifier, log);
         return utils;
     }
 
