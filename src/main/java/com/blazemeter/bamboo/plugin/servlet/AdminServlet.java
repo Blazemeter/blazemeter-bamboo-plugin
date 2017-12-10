@@ -32,9 +32,9 @@ import com.blazemeter.api.explorer.User;
 import com.blazemeter.api.logging.Logger;
 import com.blazemeter.api.logging.UserNotifier;
 import com.blazemeter.api.utils.BlazeMeterUtils;
+import com.blazemeter.bamboo.plugin.logging.*;
 import com.blazemeter.bamboo.plugin.configuration.BambooBzmUtils;
 import com.blazemeter.bamboo.plugin.configuration.Constants;
-import com.blazemeter.bamboo.plugin.logging.*;
 
 public class AdminServlet extends HttpServlet {
     private final TransactionTemplate transactionTemplate;
