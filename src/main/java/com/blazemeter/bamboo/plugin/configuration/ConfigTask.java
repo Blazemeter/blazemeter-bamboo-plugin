@@ -34,6 +34,7 @@ import com.google.common.collect.LinkedHashMultimap;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -182,13 +183,13 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
                 List<AbstractTest> tests = new ArrayList<>();
                 tests.addAll(wsp.getMultiTests());
                 tests.addAll(wsp.getSingleTests());
-//                Comparator c = new Comparator<Map.Entry<String, String>>() {
-//                    @Override
-//                    public int compare(Map.Entry<String, String> e1, Map.Entry<String, String> e2) {
-//                        return e1.getValue().compareToIgnoreCase(e2.getValue());
-//                    }
-//                };
-//                tests.sort(c);
+                Comparator c = new Comparator<AbstractTest>() {
+                    @Override
+                    public int compare(AbstractTest t1, AbstractTest t2) {
+                        return t1.getName().compareToIgnoreCase(t2.getName());
+                    }
+                };
+                tests.sort(c);
                 testListDropDown.put("workspace", wsp.getName() + "(" + wsp.getId() + ")");
                 for (AbstractTest t : tests) {
                     testListDropDown.put(t.getId(), t.getName() + "(" + t.getId() + "." + t.getTestType() + ")");
