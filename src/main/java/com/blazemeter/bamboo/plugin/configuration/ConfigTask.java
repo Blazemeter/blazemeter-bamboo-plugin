@@ -20,7 +20,9 @@ import com.atlassian.bamboo.task.TaskDefinition;
 import com.atlassian.bamboo.utils.error.ErrorCollection;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
+import com.blazemeter.api.explorer.Account;
 import com.blazemeter.api.explorer.User;
+import com.blazemeter.api.explorer.Workspace;
 import com.blazemeter.api.explorer.test.AbstractTest;
 import com.blazemeter.api.explorer.test.TestDetector;
 import com.blazemeter.api.logging.Logger;
@@ -28,10 +30,10 @@ import com.blazemeter.api.logging.UserNotifier;
 import com.blazemeter.api.utils.BlazeMeterUtils;
 import com.blazemeter.bamboo.plugin.logging.BzmLogger;
 import com.blazemeter.bamboo.plugin.logging.EmptyUserNotifier;
-import com.blazemeter.ciworkflow.TestsListFlow;
 import com.google.common.collect.LinkedHashMultimap;
 import org.apache.commons.lang.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -123,8 +125,8 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         if (StringUtils.isEmpty(selectedTest)) {
             errorCollection.addErrorMessage("Check that user has tests in account");
         } else {
-            if (selectedTest.contains(".workspace")) {
-                errorCollection.addErrorMessage("Cannot save workspace ID as a test ID");
+            if (selectedTest.contains("workspace")) {
+                errorCollection.addErrorMessage("Cannot save workspace as a test. Please, select correct test.");
                 return;
             }
             try {
@@ -170,12 +172,29 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         return config;
     }
 
-    private LinkedHashMultimap<String, String> testsList() {
-        TestsListFlow listFlow = new TestsListFlow(utils);
-        List<AbstractTest> tests = listFlow.getUsersTests();
+    private LinkedHashMultimap<String, String> testsList() throws Exception {
         LinkedHashMultimap<String, String> testListDropDown = LinkedHashMultimap.create();
-        for (AbstractTest t : tests) {
-            testListDropDown.put(t.getId(), t.getName() + "(" + t.getId() + "." + t.getTestType() + ")");
+        User user = User.getUser(utils);
+        List<Account> accounts = user.getAccounts();
+        for (Account a : accounts) {
+            List<Workspace> workspaces = a.getWorkspaces();
+            for (Workspace wsp : workspaces) {
+                List<AbstractTest> tests = new ArrayList<>();
+                tests.addAll(wsp.getMultiTests());
+                tests.addAll(wsp.getSingleTests());
+//                Comparator c = new Comparator<Map.Entry<String, String>>() {
+//                    @Override
+//                    public int compare(Map.Entry<String, String> e1, Map.Entry<String, String> e2) {
+//                        return e1.getValue().compareToIgnoreCase(e2.getValue());
+//                    }
+//                };
+//                tests.sort(c);
+                testListDropDown.put("workspace", wsp.getName() + "(" + wsp.getId() + ")");
+                for (AbstractTest t : tests) {
+                    testListDropDown.put(t.getId(), t.getName() + "(" + t.getId() + "." + t.getTestType() + ")");
+                }
+                tests.clear();
+            }
         }
         return testListDropDown;
     }
