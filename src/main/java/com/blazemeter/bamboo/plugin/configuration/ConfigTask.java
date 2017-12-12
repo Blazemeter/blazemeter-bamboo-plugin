@@ -105,17 +105,6 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
 
     }
 
-    @Override
-    public void populateContextForView(Map<String, Object> context, TaskDefinition taskDefinition) {
-        context.put(Constants.API_ID,
-                taskDefinition.getConfiguration().get(Constants.API_ID));
-        context.put(Constants.API_SECRET,
-                taskDefinition.getConfiguration().get(Constants.API_SECRET));
-        context.put(Constants.URL,
-                taskDefinition.getConfiguration().get(Constants.URL));
-        super.populateContextForView(context, taskDefinition);
-    }
-
     /**
      * Validate gui form when Saving params
      */
