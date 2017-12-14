@@ -27,14 +27,6 @@
     <description>This is the com.blazemeter.bamboo.plugin:BlazeMeterBamboo plugin for Atlassian Bamboo.</description>
     <packaging>atlassian-plugin</packaging>
 
-    <repositories>
-        <repository>
-            <id>maven-central</id>
-            <name>Maven Central</name>
-            <url>http://repo1.maven.org/maven2</url>
-        </repository>
-    </repositories>
-
     <dependencies>
         <dependency>
             <groupId>com.atlassian.bamboo</groupId>
@@ -55,7 +47,7 @@
         <dependency>
             <groupId>com.blazemeter</groupId>
             <artifactId>blazemeter-api-client</artifactId>
-            <version>1.0</version>
+            <version>1.1</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-logging</groupId>
