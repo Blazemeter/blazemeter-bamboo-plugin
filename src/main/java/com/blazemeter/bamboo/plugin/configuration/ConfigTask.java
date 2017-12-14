@@ -28,7 +28,7 @@ import com.blazemeter.api.explorer.test.TestDetector;
 import com.blazemeter.api.logging.Logger;
 import com.blazemeter.api.logging.UserNotifier;
 import com.blazemeter.api.utils.BlazeMeterUtils;
-import com.blazemeter.bamboo.plugin.logging.BzmLogger;
+import com.blazemeter.bamboo.plugin.logging.BzmLoggerOld;
 import com.blazemeter.bamboo.plugin.logging.EmptyUserNotifier;
 import com.google.common.collect.LinkedHashMultimap;
 import org.apache.commons.lang.StringUtils;
@@ -57,7 +57,7 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         String url = (String) pluginSettings.get(Constants.URL);
         context.put(Constants.URL, url);
         UserNotifier emptyUserNotifier = new EmptyUserNotifier();
-        Logger logger = new BzmLogger();
+        Logger logger = new BzmLoggerOld();
         utils = new BambooBzmUtils(apiId, apiSecret, url, url, emptyUserNotifier, logger);
         User user = null;
         try {
@@ -91,7 +91,7 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         context.put(Constants.SETTINGS_JTL_PATH, config.get(Constants.SETTINGS_JTL_PATH));
         context.put(Constants.SETTINGS_JUNIT_PATH, config.get(Constants.SETTINGS_JUNIT_PATH));
         UserNotifier emptyUserNotifier = new EmptyUserNotifier();
-        Logger logger = new BzmLogger();
+        Logger logger = new BzmLoggerOld();
         utils = new BambooBzmUtils(psai, psas, pssu, pssu, emptyUserNotifier, logger);
         User user = null;
         try {

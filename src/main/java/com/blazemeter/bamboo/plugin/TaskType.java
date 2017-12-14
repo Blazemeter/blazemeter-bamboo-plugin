@@ -23,15 +23,13 @@ import com.atlassian.bamboo.task.TaskException;
 import com.atlassian.bamboo.task.TaskResult;
 import com.atlassian.bamboo.task.TaskResultBuilder;
 import com.atlassian.bamboo.v2.build.BuildContext;
-import com.blazemeter.api.explorer.test.AbstractTest;
-import com.blazemeter.api.explorer.test.TestDetector;
 import com.blazemeter.api.logging.Logger;
 import com.blazemeter.api.logging.UserNotifier;
 import com.blazemeter.api.utils.BlazeMeterUtils;
 import com.blazemeter.bamboo.plugin.configuration.BambooBzmUtils;
 import com.blazemeter.bamboo.plugin.configuration.Constants;
 import com.blazemeter.bamboo.plugin.logging.BambooUserNotifier;
-import com.blazemeter.bamboo.plugin.logging.BzmLogger;
+import com.blazemeter.bamboo.plugin.logging.BzmLoggerOld;
 
 import java.util.List;
 import java.util.Map;
@@ -132,7 +130,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
             throw new TaskException("BlazeMeter user key not defined!");
         }
         UserNotifier notifier = new BambooUserNotifier(logger);
-        Logger log = new BzmLogger(logHandler);
+        Logger log = new BzmLoggerOld(logHandler);
         BambooBzmUtils utils = new BambooBzmUtils(apiId, apiSecret, url, url, notifier, log);
         return utils;
     }

@@ -100,7 +100,7 @@ public class AdminServlet extends HttpServlet {
         context.put(Constants.URL, url);
 
         UserNotifier emptyUserNotifier = new EmptyUserNotifier();
-        Logger logger = new BzmLogger();
+        Logger logger = new BzmLoggerOld();
         BlazeMeterUtils utils = new BambooBzmUtils(apiId, apiSecret, url, url, emptyUserNotifier, logger);
 
         try {
