@@ -21,13 +21,10 @@ import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.SimpleFormatter;
 
-public class BzmLoggerOld implements Logger {
+public class AgentLogger implements Logger {
     private java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Constants.HTTP_LOG);
 
-
-    public BzmLoggerOld() {}
-
-    public BzmLoggerOld(FileHandler httpLfh) {
+    public AgentLogger(FileHandler httpLfh) {
         httpLfh.setFormatter(new SimpleFormatter());
         logger.addHandler(httpLfh);
         logger.setUseParentHandlers(false);

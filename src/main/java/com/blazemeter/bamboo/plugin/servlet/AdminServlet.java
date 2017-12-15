@@ -43,6 +43,8 @@ public class AdminServlet extends HttpServlet {
 
     private final TemplateRenderer renderer;
 
+
+
     public AdminServlet(PluginSettingsFactory pluginSettingsFactory, TemplateRenderer renderer,
                         TransactionTemplate transactionTemplate) {
         this.pluginSettingsFactory = pluginSettingsFactory;
@@ -99,9 +101,9 @@ public class AdminServlet extends HttpServlet {
         context.put(Constants.API_SECRET, apiSecret);
         context.put(Constants.URL, url);
 
-        UserNotifier emptyUserNotifier = new EmptyUserNotifier();
-        Logger logger = new BzmLoggerOld();
-        BlazeMeterUtils utils = new BambooBzmUtils(apiId, apiSecret, url, url, emptyUserNotifier, logger);
+        UserNotifier serverUserNotifier = new ServerUserNotifier();
+        Logger logger = new ServerLogger();
+        BlazeMeterUtils utils = new BambooBzmUtils(apiId, apiSecret, url, url, serverUserNotifier, logger);
 
         try {
             User.getUser(utils);
@@ -118,7 +120,6 @@ public class AdminServlet extends HttpServlet {
             context.put(Constants.API_SECRET_ERROR, "User settings are updated. Check that jobs are configured properly");
             context.put(Constants.URL_ERROR, "User settings are updated. Check that jobs are configured properly");
         } catch (Exception e) {
-            logger.error("Failed to find user on server.", e);
             context.put(Constants.API_ID_ERROR, "User key is not saved! Check credentials with ID = "
                     + apiId + " and proxy settings.");
             context.put(Constants.API_SECRET_ERROR, "User key is not saved! Check credentials with ID = "

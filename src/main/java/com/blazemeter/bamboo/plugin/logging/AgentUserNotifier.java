@@ -17,10 +17,10 @@ package com.blazemeter.bamboo.plugin.logging;
 import com.atlassian.bamboo.build.logger.BuildLogger;
 import com.blazemeter.api.logging.UserNotifier;
 
-public class BambooUserNotifier implements UserNotifier {
+public class AgentUserNotifier implements UserNotifier {
     private BuildLogger buildLogger;
 
-    public BambooUserNotifier(BuildLogger buildLogger) {
+    public AgentUserNotifier(BuildLogger buildLogger) {
         this.buildLogger = buildLogger;
     }
 

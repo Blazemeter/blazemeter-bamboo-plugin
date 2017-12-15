@@ -28,8 +28,8 @@ import com.blazemeter.api.logging.UserNotifier;
 import com.blazemeter.api.utils.BlazeMeterUtils;
 import com.blazemeter.bamboo.plugin.configuration.BambooBzmUtils;
 import com.blazemeter.bamboo.plugin.configuration.Constants;
-import com.blazemeter.bamboo.plugin.logging.BambooUserNotifier;
-import com.blazemeter.bamboo.plugin.logging.BzmLoggerOld;
+import com.blazemeter.bamboo.plugin.logging.AgentUserNotifier;
+import com.blazemeter.bamboo.plugin.logging.AgentLogger;
 
 import java.util.List;
 import java.util.Map;
@@ -129,8 +129,8 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
             logger.addBuildLogEntry("BlazeMeter user key not defined!");
             throw new TaskException("BlazeMeter user key not defined!");
         }
-        UserNotifier notifier = new BambooUserNotifier(logger);
-        Logger log = new BzmLoggerOld(logHandler);
+        UserNotifier notifier = new AgentUserNotifier(logger);
+        Logger log = new AgentLogger(logHandler);
         BambooBzmUtils utils = new BambooBzmUtils(apiId, apiSecret, url, url, notifier, log);
         return utils;
     }

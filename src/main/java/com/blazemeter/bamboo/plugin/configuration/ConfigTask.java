@@ -28,8 +28,8 @@ import com.blazemeter.api.explorer.test.TestDetector;
 import com.blazemeter.api.logging.Logger;
 import com.blazemeter.api.logging.UserNotifier;
 import com.blazemeter.api.utils.BlazeMeterUtils;
-import com.blazemeter.bamboo.plugin.logging.BzmLoggerOld;
-import com.blazemeter.bamboo.plugin.logging.EmptyUserNotifier;
+import com.blazemeter.bamboo.plugin.logging.ServerLogger;
+import com.blazemeter.bamboo.plugin.logging.ServerUserNotifier;
 import com.google.common.collect.LinkedHashMultimap;
 import org.apache.commons.lang.StringUtils;
 
@@ -56,9 +56,10 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         String apiSecret = (String) pluginSettings.get(Constants.API_SECRET);
         String url = (String) pluginSettings.get(Constants.URL);
         context.put(Constants.URL, url);
-        UserNotifier emptyUserNotifier = new EmptyUserNotifier();
-        Logger logger = new BzmLoggerOld();
-        utils = new BambooBzmUtils(apiId, apiSecret, url, url, emptyUserNotifier, logger);
+        UserNotifier serverUserNotifier = new ServerUserNotifier();
+        Logger logger = new ServerLogger();
+        utils = new BambooBzmUtils(apiId, apiSecret, url, url, serverUserNotifier, logger);
+        logger.info("New BlazeMeter task is opened for configuration.");
         User user = null;
         try {
             user = User.getUser(utils);
@@ -90,9 +91,10 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         context.put(Constants.SETTINGS_JMETER_PROPERTIES, config.get(Constants.SETTINGS_JMETER_PROPERTIES));
         context.put(Constants.SETTINGS_JTL_PATH, config.get(Constants.SETTINGS_JTL_PATH));
         context.put(Constants.SETTINGS_JUNIT_PATH, config.get(Constants.SETTINGS_JUNIT_PATH));
-        UserNotifier emptyUserNotifier = new EmptyUserNotifier();
-        Logger logger = new BzmLoggerOld();
-        utils = new BambooBzmUtils(psai, psas, pssu, pssu, emptyUserNotifier, logger);
+        UserNotifier serverUserNotifier = new ServerUserNotifier();
+        Logger logger = new ServerLogger();
+        utils = new BambooBzmUtils(psai, psas, pssu, pssu, serverUserNotifier, logger);
+        logger.info("BlazeMeter task is opened for configuration.");
         User user = null;
         try {
             user = User.getUser(utils);
@@ -111,6 +113,7 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
     @Override
     public void validate(ActionParametersMap params, ErrorCollection errorCollection) {
         super.validate(params, errorCollection);
+        utils.getNotifier().notifyInfo("Validating BlazeMeter task settings before saving.");
         final String selectedTest = params.getString(Constants.SETTINGS_SELECTED_TEST_ID);
         if (StringUtils.isEmpty(selectedTest)) {
             errorCollection.addErrorMessage("Check that user has tests in account");
@@ -133,6 +136,7 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
                 errorCollection.addErrorMessage("Failed to get tests from BlazeMeter account: " + e.getMessage());
             }
         }
+        utils.getNotifier().notifyInfo("BlazeMeter task settings were validated and saved.");
     }
 
     /**

@@ -14,63 +14,56 @@
 
 package com.blazemeter.bamboo.plugin.logging;
 
+import ch.qos.logback.classic.LoggerContext;
 import com.blazemeter.api.logging.Logger;
-import com.blazemeter.bamboo.plugin.configuration.Constants;
+import org.slf4j.LoggerFactory;
 
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
-import java.util.logging.SimpleFormatter;
-
-public class BzmLogger implements Logger {
-    private java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Constants.HTTP_LOG);
+public class ServerLogger implements Logger {
+    private LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
+    private ch.qos.logback.classic.Logger logger = context.getLogger("com.blazemeter");
 
 
-    public BzmLogger() {}
-
-    public BzmLogger(FileHandler httpLfh) {
-        httpLfh.setFormatter(new SimpleFormatter());
-        logger.addHandler(httpLfh);
-        logger.setUseParentHandlers(false);
+    public ServerLogger() {
     }
 
     @Override
     public void debug(String message) {
-        logger.log(Level.WARNING, message);
+        logger.debug(message);
     }
 
     @Override
     public void debug(String message, Throwable throwable) {
-        logger.log(Level.WARNING, message, throwable);
+        logger.debug(message, throwable);
     }
 
     @Override
     public void info(String message) {
-        logger.log(Level.INFO, message);
+        logger.info(message);
     }
 
     @Override
     public void info(String message, Throwable throwable) {
-        logger.log(Level.INFO, message, throwable);
+        logger.info(message, throwable);
     }
 
     @Override
     public void warn(String message) {
-        logger.log(Level.WARNING, message);
+        logger.warn(message);
     }
 
     @Override
     public void warn(String message, Throwable throwable) {
-        logger.log(Level.WARNING, message, throwable);
+        logger.warn(message, throwable);
     }
 
     @Override
     public void error(String message) {
-        logger.log(Level.WARNING, message);
+        logger.error(message);
     }
 
     @Override
     public void error(String message, Throwable throwable) {
-        logger.log(Level.WARNING, message, throwable);
+        logger.error(message, throwable);
     }
 
 }

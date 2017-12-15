@@ -13,22 +13,27 @@
  */
 package com.blazemeter.bamboo.plugin.logging;
 
+import ch.qos.logback.classic.LoggerContext;
 import com.blazemeter.api.logging.UserNotifier;
+import org.slf4j.LoggerFactory;
 
-public class EmptyUserNotifier implements UserNotifier {
+public class ServerUserNotifier implements UserNotifier {
+
+    private LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
+    private ch.qos.logback.classic.Logger logger = context.getLogger("com.blazemeter");
 
     @Override
     public void notifyInfo(String info) {
-
+        logger.info(info);
     }
 
     @Override
     public void notifyWarning(String warn) {
-
+        logger.warn(warn);
     }
 
     @Override
     public void notifyError(String error) {
-
+        logger.error(error);
     }
 }
