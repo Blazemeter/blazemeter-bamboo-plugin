@@ -183,7 +183,7 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
                     }
                 };
                 tests.sort(c);
-                testListDropDown.put("workspace", wsp.getName() + "(" + wsp.getId() + ")");
+                testListDropDown.put("workspace"+wsp.getId(), "==="+wsp.getName() + "(" + wsp.getId() + ")===");
                 for (AbstractTest t : tests) {
                     testListDropDown.put(t.getId(), t.getName() + "(" + t.getId() + "." + t.getTestType() + ")");
                 }
