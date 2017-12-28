@@ -40,9 +40,9 @@ public class AdminServlet extends HttpServlet {
     private final TransactionTemplate transactionTemplate;
     private final PluginSettingsFactory pluginSettingsFactory;
     private static final long serialVersionUID = 1L;
+    private final String URL_REGEX = "^https://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
 
     private final TemplateRenderer renderer;
-
 
 
     public AdminServlet(PluginSettingsFactory pluginSettingsFactory, TemplateRenderer renderer,
@@ -96,7 +96,17 @@ public class AdminServlet extends HttpServlet {
         String apiId = req.getParameter(Constants.API_ID).trim();
         String apiSecret = req.getParameter(Constants.API_SECRET).trim();
         String url = req.getParameter(Constants.URL).trim();
-
+        if (!url.matches(URL_REGEX)) {
+            context.put(Constants.URL_ERROR, "Server url is not saved! Invalid format!");
+            context.put(Constants.API_ID_ERROR, "Credentials ID is not saved! Invalid URL format!");
+            context.put(Constants.API_SECRET_ERROR, "Credentials Secret is not saved! Invalid URL format!");
+            context.put(Constants.API_ID, apiId);
+            context.put(Constants.API_SECRET, apiSecret);
+            context.put(Constants.URL, url);
+            renderer.render(Constants.BLAZEMETER_ADMIN_VM, context, resp.getWriter());
+            return;
+        }
+        // validate url format
         context.put(Constants.API_ID, apiId);
         context.put(Constants.API_SECRET, apiSecret);
         context.put(Constants.URL, url);
