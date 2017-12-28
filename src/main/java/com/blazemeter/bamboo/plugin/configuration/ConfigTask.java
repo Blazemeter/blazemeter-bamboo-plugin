@@ -41,6 +41,7 @@ import java.util.Map;
 public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskRequirementSupport {
     PluginSettingsFactory pluginSettingsFactory;
     BlazeMeterUtils utils;
+    String CHECK_TESTS="Check that user has tests";
 
     public ConfigTask(PluginSettingsFactory pluginSettingsFactory) {
         this.pluginSettingsFactory = pluginSettingsFactory;
@@ -51,24 +52,30 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
      */
     public void populateContextForCreate(Map<String, Object> context) {
         super.populateContextForCreate(context);
+
         PluginSettings pluginSettings = this.pluginSettingsFactory.createGlobalSettings();
         String apiId = (String) pluginSettings.get(Constants.API_ID);
         String apiSecret = (String) pluginSettings.get(Constants.API_SECRET);
         String url = (String) pluginSettings.get(Constants.URL);
-        context.put(Constants.URL, url);
+        User user = null;
         UserNotifier serverUserNotifier = new ServerUserNotifier();
         Logger logger = new ServerLogger();
         utils = new BambooBzmUtils(apiId, apiSecret, url, url, serverUserNotifier, logger);
-        logger.info("New BlazeMeter task is opened for configuration.");
-        User user = null;
+        LinkedHashMultimap<String, String> testListDropDown = null;
         try {
             user = User.getUser(utils);
             assert user.getId() != null;
-            LinkedHashMultimap<String, String> testListDropDown = testsList();
-            context.put(Constants.TEST_LIST, testListDropDown.asMap());
+            testListDropDown = testsList();
+            context.    put(Constants.TEST_LIST, testListDropDown.asMap());
         } catch (Exception e) {
-            logger.error("Failed to fetch tests for user = " + user.getId(), e);
+            logger.error("Failed to get user for credentialsId = " + apiId, e);
+            testListDropDown = LinkedHashMultimap.create(1, 1);
+            testListDropDown.put(CHECK_TESTS,CHECK_TESTS);
+            context.put(Constants.TEST_LIST, testListDropDown.asMap());
+            return;
         }
+        context.put(Constants.URL, url);
+        logger.info("New BlazeMeter task is opened for configuration.");
     }
 
     /**
@@ -115,8 +122,8 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         super.validate(params, errorCollection);
         utils.getNotifier().notifyInfo("Validating BlazeMeter task settings before saving.");
         final String selectedTest = params.getString(Constants.SETTINGS_SELECTED_TEST_ID);
-        if (StringUtils.isEmpty(selectedTest)) {
-            errorCollection.addErrorMessage("Check that user has tests in account");
+        if (StringUtils.isEmpty(selectedTest)|selectedTest.contains(CHECK_TESTS)) {
+            errorCollection.addErrorMessage(CHECK_TESTS);
         } else {
             if (selectedTest.contains("workspace")) {
                 errorCollection.addErrorMessage("Cannot save workspace as a test. Please, select correct test.");
@@ -183,7 +190,7 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
                     }
                 };
                 tests.sort(c);
-                testListDropDown.put("workspace"+wsp.getId(), "==="+wsp.getName() + "(" + wsp.getId() + ")===");
+                testListDropDown.put("workspace" + wsp.getId(), "===" + wsp.getName() + "(" + wsp.getId() + ")===");
                 for (AbstractTest t : tests) {
                     testListDropDown.put(t.getId(), t.getName() + "(" + t.getId() + "." + t.getTestType() + ")");
                 }
