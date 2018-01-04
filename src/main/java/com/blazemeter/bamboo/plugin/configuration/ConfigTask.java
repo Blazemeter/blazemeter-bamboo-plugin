@@ -24,6 +24,8 @@ import com.blazemeter.api.explorer.Account;
 import com.blazemeter.api.explorer.User;
 import com.blazemeter.api.explorer.Workspace;
 import com.blazemeter.api.explorer.test.AbstractTest;
+import com.blazemeter.api.explorer.test.MultiTest;
+import com.blazemeter.api.explorer.test.SingleTest;
 import com.blazemeter.api.explorer.test.TestDetector;
 import com.blazemeter.api.logging.Logger;
 import com.blazemeter.api.logging.UserNotifier;
@@ -41,7 +43,7 @@ import java.util.Map;
 public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskRequirementSupport {
     PluginSettingsFactory pluginSettingsFactory;
     BlazeMeterUtils utils;
-    String CHECK_TESTS="Check that user has tests";
+    String CHECK_TESTS = "Check that user has tests";
 
     public ConfigTask(PluginSettingsFactory pluginSettingsFactory) {
         this.pluginSettingsFactory = pluginSettingsFactory;
@@ -66,11 +68,11 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
             user = User.getUser(utils);
             assert user.getId() != null;
             testListDropDown = testsList();
-            context.    put(Constants.TEST_LIST, testListDropDown.asMap());
+            context.put(Constants.TEST_LIST, testListDropDown.asMap());
         } catch (Exception e) {
             logger.error("Failed to get user for credentialsId = " + apiId, e);
             testListDropDown = LinkedHashMultimap.create(1, 1);
-            testListDropDown.put(CHECK_TESTS,CHECK_TESTS);
+            testListDropDown.put(CHECK_TESTS, CHECK_TESTS);
             context.put(Constants.TEST_LIST, testListDropDown.asMap());
             return;
         }
@@ -122,7 +124,7 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         super.validate(params, errorCollection);
         utils.getNotifier().notifyInfo("Validating BlazeMeter task settings before saving.");
         final String selectedTest = params.getString(Constants.SETTINGS_SELECTED_TEST_ID);
-        if (StringUtils.isEmpty(selectedTest)|selectedTest.contains(CHECK_TESTS)) {
+        if (StringUtils.isEmpty(selectedTest) | selectedTest.contains(CHECK_TESTS)) {
             errorCollection.addErrorMessage(CHECK_TESTS);
         } else {
             if (selectedTest.contains("workspace")) {
@@ -181,8 +183,21 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
             List<Workspace> workspaces = a.getWorkspaces();
             for (Workspace wsp : workspaces) {
                 List<AbstractTest> tests = new ArrayList<>();
-                tests.addAll(wsp.getMultiTests());
-                tests.addAll(wsp.getSingleTests());
+
+                try {
+                    tests.addAll(wsp.getMultiTests());
+                } catch (Exception e) {
+                    wsp.getUtils().getNotifier().notifyError("Failed to get multi-tests for workspace = " + wsp.getId());
+                    tests.add(new MultiTest(utils,"","Failed to load multi-tests",""));
+                }
+
+                try {
+                    tests.addAll(wsp.getSingleTests());
+                } catch (Exception e) {
+                    wsp.getUtils().getNotifier().notifyError("Failed to get single-tests for workspace = " + wsp.getId());
+                    tests.add(new SingleTest(utils,"","Failed to load single-tests",""));
+                }
+
                 Comparator c = new Comparator<AbstractTest>() {
                     @Override
                     public int compare(AbstractTest t1, AbstractTest t2) {
@@ -193,6 +208,9 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
                 testListDropDown.put("workspace" + wsp.getId(), "===" + wsp.getName() + "(" + wsp.getId() + ")===");
                 for (AbstractTest t : tests) {
                     testListDropDown.put(t.getId(), t.getName() + "(" + t.getId() + "." + t.getTestType() + ")");
+                    if(tests.isEmpty()){
+                        testListDropDown.put("no-tests", "No tests in workspace");
+                    }
                 }
                 tests.clear();
             }
