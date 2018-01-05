@@ -44,6 +44,8 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
     PluginSettingsFactory pluginSettingsFactory;
     BlazeMeterUtils utils;
     String CHECK_TESTS = "Check that user has tests";
+    String WORKSPACE = "workspace";
+    String NO_TESTS = "no-tests";
 
     public ConfigTask(PluginSettingsFactory pluginSettingsFactory) {
         this.pluginSettingsFactory = pluginSettingsFactory;
@@ -124,13 +126,10 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         super.validate(params, errorCollection);
         utils.getNotifier().notifyInfo("Validating BlazeMeter task settings before saving.");
         final String selectedTest = params.getString(Constants.SETTINGS_SELECTED_TEST_ID);
-        if (StringUtils.isEmpty(selectedTest) | selectedTest.contains(CHECK_TESTS)) {
-            errorCollection.addErrorMessage(CHECK_TESTS);
-        } else {
-            if (selectedTest.contains("workspace")) {
-                errorCollection.addErrorMessage("Cannot save workspace as a test. Please, select correct test.");
-                return;
-            }
+        fillErrorCollection(selectedTest,errorCollection);
+        if(errorCollection.hasAnyErrors()){
+            return;
+        }
             try {
                 if (StringUtils.isBlank(User.getUser(utils).getId())) {
                     errorCollection.addErrorMessage("Cannot load tests from BlazeMeter server. Invalid user key!");
@@ -144,8 +143,19 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
             } catch (Exception e) {
                 errorCollection.addErrorMessage("Failed to get tests from BlazeMeter account: " + e.getMessage());
             }
-        }
         utils.getNotifier().notifyInfo("BlazeMeter task settings were validated and saved.");
+    }
+
+    private void fillErrorCollection(String selectedTest,ErrorCollection errorCollection){
+        if (StringUtils.isEmpty(selectedTest) | selectedTest.contains(CHECK_TESTS)) {
+            errorCollection.addErrorMessage(CHECK_TESTS);
+        }
+        if (selectedTest.contains(WORKSPACE)) {
+            errorCollection.addErrorMessage("Cannot save workspace as a test. Please, select correct test.");
+        }
+        if (selectedTest.contains(NO_TESTS)) {
+            errorCollection.addErrorMessage("No tests in current workspace. Please, select correct test.");
+        }
     }
 
     /**
@@ -175,6 +185,24 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         return config;
     }
 
+    private void addMultiTests(Workspace wsp, List<AbstractTest> tests) {
+        try {
+            tests.addAll(wsp.getMultiTests());
+        } catch (Exception e) {
+            wsp.getUtils().getNotifier().notifyError("Failed to get multi-tests for workspace = " + wsp.getId());
+            tests.add(new MultiTest(utils, "", "Failed to load multi-tests", ""));
+        }
+    }
+
+    private void addSingleTests(Workspace wsp, List<AbstractTest> tests) {
+        try {
+            tests.addAll(wsp.getSingleTests());
+        } catch (Exception e) {
+            wsp.getUtils().getNotifier().notifyError("Failed to get single-tests for workspace = " + wsp.getId());
+            tests.add(new SingleTest(utils, "", "Failed to load single-tests", ""));
+        }
+    }
+
     private LinkedHashMultimap<String, String> testsList() throws Exception {
         LinkedHashMultimap<String, String> testListDropDown = LinkedHashMultimap.create();
         User user = User.getUser(utils);
@@ -183,34 +211,18 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
             List<Workspace> workspaces = a.getWorkspaces();
             for (Workspace wsp : workspaces) {
                 List<AbstractTest> tests = new ArrayList<>();
-
-                try {
-                    tests.addAll(wsp.getMultiTests());
-                } catch (Exception e) {
-                    wsp.getUtils().getNotifier().notifyError("Failed to get multi-tests for workspace = " + wsp.getId());
-                    tests.add(new MultiTest(utils,"","Failed to load multi-tests",""));
-                }
-
-                try {
-                    tests.addAll(wsp.getSingleTests());
-                } catch (Exception e) {
-                    wsp.getUtils().getNotifier().notifyError("Failed to get single-tests for workspace = " + wsp.getId());
-                    tests.add(new SingleTest(utils,"","Failed to load single-tests",""));
-                }
-
-                Comparator c = new Comparator<AbstractTest>() {
-                    @Override
-                    public int compare(AbstractTest t1, AbstractTest t2) {
-                        return t1.getName().compareToIgnoreCase(t2.getName());
-                    }
-                };
+                addMultiTests(wsp, tests);
+                addSingleTests(wsp, tests);
+                Comparator<AbstractTest> c = (AbstractTest t1, AbstractTest t2) -> t1.getName().compareToIgnoreCase(t2.getName());
                 tests.sort(c);
-                testListDropDown.put("workspace" + wsp.getId(), "===" + wsp.getName() + "(" + wsp.getId() + ")===");
+                testListDropDown.put(WORKSPACE + wsp.getId(), "===" + wsp.getName() + "(" + wsp.getId() + ")===");
+                if (tests.isEmpty()) {
+                    testListDropDown.put("no-tests", "No tests in workspace");
+                    continue;
+                }
                 for (AbstractTest t : tests) {
                     testListDropDown.put(t.getId(), t.getName() + "(" + t.getId() + "." + t.getTestType() + ")");
-                    if(tests.isEmpty()){
-                        testListDropDown.put("no-tests", "No tests in workspace");
-                    }
+
                 }
                 tests.clear();
             }
