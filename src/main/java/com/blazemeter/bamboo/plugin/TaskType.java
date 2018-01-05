@@ -27,6 +27,7 @@ import com.blazemeter.api.logging.Logger;
 import com.blazemeter.api.logging.UserNotifier;
 import com.blazemeter.api.utils.BlazeMeterUtils;
 import com.blazemeter.bamboo.plugin.configuration.BambooBzmUtils;
+import com.blazemeter.bamboo.plugin.configuration.BambooCiBuild;
 import com.blazemeter.bamboo.plugin.configuration.Constants;
 import com.blazemeter.bamboo.plugin.logging.AgentUserNotifier;
 import com.blazemeter.bamboo.plugin.logging.AgentLogger;
@@ -35,7 +36,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.blazemeter.ciworkflow.BuildResult;
-import com.blazemeter.ciworkflow.CiBuild;
 import com.blazemeter.ciworkflow.CiPostProcess;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -58,7 +58,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         final BuildLogger logger = context.getBuildLogger();
         logger.addBuildLogEntry("Executing BlazeMeter task...");
         logger.addBuildLogEntry("BlazemeterBamboo plugin v." + Utils.getVersion());
-        CiBuild build = null;
+        BambooCiBuild build = null;
         FileHandler logHandler = null;
         BuildResult buildResult = null;
         try {
@@ -82,7 +82,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         }
     }
 
-    private CiBuild setUpCiBuild(TaskContext context, FileHandler logHandler) throws TaskException {
+    private BambooCiBuild setUpCiBuild(TaskContext context, FileHandler logHandler) throws TaskException {
         ConfigurationMap configMap = context.getConfigurationMap();
         BuildContext buildContext = context.getBuildContext();
         buildContext.getBuildDefinition().getTaskDefinitions().get(0).getPluginKey();
@@ -106,7 +106,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
                 + context.getBuildContext().getBuildNumber();
 
         CiPostProcess ciPostProcess = new CiPostProcess(jtlReport, junitReport, junitPath, jtlPath, dd, utils.getNotifier(), utils.getLogger());
-        CiBuild build = new CiBuild(utils, testId, jmeterProps, notes, ciPostProcess);
+        BambooCiBuild build = new BambooCiBuild(utils, testId, jmeterProps, notes, ciPostProcess);
         return build;
     }
 
