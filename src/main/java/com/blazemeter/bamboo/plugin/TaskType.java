@@ -105,7 +105,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         String dd = context.getWorkingDirectory().getAbsolutePath() + "/build # "
                 + context.getBuildContext().getBuildNumber();
 
-        BambooCiPostProcess ciPostProcess = new BambooCiPostProcess(jtlReport, junitReport, junitPath, jtlPath, dd, utils.getNotifier(), utils.getLogger());
+        BambooCiPostProcess ciPostProcess = new BambooCiPostProcess(jtlReport, junitReport, jtlPath, junitPath, dd, utils.getNotifier(), utils.getLogger());
         BambooCiBuild build = new BambooCiBuild(utils, testId, jmeterProps, notes, ciPostProcess);
         return build;
     }
