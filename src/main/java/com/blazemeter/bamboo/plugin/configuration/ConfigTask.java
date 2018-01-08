@@ -43,7 +43,8 @@ import java.util.Map;
 public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskRequirementSupport {
     PluginSettingsFactory pluginSettingsFactory;
     BlazeMeterUtils utils;
-    String CHECK_TESTS = "Check that user has tests";
+    String CHECK_CREDENTIALS = "Check that credentials are valid";
+    String CHECK_TESTS = " and there are tests.";
     String WORKSPACE = "workspace";
     String NO_TESTS = "no-tests";
 
@@ -61,23 +62,10 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         String apiId = (String) pluginSettings.get(Constants.API_ID);
         String apiSecret = (String) pluginSettings.get(Constants.API_SECRET);
         String url = (String) pluginSettings.get(Constants.URL);
-        User user = null;
         UserNotifier serverUserNotifier = new ServerUserNotifier();
         Logger logger = new ServerLogger();
         utils = new BambooBzmUtils(apiId, apiSecret, url, url, serverUserNotifier, logger);
-        LinkedHashMultimap<String, String> testListDropDown = null;
-        try {
-            user = User.getUser(utils);
-            assert user.getId() != null;
-            testListDropDown = testsList();
-            context.put(Constants.TEST_LIST, testListDropDown.asMap());
-        } catch (Exception e) {
-            logger.error("Failed to get user for credentialsId = " + apiId, e);
-            testListDropDown = LinkedHashMultimap.create(1, 1);
-            testListDropDown.put(CHECK_TESTS, CHECK_TESTS);
-            context.put(Constants.TEST_LIST, testListDropDown.asMap());
-            return;
-        }
+        fillContextWithTests(context);
         context.put(Constants.URL, url);
         logger.info("New BlazeMeter task is opened for configuration.");
     }
@@ -106,16 +94,7 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         Logger logger = new ServerLogger();
         utils = new BambooBzmUtils(psai, psas, pssu, pssu, serverUserNotifier, logger);
         logger.info("BlazeMeter task is opened for configuration.");
-        User user = null;
-        try {
-            user = User.getUser(utils);
-            assert user.getId() != null;
-            LinkedHashMultimap<String, String> testListDropDown = testsList();
-            context.put(Constants.TEST_LIST, testListDropDown.asMap());
-        } catch (Exception e) {
-            logger.error("Failed to fetch tests for user = " + user.getId(), e);
-        }
-
+        fillContextWithTests(context);
     }
 
     /**
@@ -146,9 +125,26 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         utils.getNotifier().notifyInfo("BlazeMeter task settings were validated and saved.");
     }
 
+    private void fillContextWithTests(Map<String, Object> context) {
+        LinkedHashMultimap<String, String> testListDropDown = null;
+        User user = null;
+        try {
+            user = User.getUser(utils);
+            assert user.getId() != null;
+            testListDropDown = testsList();
+            context.put(Constants.TEST_LIST, testListDropDown.asMap());
+        } catch (Exception e) {
+            utils.getLogger().error("Failed to get user: " + e);
+            testListDropDown = LinkedHashMultimap.create(1, 1);
+            testListDropDown.put(CHECK_CREDENTIALS, CHECK_CREDENTIALS);
+            context.put(Constants.TEST_LIST, testListDropDown.asMap());
+            return;
+        }
+    }
+
     private void fillErrorCollection(String selectedTest, ErrorCollection errorCollection) {
-        if (StringUtils.isEmpty(selectedTest) | selectedTest.contains(CHECK_TESTS)) {
-            errorCollection.addErrorMessage(CHECK_TESTS);
+        if (StringUtils.isEmpty(selectedTest) | selectedTest.contains(CHECK_CREDENTIALS)) {
+            errorCollection.addErrorMessage(CHECK_CREDENTIALS+CHECK_TESTS);
         }
         if (selectedTest.contains(WORKSPACE)) {
             errorCollection.addErrorMessage("Cannot save workspace as a test. Please, select correct test.");
