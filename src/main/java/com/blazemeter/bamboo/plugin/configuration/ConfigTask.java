@@ -126,27 +126,27 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         super.validate(params, errorCollection);
         utils.getNotifier().notifyInfo("Validating BlazeMeter task settings before saving.");
         final String selectedTest = params.getString(Constants.SETTINGS_SELECTED_TEST_ID);
-        fillErrorCollection(selectedTest,errorCollection);
-        if(errorCollection.hasAnyErrors()){
+        fillErrorCollection(selectedTest, errorCollection);
+        if (errorCollection.hasAnyErrors()) {
             return;
         }
-            try {
-                if (StringUtils.isBlank(User.getUser(utils).getId())) {
-                    errorCollection.addErrorMessage("Cannot load tests from BlazeMeter server. Invalid user key!");
-                } else {
-                    //verify if the test still exists on BlazeMeter server
-                    AbstractTest receivedTest = TestDetector.detectTest(utils, selectedTest);
-                    if (receivedTest == null) {
-                        errorCollection.addErrorMessage("Test '" + selectedTest + "' doesn't exits on BlazeMeter server.");
-                    }
+        try {
+            if (StringUtils.isBlank(User.getUser(utils).getId())) {
+                errorCollection.addErrorMessage("Cannot load tests from BlazeMeter server. Invalid user key!");
+            } else {
+                //verify if the test still exists on BlazeMeter server
+                AbstractTest receivedTest = TestDetector.detectTest(utils, selectedTest);
+                if (receivedTest == null) {
+                    errorCollection.addErrorMessage("Test '" + selectedTest + "' doesn't exits on BlazeMeter server.");
                 }
-            } catch (Exception e) {
-                errorCollection.addErrorMessage("Failed to get tests from BlazeMeter account: " + e.getMessage());
             }
+        } catch (Exception e) {
+            errorCollection.addErrorMessage("Failed to get tests from BlazeMeter account: " + e.getMessage());
+        }
         utils.getNotifier().notifyInfo("BlazeMeter task settings were validated and saved.");
     }
 
-    private void fillErrorCollection(String selectedTest,ErrorCollection errorCollection){
+    private void fillErrorCollection(String selectedTest, ErrorCollection errorCollection) {
         if (StringUtils.isEmpty(selectedTest) | selectedTest.contains(CHECK_TESTS)) {
             errorCollection.addErrorMessage(CHECK_TESTS);
         }
@@ -221,8 +221,8 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
                     continue;
                 }
                 for (AbstractTest t : tests) {
-                    testListDropDown.put(t.getId(), t.getName() + "(" + t.getId() + "." + t.getTestType() + ")");
-
+                    String testIdType = t.getId() + "." + t.getTestType();
+                    testListDropDown.put(testIdType, t.getName() + "(" + testIdType + ")");
                 }
                 tests.clear();
             }
