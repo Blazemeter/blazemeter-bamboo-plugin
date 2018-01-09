@@ -66,6 +66,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
             build = setUpCiBuild(context, logHandler);
             buildResult = build.execute();
         } catch (Exception e) {
+            logger.addErrorLogEntry("Failed to start build: ",e);
             return resultBuilder.failed().build();
         } finally {
             logHandler.close();
