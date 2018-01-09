@@ -95,7 +95,7 @@ public class AdminServlet extends HttpServlet {
 
         String apiId = req.getParameter(Constants.API_ID).trim();
         String apiSecret = req.getParameter(Constants.API_SECRET).trim();
-        String url = req.getParameter(Constants.URL).trim();
+        String url = req.getParameter(Constants.URL).trim().replaceAll("/+$", "");
         if (!url.matches(URL_REGEX)) {
             context.put(Constants.URL_ERROR, "Server url is not saved! Invalid format!");
             context.put(Constants.API_ID_ERROR, "Credentials ID is not saved! Invalid URL format!");
