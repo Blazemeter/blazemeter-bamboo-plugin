@@ -30,6 +30,7 @@ import com.blazemeter.api.explorer.test.TestDetector;
 import com.blazemeter.api.logging.Logger;
 import com.blazemeter.api.logging.UserNotifier;
 import com.blazemeter.api.utils.BlazeMeterUtils;
+import com.blazemeter.bamboo.plugin.Utils;
 import com.blazemeter.bamboo.plugin.logging.ServerLogger;
 import com.blazemeter.bamboo.plugin.logging.ServerUserNotifier;
 import com.google.common.collect.LinkedHashMultimap;
@@ -104,7 +105,7 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
     public void validate(ActionParametersMap params, ErrorCollection errorCollection) {
         super.validate(params, errorCollection);
         utils.getNotifier().notifyInfo("Validating BlazeMeter task settings before saving.");
-        final String selectedTest = params.getString(Constants.SETTINGS_SELECTED_TEST_ID);
+        final String selectedTest = Utils.cutTestType(params.getString(Constants.SETTINGS_SELECTED_TEST_ID));
         fillErrorCollection(selectedTest, errorCollection);
         if (errorCollection.hasAnyErrors()) {
             return;
@@ -114,7 +115,7 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
                 errorCollection.addErrorMessage("Cannot load tests from BlazeMeter server. Invalid user key!");
             } else {
                 //verify if the test still exists on BlazeMeter server
-                AbstractTest receivedTest = TestDetector.detectTest(utils, selectedTest);
+                AbstractTest receivedTest = TestDetector.detectTest(utils,selectedTest);
                 if (receivedTest == null) {
                     errorCollection.addErrorMessage("Test '" + selectedTest + "' doesn't exits on BlazeMeter server.");
                 }

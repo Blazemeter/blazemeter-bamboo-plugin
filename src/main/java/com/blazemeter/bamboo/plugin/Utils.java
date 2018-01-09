@@ -21,6 +21,12 @@ public class Utils {
 
     private Utils() {
     }
+
+
+    public static String cutTestType(String testIdwithType){
+        return testIdwithType.substring(0,testIdwithType.indexOf("."));
+    }
+
     public static String getVersion() {
         Properties props = new Properties();
         try {

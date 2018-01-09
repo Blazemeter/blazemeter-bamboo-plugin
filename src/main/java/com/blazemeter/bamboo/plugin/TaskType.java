@@ -87,7 +87,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         ConfigurationMap configMap = context.getConfigurationMap();
         BuildContext buildContext = context.getBuildContext();
         buildContext.getBuildDefinition().getTaskDefinitions().get(0).getPluginKey();
-        String testId = configMap.get(Constants.SETTINGS_SELECTED_TEST_ID);
+        String testId = Utils.cutTestType(configMap.get(Constants.SETTINGS_SELECTED_TEST_ID));
         final BuildLogger logger = context.getBuildLogger();
         BlazeMeterUtils utils;
         try {
