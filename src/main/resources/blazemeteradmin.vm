@@ -12,6 +12,7 @@
  limitations under the License.
 -->
 <html>
+<style type="text/css">.infoText{color: green;}</style>
   <head>
     <title>BlazeMeter Administration</title>
     <meta name="decorator" content="atl.admin">
@@ -24,17 +25,20 @@
         <input type="text" id="id" name="id" class="text" value="${id}">
         <br />
         <span class="errorText">${api_id_error}</span>
+        <span class="infoText">${api_id_info}</span>
         <br />
         <label for="name">${i18n.getText("blazemeter.admin.secret")}</label>
         <input type="password" id="secret" name="secret" class="text" value="${secret}">
         <br />
         <span class="errorText">${api_secret_error}</span>
+        <span class="infoText">${api_secret_info}</span>
         <br />
         </div>
         <div class="field-group">
             <label for="name">${i18n.getText("blazemeter.admin.url")}</label>
             <input type="text" id="url" name="url" class="text" value="${url}">
             <br />
+            <span class="infoText">${url_info}</span>
             <span class="errorText">${url_error}</span>
         </div>
      <div class="field-group">

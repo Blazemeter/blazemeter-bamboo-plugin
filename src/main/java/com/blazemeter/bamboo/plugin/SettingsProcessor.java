@@ -24,6 +24,7 @@ import com.blazemeter.bamboo.plugin.configuration.Constants;
 import java.util.List;
 import java.util.Map;
 
+import com.blazemeter.bamboo.plugin.servlet.AdminServlet;
 import org.jetbrains.annotations.NotNull;
 
 public class SettingsProcessor implements PreJobAction {
@@ -37,17 +38,17 @@ public class SettingsProcessor implements PreJobAction {
     @Override
     public void execute(@NotNull final StageExecution stageExecution, @NotNull final BuildContext buildContext) {
         PluginSettings pluginSettings = this.pluginSettingsFactory.createGlobalSettings();
-        String api_id = (String) pluginSettings.get(Constants.API_ID);
-        String api_secret = (String) pluginSettings.get(Constants.API_SECRET);
-        String serverUrl = (String) pluginSettings.get(Constants.URL);
+        String api_id = (String) pluginSettings.get(AdminServlet.API_ID);
+        String api_secret = (String) pluginSettings.get(AdminServlet.API_SECRET);
+        String serverUrl = (String) pluginSettings.get(AdminServlet.URL);
         buildContext.getBuildDefinition().getTaskDefinitions().get(0).getPluginKey();
         List<TaskDefinition> tds = buildContext.getBuildDefinition().getTaskDefinitions();
         for (TaskDefinition d : tds) {
             if (d.getPluginKey().equals(Constants.PLUGIN_KEY)) {
                 Map<String, String> conf = d.getConfiguration();
-                conf.put(Constants.API_ID, api_id);
-                conf.put(Constants.API_SECRET, api_secret);
-                conf.put(Constants.URL, serverUrl);
+                conf.put(AdminServlet.API_ID, api_id);
+                conf.put(AdminServlet.API_SECRET, api_secret);
+                conf.put(AdminServlet.URL, serverUrl);
             }
         }
     }

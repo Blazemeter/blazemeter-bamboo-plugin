@@ -16,7 +16,6 @@ package com.blazemeter.bamboo.plugin.configuration;
 public interface Constants {
 
     String HTTP_LOG ="http-log";
-    String BM_TRESHOLDS="bm-thresholds.xml";
     String PLUGIN_KEY="com.blazemeter.bamboo.plugin.BlazeMeterBamboo:blazemeter";
 
     //settings properties
@@ -30,12 +29,4 @@ public interface Constants {
 
     //BlazeMeterConfigTask
      String TEST_LIST ="testlist";
-    //Admin page constants
-    String API_ID_ERROR ="api_id_error";
-    String API_SECRET_ERROR ="api_secret_error";
-    String API_ID = "id";
-    String API_SECRET = "secret";
-    String URL ="url";
-    String URL_ERROR ="url_error";
-    String BLAZEMETER_ADMIN_VM ="blazemeteradmin.vm";
 }

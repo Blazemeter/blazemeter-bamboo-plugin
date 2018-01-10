@@ -36,6 +36,7 @@ import com.blazemeter.bamboo.plugin.logging.AgentLogger;
 import java.util.List;
 import java.util.Map;
 
+import com.blazemeter.bamboo.plugin.servlet.AdminServlet;
 import com.blazemeter.ciworkflow.BuildResult;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -121,9 +122,9 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         for (TaskDefinition d : tds) {
             if (d.getPluginKey().equals(Constants.PLUGIN_KEY)) {
                 Map<String, String> conf = d.getConfiguration();
-                apiId = conf.get(Constants.API_ID);
-                apiSecret = conf.get(Constants.API_SECRET);
-                url = conf.get(Constants.URL);
+                apiId = conf.get(AdminServlet.API_ID);
+                apiSecret = conf.get(AdminServlet.API_SECRET);
+                url = conf.get(AdminServlet.URL);
             }
         }
         if (StringUtils.isBlank(apiId)) {
