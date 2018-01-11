@@ -36,12 +36,8 @@ import com.blazemeter.bamboo.plugin.logging.*;
 import com.blazemeter.bamboo.plugin.configuration.BambooBzmUtils;
 
 public class AdminServlet extends HttpServlet {
-    public static final String API_ID_ERROR = "api_id_error";
-    public static final String API_ID_INFO = "api_id_info";
-    public static final String API_SECRET_ERROR = "api_secret_error";
-    public static final String API_SECRET_INFO = "api_secret_info";
-    public static final String URL_ERROR = "url_error";
-    public static final String URL_INFO = "url_info";
+    public static final String ERROR = "error";
+    public static final String INFO = "info";
     public static final String API_ID = "id";
     public static final String API_SECRET = "secret";
     public static final String URL = "url";
@@ -70,34 +66,28 @@ public class AdminServlet extends HttpServlet {
         String apiId = (String) pluginSettings.get(API_ID);
         if (apiId != null) {
             context.put(API_ID, apiId.trim());
-            context.put(API_ID_ERROR, "");
-            context.put(API_ID_INFO, "");
         } else {
             context.put(API_ID, "");
-            context.put(API_ID_INFO, "");
-            context.put(API_ID_ERROR, "Please set the BlazeMeter api credentials!");
+            context.put(ERROR, "Please set the BlazeMeter api credentials!");
         }
 
         String apiSecret = (String) pluginSettings.get(API_SECRET);
         if (apiSecret != null) {
             context.put(API_SECRET, apiSecret.trim());
-            context.put(API_SECRET_ERROR, "");
-            context.put(API_SECRET_INFO, "");
         } else {
             context.put(API_SECRET, "");
-            context.put(API_SECRET_ERROR, "Please set the BlazeMeter api credentials!");
-            context.put(API_SECRET_INFO, "");
+            context.put(ERROR, "Please set the BlazeMeter api credentials!");
         }
 
         String url = (String) pluginSettings.get(URL);
         if (url != null) {
             context.put(URL, url);
-            context.put(URL_ERROR, "");
-            context.put(URL_INFO, "");
+            context.put(ERROR, "");
+            context.put(INFO, "");
         } else {
             context.put(URL, "");
-            context.put(URL_ERROR, "Please set the BlazeMeter server url!");
-            context.put(URL_INFO, "");
+            context.put(ERROR, "Please set the BlazeMeter server url!");
+            context.put(INFO, "");
         }
 
         renderer.render(BLAZEMETER_ADMIN_VM, context, resp.getWriter());
@@ -112,15 +102,11 @@ public class AdminServlet extends HttpServlet {
         String apiSecret = req.getParameter(API_SECRET).trim();
         String url = req.getParameter(URL).trim().replaceAll("/+$", "");
         if (!url.matches(URL_REGEX)) {
-            context.put(URL_ERROR, "Server url is not saved! Invalid format!");
+            context.put(ERROR, "Server url is not saved! Invalid format!");
             context.put(API_ID, apiId);
             context.put(API_SECRET, apiSecret);
             context.put(URL, url);
-            context.put(API_ID_INFO, "");
-            context.put(API_SECRET_INFO, "");
-            context.put(API_ID_ERROR, "");
-            context.put(API_SECRET_ERROR, "");
-            context.put(URL_INFO, "");
+            context.put(INFO, "");
 
             renderer.render(BLAZEMETER_ADMIN_VM, context, resp.getWriter());
             return;
@@ -145,22 +131,11 @@ public class AdminServlet extends HttpServlet {
                     return null;
                 }
             });
-            context.put(API_ID_INFO, "User settings are updated. Check that jobs are configured properly");
-            context.put(API_ID_ERROR, "");
-            context.put(API_SECRET_INFO, "User settings are updated. Check that jobs are configured properly");
-            context.put(API_SECRET_ERROR, "");
-            context.put(URL_INFO, "User settings are updated. Check that jobs are configured properly");
-            context.put(URL_ERROR, "");
+            context.put(INFO, "User settings are updated. Check that jobs are configured properly");
+            context.put(ERROR, "");
         } catch (Exception e) {
-            context.put(API_ID_ERROR, "User key is not saved! Check credentials with ID = "
-                    + apiId + " and proxy settings.");
-            context.put(API_ID_INFO, "");
-            context.put(API_SECRET_ERROR, "User key is not saved! Check credentials with ID = "
-                    + apiId + " and proxy settings.");
-            context.put(API_SECRET_INFO, "");
-            context.put(URL_ERROR, "Server url is not saved! Check server url "
-                    + url + " and proxy settings.");
-            context.put(URL_INFO, "");
+            context.put(ERROR, "Settings were not saved! Check credentials, server url and proxy settings.");
+            context.put(INFO, "");
         } finally {
             renderer.render(BLAZEMETER_ADMIN_VM, context, resp.getWriter());
         }
