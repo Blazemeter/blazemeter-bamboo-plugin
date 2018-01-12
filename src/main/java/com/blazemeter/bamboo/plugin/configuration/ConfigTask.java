@@ -116,7 +116,7 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
                 errorCollection.addErrorMessage("Cannot load tests from BlazeMeter server. Invalid user key!");
             } else {
                 //verify if the test still exists on BlazeMeter server
-                AbstractTest receivedTest = TestDetector.detectTest(utils,selectedTest);
+                AbstractTest receivedTest = TestDetector.detectTest(utils, selectedTest);
                 if (receivedTest == null) {
                     errorCollection.addErrorMessage("Test '" + selectedTest + "' doesn't exits on BlazeMeter server.");
                 }
@@ -146,7 +146,7 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
 
     private void fillErrorCollection(String selectedTest, ErrorCollection errorCollection) {
         if (StringUtils.isEmpty(selectedTest) | selectedTest.contains(CHECK_CREDENTIALS)) {
-            errorCollection.addErrorMessage(CHECK_CREDENTIALS+CHECK_TESTS);
+            errorCollection.addErrorMessage(CHECK_CREDENTIALS + CHECK_TESTS);
         }
         if (selectedTest.contains(WORKSPACE)) {
             errorCollection.addErrorMessage("Cannot save workspace as a test. Please, select correct test.");
@@ -207,22 +207,22 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         List<Account> accounts = user.getAccounts();
         for (Account a : accounts) {
             List<Workspace> workspaces = a.getWorkspaces();
+            List<AbstractTest> tests = new ArrayList<>();
             for (Workspace wsp : workspaces) {
-                List<AbstractTest> tests = new ArrayList<>();
+                tests.clear();
                 addMultiTests(wsp, tests);
                 addSingleTests(wsp, tests);
                 Comparator<AbstractTest> c = (AbstractTest t1, AbstractTest t2) -> t1.getName().compareToIgnoreCase(t2.getName());
                 tests.sort(c);
                 testListDropDown.put(WORKSPACE + wsp.getId(), "===" + wsp.getName() + "(" + wsp.getId() + ")===");
                 if (tests.isEmpty()) {
-                    testListDropDown.put("no-tests", "No tests in workspace");
+                    testListDropDown.put("no-tests"+workspaces.indexOf(wsp), "No tests in workspace");
                     continue;
                 }
                 for (AbstractTest t : tests) {
                     String testIdType = t.getId() + "." + t.getTestType();
                     testListDropDown.put(testIdType, t.getName() + "(" + testIdType + ")");
                 }
-                tests.clear();
             }
         }
         return testListDropDown;
