@@ -28,7 +28,6 @@ import com.blazemeter.api.logging.UserNotifier;
 import com.blazemeter.api.utils.BlazeMeterUtils;
 import com.blazemeter.bamboo.plugin.configuration.BambooBzmUtils;
 import com.blazemeter.bamboo.plugin.configuration.BambooCiBuild;
-import com.blazemeter.bamboo.plugin.configuration.BambooCiPostProcess;
 import com.blazemeter.bamboo.plugin.configuration.Constants;
 import com.blazemeter.bamboo.plugin.logging.AgentUserNotifier;
 import com.blazemeter.bamboo.plugin.logging.AgentLogger;
@@ -38,6 +37,7 @@ import java.util.Map;
 
 import com.blazemeter.bamboo.plugin.servlet.AdminServlet;
 import com.blazemeter.ciworkflow.BuildResult;
+import com.blazemeter.ciworkflow.CiPostProcess;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -106,7 +106,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         String dd = context.getWorkingDirectory().getAbsolutePath() + "/build # "
                 + context.getBuildContext().getBuildNumber();
 
-        BambooCiPostProcess ciPostProcess = new BambooCiPostProcess(jtlReport, junitReport, jtlPath, junitPath, dd, utils.getNotifier(), utils.getLogger());
+        CiPostProcess ciPostProcess = new CiPostProcess(jtlReport, junitReport, jtlPath, junitPath, dd, utils.getNotifier(), utils.getLogger());
         return new BambooCiBuild(utils, testId, jmeterProps, notes, ciPostProcess);
     }
 
