@@ -15,7 +15,7 @@ package com.blazemeter.bamboo.plugin.configuration;
 
 public interface Constants {
 
-    String HTTP_LOG ="http-log";
+    String BZM_LOG ="bzm-log-";
     String PLUGIN_KEY="com.blazemeter.bamboo.plugin.BlazeMeterBamboo:blazemeter";
 
     //settings properties

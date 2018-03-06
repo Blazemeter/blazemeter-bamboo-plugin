@@ -3,6 +3,7 @@ package com.blazemeter.bamboo.plugin.configuration;
 import com.blazemeter.api.explorer.Master;
 import com.blazemeter.api.explorer.test.AbstractTest;
 import com.blazemeter.api.utils.BlazeMeterUtils;
+import com.blazemeter.bamboo.plugin.logging.AgentLogger;
 import com.blazemeter.ciworkflow.CiBuild;
 import org.apache.commons.lang.StringUtils;
 
@@ -25,4 +26,9 @@ public class BambooCiBuild extends CiBuild {
         return master;
     }
 
+    public void closeLogger() {
+        if (logger != null && logger instanceof AgentLogger) {
+            ((AgentLogger) logger).close();
+        }
+    }
 }
