@@ -14,30 +14,42 @@
 
 package com.blazemeter.bamboo.plugin.logging;
 
-import com.blazemeter.api.logging.Logger;
-import com.blazemeter.bamboo.plugin.configuration.Constants;
-
+import java.io.File;
+import java.io.IOException;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.SimpleFormatter;
 
-public class AgentLogger implements Logger {
-    private java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Constants.HTTP_LOG);
+public class AgentLogger implements com.blazemeter.api.logging.Logger {
 
-    public AgentLogger(FileHandler httpLfh) {
-        httpLfh.setFormatter(new SimpleFormatter());
-        logger.addHandler(httpLfh);
+    private java.util.logging.Logger logger;
+    private FileHandler fileHandler;
+
+    public AgentLogger(String logFilePath) {
+        File f = new File(logFilePath);
+        logger = java.util.logging.Logger.getLogger(f.getName());
+        try {
+            fileHandler = new FileHandler(logFilePath);
+        } catch (IOException ex) {
+            throw new RuntimeException("Cannot create file handler for log file", ex);
+        }
+        fileHandler.setFormatter(new SimpleFormatter());
+        logger.addHandler(fileHandler);
         logger.setUseParentHandlers(false);
+    }
+
+    public void close() {
+        fileHandler.close();
     }
 
     @Override
     public void debug(String message) {
-        logger.log(Level.WARNING, message);
+        logger.log(Level.FINE, message);
     }
 
     @Override
     public void debug(String message, Throwable throwable) {
-        logger.log(Level.WARNING, message, throwable);
+        logger.log(Level.FINE, message, throwable);
     }
 
     @Override
@@ -62,12 +74,12 @@ public class AgentLogger implements Logger {
 
     @Override
     public void error(String message) {
-        logger.log(Level.WARNING, message);
+        logger.log(Level.SEVERE, message);
     }
 
     @Override
     public void error(String message, Throwable throwable) {
-        logger.log(Level.WARNING, message, throwable);
+        logger.log(Level.SEVERE, message, throwable);
     }
 
 }

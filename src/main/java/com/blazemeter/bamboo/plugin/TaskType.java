@@ -42,7 +42,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.util.logging.FileHandler;
 
 @Component
 public class TaskType implements com.atlassian.bamboo.task.TaskType {
@@ -60,17 +59,17 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         logger.addBuildLogEntry("Executing BlazeMeter task...");
         logger.addBuildLogEntry("BlazemeterBamboo plugin v." + Utils.getVersion());
         BambooCiBuild build = null;
-        FileHandler logHandler = null;
-        BuildResult buildResult = null;
+        BuildResult buildResult;
         try {
-            logHandler = setUpLogFileHandler(context);
-            build = setUpCiBuild(context, logHandler);
+            build = setUpCiBuild(context, createLogFile(context));
             buildResult = build.execute();
         } catch (Exception e) {
             logger.addErrorLogEntry("Failed to start build: ",e);
             return resultBuilder.failed().build();
         } finally {
-            logHandler.close();
+            if (build != null) {
+                build.closeLogger();
+            }
         }
         switch (buildResult) {
             case FAILED:
@@ -84,7 +83,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         }
     }
 
-    private BambooCiBuild setUpCiBuild(TaskContext context, FileHandler logHandler) throws TaskException {
+    private BambooCiBuild setUpCiBuild(TaskContext context, String logFilePath) throws TaskException {
         ConfigurationMap configMap = context.getConfigurationMap();
         BuildContext buildContext = context.getBuildContext();
         buildContext.getBuildDefinition().getTaskDefinitions().get(0).getPluginKey();
@@ -92,7 +91,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         final BuildLogger logger = context.getBuildLogger();
         BlazeMeterUtils utils;
         try {
-            utils = setUpBzmUtils(context, logHandler);
+            utils = setUpBzmUtils(context, logFilePath);
         } catch (Exception e) {
             logger.addBuildLogEntry("Failed to find test = " + testId + " on server.");
             throw new TaskException("");
@@ -108,11 +107,10 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
                 + context.getBuildContext().getBuildNumber();
 
         BambooCiPostProcess ciPostProcess = new BambooCiPostProcess(jtlReport, junitReport, jtlPath, junitPath, dd, utils.getNotifier(), utils.getLogger());
-        BambooCiBuild build = new BambooCiBuild(utils, testId, jmeterProps, notes, ciPostProcess);
-        return build;
+        return new BambooCiBuild(utils, testId, jmeterProps, notes, ciPostProcess);
     }
 
-    private BambooBzmUtils setUpBzmUtils(TaskContext context, FileHandler logHandler) throws TaskException {
+    private BambooBzmUtils setUpBzmUtils(TaskContext context, String logFilePath) throws TaskException {
         List<TaskDefinition> tds = context.getBuildContext().getBuildDefinition().getTaskDefinitions();
         final BuildLogger logger = context.getBuildLogger();
 
@@ -132,23 +130,26 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
             throw new TaskException("BlazeMeter user key not defined!");
         }
         UserNotifier notifier = new AgentUserNotifier(logger);
-        Logger log = new AgentLogger(logHandler);
-        BambooBzmUtils utils = new BambooBzmUtils(apiId, apiSecret, url, url, notifier, log);
-        return utils;
+        Logger log = new AgentLogger(logFilePath);
+        return new BambooBzmUtils(apiId, apiSecret, url, url, notifier, log);
     }
 
-    private FileHandler setUpLogFileHandler(TaskContext context) throws Exception {
+    private String createLogFile(TaskContext context) throws Exception {
         File dd = new File(context.getWorkingDirectory().getAbsolutePath() + "/build # "
                 + context.getBuildContext().getBuildNumber());
-        String log = dd + File.separator + Constants.HTTP_LOG;
-        File logFile = new File(log);
+
+        final String logFileName = Constants.BZM_LOG + System.currentTimeMillis();
+
+        String logPath = dd + File.separator + logFileName;
+        File logFile = new File(logPath);
+
         BuildLogger buildLogger = context.getBuildLogger();
         try {
             logFile.getParentFile().mkdirs();
             logFile.createNewFile();
         } catch (Exception e) {
-            buildLogger.addBuildLogEntry("Failed to create log file = " + log);
-            logFile = new File(context.getWorkingDirectory().getAbsolutePath(), File.separator + Constants.HTTP_LOG);
+            buildLogger.addBuildLogEntry("Failed to create log file = " + logPath);
+            logFile = new File(context.getWorkingDirectory().getAbsolutePath(), File.separator + logFileName);
             try {
                 buildLogger.addBuildLogEntry("Log will be written to " + logFile.getAbsolutePath());
                 logFile.createNewFile();
@@ -157,7 +158,6 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
                 throw e;
             }
         }
-        FileHandler bzm = new FileHandler(log);
-        return bzm;
+        return logFile.getAbsolutePath();
     }
 }
