@@ -36,6 +36,7 @@ public class AgentLogger implements com.blazemeter.api.logging.Logger {
         fileHandler.setFormatter(new SimpleFormatter());
         logger.addHandler(fileHandler);
         logger.setUseParentHandlers(false);
+        logger.setLevel(Level.FINE);
     }
 
     public void close() {
