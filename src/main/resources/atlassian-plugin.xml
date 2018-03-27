@@ -88,4 +88,32 @@
 			location="templates/viewConfigTask.ftl" />
 		<resource type="download" name="icon" location="images/blazemeter.jpg" />
 	</taskType>
+
+	<!-- BlazeMeter Report Tab -->
+	<xwork key="blazeMeterReports" name="View BlazeMeter Reports">
+		<package name="blazemeterReportView" extends="buildResultView">
+			<action name="viewBlazeMeterReport"	class="com.blazemeter.bamboo.plugin.ui.ViewBlazeMeterReport">
+				<result name="success" type="freemarker">/templates/viewBlazeMeterTestReport.ftl</result>
+			</action>
+		</package>
+	</xwork>
+
+	<!-- Build Report -->
+	<web-item name="BlazemeterJobReportPage" i18n-name-key="blazemeterJobReport.label"
+			  key="blazemeterJobReport" section="chainResults.subMenu/chainResults"
+			  weight="80">
+		<description key="blazemeterJobReport.description">Display the BlazeMeter Test Report page</description>
+		<label key="blazemeterJobReport.label" />
+		<link linkId="blazemeterJobReport">/build/result/viewBlazeMeterReport.action?buildKey=${buildKey}&amp;buildNumber=${buildNumber}</link>
+	</web-item>
+
+	<!-- Build Report -->
+	<web-item name="BlazemeterJobReportPageStage" i18n-name-key="blazemeterJobReport.label"
+			  key="blazemeterJobReportStage" section="results.subMenu/results"
+			  weight="80">
+		<description key="blazemeterJobReport.description">Display the BlazeMeter Test Report page</description>
+		<label key="blazemeterJobReport.label" />
+		<link linkId="blazemeterJobReport">/build/result/viewBlazeMeterReport.action?buildKey=${buildKey}&amp;buildNumber=${buildNumber}</link>
+	</web-item>
+
 </atlassian-plugin>
