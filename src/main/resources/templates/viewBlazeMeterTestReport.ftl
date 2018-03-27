@@ -6,13 +6,11 @@
 <div>
 	[#if hasBzmReports]
 	    [#if reports?? && (reports.size()>0)]
-
-                [#foreach key in reports.keySet()]
-            <div class="aui-message error">
-                   <a href="${reports.get(key)}">BlazeMeter Report (Master #${key})</a>
-            </div>
-                [/#foreach]
-
+            [#foreach key in reports.keySet()]
+                <div class="aui-message">
+                    <a href="${reports.get(key)}">BlazeMeter Report (Master #${key})</a>
+                </div>
+            [/#foreach]
 		[#else]
 			<p>BlazeMeter Test Reports not available for this job.</p>
 		[/#if]
