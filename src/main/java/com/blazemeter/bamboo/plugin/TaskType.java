@@ -30,22 +30,20 @@ import com.blazemeter.api.utils.BlazeMeterUtils;
 import com.blazemeter.bamboo.plugin.configuration.BambooBzmUtils;
 import com.blazemeter.bamboo.plugin.configuration.BambooCiBuild;
 import com.blazemeter.bamboo.plugin.configuration.Constants;
-import com.blazemeter.bamboo.plugin.logging.AgentUserNotifier;
 import com.blazemeter.bamboo.plugin.logging.AgentLogger;
-
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.List;
-import java.util.Map;
-
+import com.blazemeter.bamboo.plugin.logging.AgentUserNotifier;
 import com.blazemeter.bamboo.plugin.servlet.AdminServlet;
 import com.blazemeter.ciworkflow.BuildResult;
 import com.blazemeter.ciworkflow.CiBuild;
 import com.blazemeter.ciworkflow.CiPostProcess;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class TaskType implements com.atlassian.bamboo.task.TaskType {
@@ -57,8 +55,9 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
     }
 
     @Override
-    public TaskResult execute(TaskContext context) throws TaskException {
-        TaskResultBuilder resultBuilder = TaskResultBuilder.create(context);
+    public TaskResult execute(@NotNull TaskContext context) throws TaskException {
+        TaskResultBuilder resultBuilder = TaskResultBuilder.newBuilder(context);
+        context.getBuildContext().getBuildResult().getCustomBuildData().put("isBlazeMeterStep", "true");
         final BuildLogger logger = context.getBuildLogger();
         logger.addBuildLogEntry("Executing BlazeMeter task...");
         logger.addBuildLogEntry("BlazeMeterBamboo plugin v." + Utils.getVersion());

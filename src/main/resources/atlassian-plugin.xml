@@ -99,21 +99,19 @@
 	</xwork>
 
 	<!-- Build Report -->
-	<web-item name="BlazemeterJobReportPage" i18n-name-key="blazemeterJobReport.label"
-			  key="blazemeterJobReport" section="chainResults.subMenu/chainResults"
-			  weight="80">
+	<web-item name="BlazemeterJobReportPage" key="blazemeterJobReport" section="chainResults.subMenu/chainResults" weight="80">
 		<description key="blazemeterJobReport.description">Display the BlazeMeter Test Report page</description>
 		<label key="blazemeterJobReport.label" />
 		<link linkId="blazemeterJobReport">/build/result/viewBlazeMeterReport.action?buildKey=${buildKey}&amp;buildNumber=${buildNumber}</link>
+		<condition class="com.blazemeter.bamboo.plugin.ui.ViewBlazeMeterReportCondition" />
 	</web-item>
 
 	<!-- Build Report -->
-	<web-item name="BlazemeterJobReportPageStage" i18n-name-key="blazemeterJobReport.label"
-			  key="blazemeterJobReportStage" section="results.subMenu/results"
-			  weight="80">
+	<web-item name="BlazemeterJobReportPageStage" key="blazemeterJobReportStage" section="results.subMenu/results" weight="80">
 		<description key="blazemeterJobReport.description">Display the BlazeMeter Test Report page</description>
 		<label key="blazemeterJobReport.label" />
 		<link linkId="blazemeterJobReport">/build/result/viewBlazeMeterReport.action?buildKey=${buildKey}&amp;buildNumber=${buildNumber}</link>
+		<condition class="com.blazemeter.bamboo.plugin.ui.ViewBlazeMeterReportCondition" />
 	</web-item>
 
 </atlassian-plugin>
