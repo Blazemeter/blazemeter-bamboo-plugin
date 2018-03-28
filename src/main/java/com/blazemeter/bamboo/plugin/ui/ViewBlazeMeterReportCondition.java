@@ -62,7 +62,7 @@ public class ViewBlazeMeterReportCondition implements Condition {
             return false;
         }
 
-        if (!summary.isInProgress()) {
+        if (!summary.isInProgress()) { // isFinished() does not include interrupt case
             log.debug("Check is build contains BlazeMeter Step");
             if (summary instanceof ChainResultsSummaryImpl) {
                 ChainResultsSummaryImpl chainResults = (ChainResultsSummaryImpl) summary;
