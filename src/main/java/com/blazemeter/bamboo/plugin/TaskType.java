@@ -23,25 +23,27 @@ import com.atlassian.bamboo.task.TaskException;
 import com.atlassian.bamboo.task.TaskResult;
 import com.atlassian.bamboo.task.TaskResultBuilder;
 import com.atlassian.bamboo.v2.build.BuildContext;
+import com.blazemeter.api.explorer.Master;
 import com.blazemeter.api.logging.Logger;
 import com.blazemeter.api.logging.UserNotifier;
 import com.blazemeter.api.utils.BlazeMeterUtils;
 import com.blazemeter.bamboo.plugin.configuration.BambooBzmUtils;
 import com.blazemeter.bamboo.plugin.configuration.BambooCiBuild;
 import com.blazemeter.bamboo.plugin.configuration.Constants;
-import com.blazemeter.bamboo.plugin.logging.AgentUserNotifier;
 import com.blazemeter.bamboo.plugin.logging.AgentLogger;
-
-import java.util.List;
-import java.util.Map;
-
+import com.blazemeter.bamboo.plugin.logging.AgentUserNotifier;
 import com.blazemeter.bamboo.plugin.servlet.AdminServlet;
 import com.blazemeter.ciworkflow.BuildResult;
+import com.blazemeter.ciworkflow.CiBuild;
 import com.blazemeter.ciworkflow.CiPostProcess;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class TaskType implements com.atlassian.bamboo.task.TaskType {
@@ -53,16 +55,37 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
     }
 
     @Override
-    public TaskResult execute(TaskContext context) throws TaskException {
-        TaskResultBuilder resultBuilder = TaskResultBuilder.create(context);
+    public TaskResult execute(@NotNull TaskContext context) throws TaskException {
+        TaskResultBuilder resultBuilder = TaskResultBuilder.newBuilder(context);
+        context.getBuildContext().getBuildResult().getCustomBuildData().put("isBlazeMeterStep", "true");
         final BuildLogger logger = context.getBuildLogger();
         logger.addBuildLogEntry("Executing BlazeMeter task...");
-        logger.addBuildLogEntry("BlazemeterBamboo plugin v." + Utils.getVersion());
+        logger.addBuildLogEntry("BlazeMeterBamboo plugin v." + Utils.getVersion());
         BambooCiBuild build = null;
-        BuildResult buildResult;
         try {
             build = setUpCiBuild(context, createLogFile(context));
-            buildResult = build.execute();
+            Master master = null;
+            try {
+                master = build.start();
+                if (master != null) {
+                    context.getBuildContext().getBuildResult().getCustomBuildData().put("master_id_" + master.getId(), build.getPublicReport());
+                    build.waitForFinish(master);
+                } else {
+                    logger.addErrorLogEntry("Failed to start test");
+                    return resultBuilder.failed().build();
+                }
+            } catch (InterruptedException e) {
+                build.getUtils().getLogger().warn("Wait for finish has been interrupted", e);
+                interrupt(build, master, logger);
+                return resultBuilder.failed().build();
+            } catch (Exception e) {
+                build.getUtils().getLogger().warn("Caught exception while waiting for build", e);
+                logger.addErrorLogEntry("Caught exception " + e.getMessage());
+                return resultBuilder.failed().build();
+            }
+
+            BuildResult buildResult = build.doPostProcess(master);
+            return mappedBuildResult(buildResult, resultBuilder);
         } catch (Exception e) {
             logger.addErrorLogEntry("Failed to start build: ",e);
             return resultBuilder.failed().build();
@@ -71,6 +94,9 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
                 build.closeLogger();
             }
         }
+    }
+
+    private TaskResult mappedBuildResult(BuildResult buildResult, TaskResultBuilder resultBuilder) {
         switch (buildResult) {
             case FAILED:
                 return resultBuilder.failed().build();
@@ -80,6 +106,21 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
                 return resultBuilder.success().build();
             default:
                 return resultBuilder.success().build();
+        }
+    }
+
+
+    public void interrupt(CiBuild build, Master master, BuildLogger logger) {
+        if (build != null && master != null) {
+            try {
+                boolean hasReport = build.interrupt(master);
+                if (hasReport) {
+                    logger.addBuildLogEntry("Get reports after interrupt");
+                    build.doPostProcess(master);
+                }
+            } catch (IOException e) {
+                logger.addErrorLogEntry("Failed to interrupt build " + e.getMessage());
+            }
         }
     }
 

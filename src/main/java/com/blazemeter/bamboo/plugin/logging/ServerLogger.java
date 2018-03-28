@@ -14,14 +14,10 @@
 
 package com.blazemeter.bamboo.plugin.logging;
 
-import ch.qos.logback.classic.LoggerContext;
 import com.blazemeter.api.logging.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ServerLogger implements Logger {
-    private LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
-    private ch.qos.logback.classic.Logger logger = context.getLogger("com.blazemeter");
-
+    private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ServerLogger.class);
 
     public ServerLogger() {
     }

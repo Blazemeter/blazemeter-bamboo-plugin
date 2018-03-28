@@ -123,10 +123,10 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${basedir}/target/classes/com/blazemeter/bamboo/plugin/</outputDirectory>
+                            <outputDirectory>${basedir}/target/classes</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${basedir}/src/main/java/com/blazemeter/bamboo/plugin</directory>
+                                    <directory>${basedir}/src/main/resources</directory>
                                     <filtering>true</filtering>
                                     <includes>
                                         <include>version.properties</include>
