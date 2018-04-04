@@ -16,7 +16,7 @@
 
     <groupId>com.blazemeter.bamboo.plugin</groupId>
     <artifactId>BlazeMeterBamboo</artifactId>
-    <version>3.2.${jenkins.build.number}</version>
+    <version>3.3.${jenkins.build.number}</version>
 
     <organization>
         <name>BlazeMeter LTD.</name>
