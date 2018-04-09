@@ -1,14 +1,17 @@
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/0ffecaf549db476780d0497f40b6cce1)](https://www.codacy.com/app/dzmitrykashlach/blazemeter-bamboo-plugin?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Blazemeter/blazemeter-bamboo-plugin&amp;utm_campaign=Badge_Grade)
-You have successfully created an Atlassian Plugin!
+####  What's this?
 
-Here are the SDK commands you'll use immediately:
+This is [Bamboo](https://www.atlassian.com/software/bamboo) plugin for running performance test at [load testing platform](http://blazemeter.com).
 
-* atlas-run   -- installs this plugin into the product and starts it on localhost
-* atlas-debug -- same as atlas-run, but allows a debugger to attach at port 5005
-* atlas-cli   -- after atlas-run or atlas-debug, opens a Maven command line window:
-                 - 'pi' reinstalls the plugin into the running product instance
-* atlas-help  -- prints description for all commands in the SDK
+Bamboo is a Continuous Integration tool by [Atlassian](https://www.atlassian.com/). Bamboo does more than just run builds and tests. It connects issues, commits, test results, and deploys so the whole picture is available to your entire product team – from project managers to devs and testers, to system admins.
 
-Full documentation is always available at:
+####  Installation & usage
 
-https://developer.atlassian.com/display/DOCS/Introduction+to+the+Atlassian+Plugin+SDK
+Please, refer to [plugin's guide](https://guide.blazemeter.com/hc/en-us/articles/206733419-BlazeMeter-Plugin-to-Bamboo) for further instructions. 
+
+#### [Changelog](https://github.com/Blazemeter/blazemeter-bamboo-plugin/blob/master/CHANGELOG.md)
+
+#### [Download latest version](https://marketplace.atlassian.com/plugins/com.blazemeter.bamboo.plugin.BlazeMeterBamboo/server/overview)
+
+#### License
+ 
+    Apache License, Version 2.0
