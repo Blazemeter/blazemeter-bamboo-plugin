@@ -39,6 +39,7 @@ import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -67,7 +68,7 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         UserNotifier serverUserNotifier = new ServerUserNotifier();
         Logger logger = new ServerLogger();
         utils = new BambooBzmUtils(apiId, apiSecret, url, url, serverUserNotifier, logger);
-        fillContextWithTests(context);
+        fillContextWithTests(context, null, null);
         context.put(AdminServlet.URL, url);
         logger.info("New BlazeMeter task is opened for configuration.");
     }
@@ -96,7 +97,7 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         Logger logger = new ServerLogger();
         utils = new BambooBzmUtils(psai, psas, pssu, pssu, serverUserNotifier, logger);
         logger.info("BlazeMeter task is opened for configuration.");
-        fillContextWithTests(context);
+        fillContextWithTests(context, config.get("selectedWorkspace"), config.get("selectedtest"));
     }
 
     /**
@@ -127,20 +128,26 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         utils.getNotifier().notifyInfo("BlazeMeter task settings were validated and saved.");
     }
 
-    private void fillContextWithTests(Map<String, Object> context) {
-        LinkedHashMultimap<String, String> testListDropDown = null;
-        User user = null;
+    private void fillContextWithTests(Map<String, Object> context, String selectedWorkspace, String selectedTest) {
+        Map<String, String> testListDropDown = new HashMap<>();
+        Map<String, String> workspacesDropDown = new HashMap<>();
+        Map<String, Map<String, String>> wspMap = new HashMap<>();
         try {
-            user = User.getUser(utils);
+            User user = User.getUser(utils);
             assert user.getId() != null;
-            testListDropDown = testsList();
-            context.put(Constants.TEST_LIST, testListDropDown.asMap());
+            String wspForSelect = fillAccountInfo(user, selectedTest, wspMap, workspacesDropDown, testListDropDown);
+//            testListDropDown = testsList(wspMap);
+            context.put(Constants.TEST_LIST, testListDropDown);
+//            workspaces = getWorkspaces();
+            // TODO: find current workspace
+            context.put("workspaceList", workspacesDropDown);
+            context.put("wspMap", wspMap);
         } catch (Exception e) {
             utils.getLogger().error("Failed to get user: " + e);
-            testListDropDown = LinkedHashMultimap.create(1, 1);
+            testListDropDown = new HashMap<>();
             testListDropDown.put(CHECK_CREDENTIALS, CHECK_CREDENTIALS);
-            context.put(Constants.TEST_LIST, testListDropDown.asMap());
-            return;
+            context.put(Constants.TEST_LIST, testListDropDown);
+            // TODO: the same for workspaces
         }
     }
 
@@ -201,7 +208,7 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         }
     }
 
-    private LinkedHashMultimap<String, String> testsList() throws Exception {
+    private LinkedHashMultimap<String, String> testsList(LinkedHashMultimap<Map<String, String>, LinkedHashMultimap<String, String>> wspMap) throws Exception {
         LinkedHashMultimap<String, String> testListDropDown = LinkedHashMultimap.create();
         User user = User.getUser(utils);
         List<Account> accounts = user.getAccounts();
@@ -216,7 +223,7 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
                 tests.sort(c);
                 testListDropDown.put(WORKSPACE + wsp.getId(), "===" + wsp.getName() + "(" + wsp.getId() + ")===");
                 if (tests.isEmpty()) {
-                    testListDropDown.put("no-tests"+workspaces.indexOf(wsp), "No tests in workspace");
+                    testListDropDown.put("no-tests" + workspaces.indexOf(wsp), "No tests in workspace");
                     continue;
                 }
                 for (AbstractTest t : tests) {
@@ -226,5 +233,67 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
             }
         }
         return testListDropDown;
+    }
+
+    public LinkedHashMultimap<String, String> getWorkspaces() throws Exception {
+        LinkedHashMultimap<String, String> workspacesResult = LinkedHashMultimap.create();
+        User user = User.getUser(utils);
+        List<Account> accounts = user.getAccounts();
+        for (Account a : accounts) {
+            List<Workspace> workspaces = a.getWorkspaces();
+            for (Workspace wsp : workspaces) {
+                workspacesResult.put(WORKSPACE + wsp.getId(), "===" + wsp.getName() + "(" + wsp.getId() + ")===");
+            }
+        }
+        return workspacesResult;
+    }
+
+    public String fillAccountInfo(User user, String selectedTest,
+                                  Map<String, Map<String, String>> wspMap,
+                                  Map<String, String> workspacesDropDown,
+                                  Map<String, String> testListDropDown) throws Exception {
+
+        Comparator<AbstractTest> c = (AbstractTest t1, AbstractTest t2) -> t1.getName().compareToIgnoreCase(t2.getName());
+        String wspForSelect = null;
+
+        List<Account> accounts = user.getAccounts();
+        for (Account a : accounts) {
+
+            List<Workspace> workspaces = a.getWorkspaces();
+            List<AbstractTest> tests = new ArrayList<>();
+            for (Workspace wsp : workspaces) {
+                workspacesDropDown.put(WORKSPACE + wsp.getId(), wsp.getName() + "(" + wsp.getId() + ")");
+                tests.clear();
+                addMultiTests(wsp, tests);
+                addSingleTests(wsp, tests);
+                tests.sort(c);
+
+                Map<String, String> workspaceKey = new HashMap<>();
+                workspaceKey.put(WORKSPACE + wsp.getId(), wsp.getName() + "(" + wsp.getId() + ")");
+
+                Map<String, String> testsList = new HashMap<>();
+                if (tests.isEmpty()) {
+                    testsList.put("no-tests" + workspaces.indexOf(wsp), "No tests in workspace");
+                    wspMap.put(WORKSPACE + wsp.getId(), testsList);
+                    continue;
+                }
+
+                boolean isSelectedWorkspace = false;
+                for (AbstractTest t : tests) {
+                    String testIdType = t.getId() + "." + t.getTestType();
+                    testsList.put(testIdType, t.getName() + "(" + testIdType + ")");
+                    if (testIdType.equals(selectedTest)) {
+                        isSelectedWorkspace = true;
+                        wspForSelect = WORKSPACE + wsp.getId();
+                    }
+                }
+                wspMap.put(WORKSPACE + wsp.getId(), testsList);
+                if (isSelectedWorkspace) {
+                    testListDropDown.putAll(testsList);
+                }
+
+            }
+        }
+        return wspForSelect;
     }
 }
