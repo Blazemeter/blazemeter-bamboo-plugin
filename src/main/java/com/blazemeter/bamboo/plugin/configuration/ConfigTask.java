@@ -42,6 +42,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskRequirementSupport {
     PluginSettingsFactory pluginSettingsFactory;
@@ -130,7 +131,7 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
 
     private void fillContextWithTests(Map<String, Object> context, String selectedWorkspace, String selectedTest) {
         Map<String, String> testListDropDown = new HashMap<>();
-        Map<String, String> workspacesDropDown = new HashMap<>();
+        Map<String, String> workspacesDropDown = new TreeMap<>();
         Map<String, Map<String, String>> wspMap = new HashMap<>();
         try {
             User user = User.getUser(utils);
@@ -138,6 +139,9 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
             String wspForSelect = fillAccountInfo(user, selectedTest, wspMap, workspacesDropDown, testListDropDown);
 //            testListDropDown = testsList(wspMap);
             context.put(Constants.TEST_LIST, testListDropDown);
+//            context.put("savedWsp", StringUtils.isBlank(selectedWorkspace) ? wspForSelect : selectedWorkspace);
+            context.put("savedWsp", wspForSelect);
+            context.put("savedTest", selectedTest);
 //            workspaces = getWorkspaces();
             // TODO: find current workspace
             context.put("workspaceList", workspacesDropDown);
@@ -267,9 +271,6 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
                 addMultiTests(wsp, tests);
                 addSingleTests(wsp, tests);
                 tests.sort(c);
-
-                Map<String, String> workspaceKey = new HashMap<>();
-                workspaceKey.put(WORKSPACE + wsp.getId(), wsp.getName() + "(" + wsp.getId() + ")");
 
                 Map<String, String> testsList = new HashMap<>();
                 if (tests.isEmpty()) {

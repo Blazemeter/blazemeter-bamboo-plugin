@@ -1,10 +1,6 @@
 <script>
-    function selectedWorkspace(wsp, all) {
-        console.log(wsp.value);
-        console.log(all);
-    }
-
-    var testList = "${testlist}";
+    var savedWsp = "${savedWsp}";
+    var savedTest = "${savedTest}";
 
     var bzmTestMap = [];
 
@@ -16,16 +12,52 @@
             obj.value = "${wspMap.get(key).get(id)}";
             array.push(obj);
         [/#foreach]
+        array.sort(customComparator);
         bzmTestMap["${key}"] = array;
     [/#foreach]
 
+    function customComparator(a, b) {
+        var valueA = a.value.toUpperCase(); // ignore upper and lowercase
+        var valueB = b.value.toUpperCase(); // ignore upper and lowercase
+        if (valueA < valueB) {
+            return -1;
+        }
+        if (valueA > valueB) {
+            return 1;
+        }
+
+        // names must be equal
+        return 0;
+    }
+
+    function onChangedWorkspaceSelect(wsp) {
+        console.log(wsp.value);
+        if (wsp.value) {
+            var list = bzmTestMap[wsp.value];
+
+            var testsSel = document.getElementById("selectedtest");
+            testsSel.options.length = 0;
+
+            for (var i = 0; i < list.length; i++) {
+                var option = new Option(list[i].value, list[i].id)
+                testsSel.options[i] = option;
+            }
+        // TODO: Add sort by label
+        } else {
+            wsp.prepend(new Option("Select Workspace", ""));
+            wsp.value = "";
+            var testsSel = document.getElementById("selectedtest");
+            testsSel.prepend(new Option("No Workspace", ""));
+            testsSel.value = "";
+        }
+    }
 </script>
 
 [@ww.select labelKey='blazemeter.workspace'
             name='selectedWorkspace'
             list='workspaceList'
             toggle='true'
-            onchange='selectedWorkspace(this, bzmTestMap)'
+            onchange='onChangedWorkspaceSelect(this);'
 /]
 [@ww.select labelKey='blazemeter.test' name='selectedtest' list='testlist'/]
 
@@ -41,5 +73,8 @@
 <script>
     console.log("opened");
     var wspSel = document.getElementById("selectedWorkspace");
-    selectedWorkspace(wspSel, bzmTestMap);
+    wspSel.value = savedWsp;
+    onChangedWorkspaceSelect(wspSel);
+    var testsSelect = document.getElementById("selectedtest");
+    testsSelect.value = savedTest;
 </script>
