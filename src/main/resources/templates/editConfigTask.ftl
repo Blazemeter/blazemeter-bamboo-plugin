@@ -81,6 +81,17 @@
     var wspSel = document.getElementById("selectedWorkspace");
     wspSel.value = savedWsp;
     onChangedWorkspaceSelect(wspSel);
+
+    // select value in tests selection
     var testsSelect = document.getElementById("selectedtest");
-    testsSelect.value = savedTest;
+    var isSelected = false;
+    for (var i = 0; i < wspSel.options.length; i++) {
+        if (wspSel.options[i].value == savedTest) {
+            wspSel.options[i].selected = true;
+            isSelected = true;
+        }
+    }
+    if (!isSelected && wspSel.options.length > 0) {
+        wspSel.options[0].selected = true;
+    }
 </script>
