@@ -139,15 +139,19 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
             String wspForSelect = fillAccountInfo(user, selectedTest, wspMap, workspacesDropDown, testListDropDown);
             context.put("savedWsp", wspForSelect);
             context.put("savedTest", selectedTest);
+
+        } catch (Exception e) {
+            utils.getLogger().error("Failed to get user: " + e);
+            testListDropDown.put(CHECK_CREDENTIALS, CHECK_CREDENTIALS);
+            workspacesDropDown.put(CHECK_CREDENTIALS, CHECK_CREDENTIALS);
+            wspMap.put(CHECK_CREDENTIALS, testListDropDown);
+
+            context.put("savedWsp", CHECK_CREDENTIALS);
+            context.put("savedTest", CHECK_CREDENTIALS);
+        } finally {
             context.put(Constants.TEST_LIST, testListDropDown);
             context.put("workspaceList", workspacesDropDown);
             context.put("wspMap", wspMap);
-        } catch (Exception e) {
-            utils.getLogger().error("Failed to get user: " + e);
-            testListDropDown = new HashMap<>();
-            testListDropDown.put(CHECK_CREDENTIALS, CHECK_CREDENTIALS);
-            context.put(Constants.TEST_LIST, testListDropDown);
-            // TODO: the same for workspaces
         }
     }
 
