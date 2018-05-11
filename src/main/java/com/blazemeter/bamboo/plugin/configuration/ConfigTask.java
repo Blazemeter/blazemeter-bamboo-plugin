@@ -34,11 +34,9 @@ import com.blazemeter.bamboo.plugin.Utils;
 import com.blazemeter.bamboo.plugin.logging.ServerLogger;
 import com.blazemeter.bamboo.plugin.logging.ServerUserNotifier;
 import com.blazemeter.bamboo.plugin.servlet.AdminServlet;
-import com.google.common.collect.LinkedHashMultimap;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -156,11 +154,13 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
     }
 
     private void fillErrorCollection(String selectedTest, ErrorCollection errorCollection) {
-        if (StringUtils.isEmpty(selectedTest) | selectedTest.contains(CHECK_CREDENTIALS)) {
+        if (StringUtils.isBlank(selectedTest) || selectedTest.contains(CHECK_CREDENTIALS)) {
             errorCollection.addErrorMessage(CHECK_CREDENTIALS + CHECK_TESTS);
+            return;
         }
         if (selectedTest.contains(WORKSPACE)) {
             errorCollection.addErrorMessage("Cannot save workspace as a test. Please, select correct test.");
+            return;
         }
         if (selectedTest.contains(NO_TESTS)) {
             errorCollection.addErrorMessage("No tests in current workspace. Please, select correct test.");
