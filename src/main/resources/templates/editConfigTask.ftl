@@ -31,8 +31,8 @@
     }
 
     function onChangedWorkspaceSelect(wsp) {
-        console.log(wsp.value);
         if (wsp.value) {
+            checkForEmptyValue(wsp);
             var list = bzmTestMap[wsp.value];
 
             var testsSel = document.getElementById("selectedtest");
@@ -42,13 +42,20 @@
                 var option = new Option(list[i].value, list[i].id)
                 testsSel.options[i] = option;
             }
-        // TODO: Add sort by label
         } else {
             wsp.prepend(new Option("Select Workspace", ""));
             wsp.value = "";
             var testsSel = document.getElementById("selectedtest");
             testsSel.prepend(new Option("No Workspace", ""));
             testsSel.value = "";
+        }
+    }
+
+    function checkForEmptyValue(wsp) {
+        for (var i = 0; i < wsp.options.length; i++) {
+            if (wsp.options[i].value == "") {
+                wsp.options[i] = null;
+            }
         }
     }
 </script>
@@ -71,7 +78,6 @@
 [@ww.textfield labelKey="blazemeter.config.junit.path" name="junit.path" required='false'/]
 
 <script>
-    console.log("opened");
     var wspSel = document.getElementById("selectedWorkspace");
     wspSel.value = savedWsp;
     onChangedWorkspaceSelect(wspSel);
