@@ -1,5 +1,8 @@
 ## Changelog
 
+### 3.3 (upcoming)
+- `ADDED` - workspace selection 
+
 ### 3.3 (4th of April, 2018)
 - `ADDED` - link to BlazeMeter report 
 
