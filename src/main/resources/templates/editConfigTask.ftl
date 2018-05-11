@@ -85,13 +85,13 @@
     // select value in tests selection
     var testsSelect = document.getElementById("selectedtest");
     var isSelected = false;
-    for (var i = 0; i < wspSel.options.length; i++) {
-        if (wspSel.options[i].value == savedTest) {
-            wspSel.options[i].selected = true;
+    for (var i = 0; i < testsSelect.options.length; i++) {
+        if (testsSelect.options[i].value == savedTest) {
+            testsSelect.options[i].selected = true;
             isSelected = true;
         }
     }
-    if (!isSelected && wspSel.options.length > 0) {
-        wspSel.options[0].selected = true;
+    if (!isSelected && testsSelect.options.length > 0) {
+        testsSelect.options[0].selected = true;
     }
 </script>
