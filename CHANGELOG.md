@@ -1,6 +1,6 @@
 ## Changelog
 
-### 3.3 (upcoming)
+### 3.4 (upcoming)
 - `ADDED` - workspace selection 
 
 ### 3.3 (4th of April, 2018)
