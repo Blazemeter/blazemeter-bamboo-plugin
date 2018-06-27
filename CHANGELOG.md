@@ -1,9 +1,9 @@
 ## Changelog
 
-### 3.4 (upcoming)
+### 3.3.135 (27th of June, 2018)
 - `ADDED` - workspace selection 
 
-### 3.3 (4th of April, 2018)
+### 3.3.132 (4th of April, 2018)
 - `ADDED` - link to BlazeMeter report 
 
 _Limitations: If Build in progress state (does not finished or interrupted) 'BlazeMeter Report tab' will not display. Also this tab does not display for Job builds, that does not contains BlazeMeter Build Step_
