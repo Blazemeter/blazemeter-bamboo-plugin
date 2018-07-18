@@ -1,7 +1,8 @@
 ## Changelog
 
 ### 3.3.135 (27th of June, 2018)
-- `ADDED` - workspace selection 
+- `ADDED` - workspace selection
+- Updated plugin compatibility to the latest Bamboo version (6.6.0)
 
 ### 3.3.132 (4th of April, 2018)
 - `ADDED` - link to BlazeMeter report 

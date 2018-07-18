@@ -8,7 +8,7 @@ Bamboo is a Continuous Integration tool by [Atlassian](https://www.atlassian.com
 
 Please, refer to [plugin's guide](https://guide.blazemeter.com/hc/en-us/articles/206733419-BlazeMeter-Plugin-to-Bamboo) for further instructions. 
 
-#### [Changelog](https://github.com/Blazemeter/blazemeter-bamboo-plugin/blob/master/CHANGELOG.md)
+#### [Changelog](https://github.com/Blazemeter/blazemeter-bamboo-plugin/blob/master/Changelog.md)
 
 #### [Download latest version](https://marketplace.atlassian.com/plugins/com.blazemeter.bamboo.plugin.BlazeMeterBamboo/server/overview)
 
