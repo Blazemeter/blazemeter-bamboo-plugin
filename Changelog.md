@@ -1,5 +1,8 @@
 ## Changelog
 
+### 3.4.* (upcoming)
+- `FIXED` - broken UI when user has test with double quotes in test name
+
 ### 3.3.135 (27th of June, 2018)
 - `ADDED` - workspace selection
 - Updated plugin compatibility to the latest Bamboo version (6.6.0)

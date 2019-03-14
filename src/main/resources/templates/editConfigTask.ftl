@@ -1,6 +1,15 @@
 <script>
-    var savedWsp = "${savedWsp}";
-    var savedTest = "${savedTest}";
+    [#if savedWsp??]
+        var savedWsp = "${savedWsp}";
+    [#else]
+        var savedWsp = "";
+    [/#if]
+
+    [#if savedTest??]
+        var savedTest = "${savedTest}";
+    [#else]
+        var savedTest = "";
+    [/#if]
 
     var bzmTestMap = [];
 
@@ -9,7 +18,7 @@
         [#foreach id in wspMap.get(key).keySet()]
             var obj = {};
             obj.id = "${id}";
-            obj.value = "${wspMap.get(key).get(id)}";
+            obj.value = "${wspMap.get(key).get(id).replace("\"", "'")}";
             array.push(obj);
         [/#foreach]
         array.sort(customComparator);
