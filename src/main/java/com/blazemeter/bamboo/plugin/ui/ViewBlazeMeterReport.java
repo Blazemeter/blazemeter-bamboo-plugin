@@ -6,19 +6,20 @@ import com.atlassian.bamboo.chains.ChainStageResult;
 import com.atlassian.bamboo.resultsummary.BuildResultsSummary;
 import com.atlassian.bamboo.resultsummary.BuildResultsSummaryImpl;
 import com.atlassian.bamboo.resultsummary.ResultsSummary;
-import org.apache.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ViewBlazeMeterReport extends PlanResultsAction {
     /**
      *
      */
     private static final long serialVersionUID = 1L;
-    private static final Logger log = Logger.getLogger(ViewBlazeMeterReport.class);
+    private static final Logger log = Logger.getLogger(ViewBlazeMeterReport.class.getName());
 
     private Map<String, String> reports = new HashMap<>();
 
@@ -28,7 +29,7 @@ public class ViewBlazeMeterReport extends PlanResultsAction {
         ResultsSummary summary = this.getResultsSummary();
         if (summary instanceof ChainResultsSummaryImpl) {
             ChainResultsSummaryImpl chainResults = (ChainResultsSummaryImpl) summary;
-            log.debug("Try to get report link for ChainResultsSummaryImpl");
+            log.log(Level.FINE,"Try to get report link for ChainResultsSummaryImpl");
             List<ChainStageResult> resultList = chainResults.getStageResults();
             for (ChainStageResult chainResult : resultList) {
                 Set<BuildResultsSummary> resultSet = chainResult.getBuildResults();
@@ -36,7 +37,7 @@ public class ViewBlazeMeterReport extends PlanResultsAction {
                     Map<String, String> customBuildData = sum.getCustomBuildData();
                     for (String key : customBuildData.keySet()) {
                         if (key.startsWith("master_id_")) {
-                            log.debug("Found report link for master =" + key);
+                            log.log(Level.FINE,"Found report link for master =" + key);
                             reports.put(key.substring(10), customBuildData.get(key));
                         }
                     }
@@ -44,11 +45,11 @@ public class ViewBlazeMeterReport extends PlanResultsAction {
             }
         } else if (summary instanceof BuildResultsSummaryImpl) {
             BuildResultsSummaryImpl buildResultsSummary = (BuildResultsSummaryImpl) summary;
-            log.debug("Try to get report link for BuildResultsSummaryImpl");
+            log.log(Level.FINE,"Try to get report link for BuildResultsSummaryImpl");
             Map<String, String> customBuildData = buildResultsSummary.getCustomBuildData();
             for (String key : customBuildData.keySet()) {
                 if (key.startsWith("master_id_")) {
-                    log.debug("Found report link for master =" + key);
+                    log.log(Level.FINE,"Found report link for master =" + key);
                     reports.put(key.substring(10), customBuildData.get(key));
                 }
             }
