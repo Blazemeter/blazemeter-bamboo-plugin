@@ -1,5 +1,5 @@
 ## Changelog
-### 3.4.102 (upcoming)
+### 3.4.102
 - `FIXED` - Removed log4j and added java logs
 
 ### 3.4.* (upcoming)
