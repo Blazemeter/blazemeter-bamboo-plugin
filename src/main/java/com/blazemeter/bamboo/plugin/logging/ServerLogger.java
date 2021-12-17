@@ -16,50 +16,51 @@ package com.blazemeter.bamboo.plugin.logging;
 
 import com.blazemeter.api.logging.Logger;
 
-public class ServerLogger implements Logger {
-    private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ServerLogger.class);
+import java.util.logging.Level;
 
+public class ServerLogger implements Logger {
+
+    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(ServerLogger.class.getName());
     public ServerLogger() {
     }
 
     @Override
     public void debug(String message) {
-        logger.debug(message);
+        logger.log(Level.FINE,message);
     }
 
     @Override
     public void debug(String message, Throwable throwable) {
-        logger.debug(message, throwable);
+        logger.log(Level.FINE,message,throwable);
     }
 
     @Override
     public void info(String message) {
-        logger.info(message);
+        logger.log(Level.INFO,message);
     }
 
     @Override
     public void info(String message, Throwable throwable) {
-        logger.info(message, throwable);
+        logger.log(Level.INFO,message,throwable);
     }
 
     @Override
     public void warn(String message) {
-        logger.warn(message);
+        logger.log(Level.WARNING,message);
     }
 
     @Override
     public void warn(String message, Throwable throwable) {
-        logger.warn(message, throwable);
+        logger.log(Level.WARNING,message,throwable);
     }
 
     @Override
     public void error(String message) {
-        logger.error(message);
+        logger.log(Level.SEVERE,message);
     }
 
     @Override
     public void error(String message, Throwable throwable) {
-        logger.error(message, throwable);
+        logger.log(Level.SEVERE,message,throwable);
     }
-
 }

@@ -14,24 +14,26 @@
 package com.blazemeter.bamboo.plugin.logging;
 
 import com.blazemeter.api.logging.UserNotifier;
-import org.apache.log4j.Logger;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ServerUserNotifier implements UserNotifier {
 
-    private static final Logger logger = Logger.getLogger(ServerUserNotifier.class);
+    private static final Logger logger = Logger.getLogger(ServerUserNotifier.class.getName());
 
     @Override
     public void notifyInfo(String info) {
-        logger.info(info);
+        logger.log(Level.INFO, info);
     }
 
     @Override
     public void notifyWarning(String warn) {
-        logger.warn(warn);
+        logger.log(Level.WARNING,warn);
     }
 
     @Override
     public void notifyError(String error) {
-        logger.error(error);
+        logger.log(Level.SEVERE,error);
     }
 }
