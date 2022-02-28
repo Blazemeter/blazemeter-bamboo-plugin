@@ -1,4 +1,8 @@
 ## Changelog
+### 3.5.109 (28th of Feb, 2022)
+- `FIXED` - Removed special character bug
+- `FIXED` - Fixed public report URL bug for Functional GUI
+
 ### 3.4.102 (17th of Dec, 2021)
 - `FIXED` - Removed log4j and added java logs
 

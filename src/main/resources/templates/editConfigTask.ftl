@@ -18,7 +18,7 @@
         [#foreach id in wspMap.get(key).keySet()]
             var obj = {};
             obj.id = "${id}";
-            obj.value = "${wspMap.get(key).get(id).replace("\"", "'")}";
+            obj.value = "${wspMap.get(key).get(id).replace("\"", "'").replace("\n", " ")}";
             array.push(obj);
         [/#foreach]
         array.sort(customComparator);

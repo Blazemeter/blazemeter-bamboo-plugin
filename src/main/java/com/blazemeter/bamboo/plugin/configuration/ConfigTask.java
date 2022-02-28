@@ -92,6 +92,8 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         context.put(Constants.SETTINGS_JMETER_PROPERTIES, config.get(Constants.SETTINGS_JMETER_PROPERTIES));
         context.put(Constants.SETTINGS_JTL_PATH, config.get(Constants.SETTINGS_JTL_PATH));
         context.put(Constants.SETTINGS_JUNIT_PATH, config.get(Constants.SETTINGS_JUNIT_PATH));
+        context.put(Constants.SETTINGS_SELECTED_WORKSPACE_ID,config.get(Constants.SETTINGS_SELECTED_WORKSPACE_ID));
+
         UserNotifier serverUserNotifier = new ServerUserNotifier();
         Logger logger = new ServerLogger();
         utils = new BambooBzmUtils(psai, psas, pssu, pssu, serverUserNotifier, logger);
@@ -183,6 +185,7 @@ public class ConfigTask extends AbstractTaskConfigurator implements BuildTaskReq
         String junitReport = params.getString(Constants.SETTINGS_JUNIT_REPORT) == null ? "false" : "true";
         config.put(Constants.SETTINGS_JTL_REPORT, jtlReport);
         config.put(Constants.SETTINGS_JUNIT_REPORT, junitReport);
+        config.put(Constants.SETTINGS_SELECTED_WORKSPACE_ID,params.getString(Constants.SETTINGS_SELECTED_WORKSPACE_ID).trim());
 
         PluginSettings pluginSettings = this.pluginSettingsFactory.createGlobalSettings();
         config.put(AdminServlet.API_ID,
