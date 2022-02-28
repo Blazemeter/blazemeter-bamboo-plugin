@@ -67,7 +67,7 @@
         <dependency>
             <groupId>com.blazemeter</groupId>
             <artifactId>blazemeter-api-client</artifactId>
-            <version>1.8</version>
+            <version>1.17</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-logging</groupId>

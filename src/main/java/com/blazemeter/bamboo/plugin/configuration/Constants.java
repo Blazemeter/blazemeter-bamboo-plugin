@@ -19,14 +19,14 @@ public interface Constants {
     String PLUGIN_KEY="com.blazemeter.bamboo.plugin.BlazeMeterBamboo:blazemeter";
 
     //settings properties
-     String SETTINGS_SELECTED_TEST_ID = "selectedtest";
-     String SETTINGS_JTL_REPORT = "jtl.report";
-     String SETTINGS_JUNIT_REPORT = "junit.report";
-     String SETTINGS_JMETER_PROPERTIES = "jmeter.properties";
-     String SETTINGS_NOTES = "notes";
-     String SETTINGS_JTL_PATH="jtl.path";
-     String SETTINGS_JUNIT_PATH="junit.path";
-
+    String SETTINGS_SELECTED_TEST_ID = "selectedtest";
+    String SETTINGS_JTL_REPORT = "jtl.report";
+    String SETTINGS_JUNIT_REPORT = "junit.report";
+    String SETTINGS_JMETER_PROPERTIES = "jmeter.properties";
+    String SETTINGS_NOTES = "notes";
+    String SETTINGS_JTL_PATH="jtl.path";
+    String SETTINGS_JUNIT_PATH="junit.path";
     //BlazeMeterConfigTask
-     String TEST_LIST ="testlist";
+    String TEST_LIST ="testlist";
+    String SETTINGS_SELECTED_WORKSPACE_ID= "selectedWorkspace";
 }

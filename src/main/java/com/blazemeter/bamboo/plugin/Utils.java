@@ -31,6 +31,17 @@ public class Utils {
         }
     }
 
+    public static String cutWorkspaceName(String workspaceId)
+    {
+        try {
+            return workspaceId.substring(9);
+        }
+        catch (Exception e)
+        {
+            return workspaceId;
+        }
+    }
+
     public static String getVersion() {
         Properties props = new Properties();
         try {

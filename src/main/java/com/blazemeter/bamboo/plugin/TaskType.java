@@ -61,11 +61,16 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         final BuildLogger logger = context.getBuildLogger();
         logger.addBuildLogEntry("Executing BlazeMeter task...");
         logger.addBuildLogEntry("BlazeMeterBamboo plugin v." + Utils.getVersion());
+
+        ConfigurationMap configMap = context.getConfigurationMap();
+        String workspaceId = Utils.cutWorkspaceName(configMap.get(Constants.SETTINGS_SELECTED_WORKSPACE_ID));
+
         BambooCiBuild build = null;
         try {
             build = setUpCiBuild(context, createLogFile(context));
             Master master = null;
             try {
+                build.setWorkspaceId(workspaceId);
                 master = build.start();
                 if (master != null) {
                     context.getBuildContext().getBuildResult().getCustomBuildData().put("master_id_" + master.getId(), build.getPublicReport());
@@ -130,6 +135,7 @@ public class TaskType implements com.atlassian.bamboo.task.TaskType {
         buildContext.getBuildDefinition().getTaskDefinitions().get(0).getPluginKey();
         String testId = Utils.cutTestType(configMap.get(Constants.SETTINGS_SELECTED_TEST_ID));
         final BuildLogger logger = context.getBuildLogger();
+
         BlazeMeterUtils utils;
         try {
             utils = setUpBzmUtils(context, logFilePath);
