@@ -16,7 +16,7 @@
 
     <groupId>com.blazemeter.bamboo.plugin</groupId>
     <artifactId>BlazeMeterBamboo</artifactId>
-    <version>3.4.${jenkins.build.number}</version>
+    <version>3.5.${jenkins.build.number}</version>
 
     <organization>
         <name>BlazeMeter LTD.</name>
@@ -67,7 +67,7 @@
         <dependency>
             <groupId>com.blazemeter</groupId>
             <artifactId>blazemeter-api-client</artifactId>
-            <version>1.17</version>
+            <version>1.21</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-logging</groupId>

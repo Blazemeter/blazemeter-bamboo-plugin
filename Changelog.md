@@ -1,4 +1,7 @@
 ## Changelog
+### 3.5.116 (13th of May, 2022)
+- `ADDED` - Added No data/ Not set Condition
+
 ### 3.5.109 (28th of Feb, 2022)
 - `FIXED` - Removed special character bug
 - `FIXED` - Fixed public report URL bug for Functional GUI
